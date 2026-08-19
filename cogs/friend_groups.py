@@ -321,8 +321,10 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @fg_group.command(name="overview", description="Browse all server Friend Groups with an interactive dropdown selector")
+    @fg_group.command(name="overview", description="[Owner/Mods] Browse all server Friend Groups with an interactive dropdown selector")
+    @is_admin_or_has_role()
     async def fg_overview(self, interaction: discord.Interaction):
+
         guild = interaction.guild
 
         async with AsyncSessionLocal() as session:
