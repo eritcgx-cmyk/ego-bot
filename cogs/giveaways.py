@@ -91,15 +91,17 @@ class GiveawaysCog(commands.Cog, name="Giveaways"):
 
     async def restore_persistent_views(self):
         """Restore persistent buttons for all active giveaways."""
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(Giveaway).where(Giveaway.status == "active"))
-            active_gws = res.scalars().all()
-            for gw in active_gws:
-                view = GiveawayEntryView(gw.id)
-                # Update label with current participant count
-                view.entry_button.label = f"Enter Giveaway ({len(gw.participants)})"
-                self.bot.add_view(view, message_id=gw.message_id)
-        logger.info("Restored persistent views for active giveaways.")
+        try:
+            async with AsyncSessionLocal() as session:
+                res = await session.execute(select(Giveaway).where(Giveaway.status == "active"))
+                active_gws = res.scalars().all()
+                for gw in active_gws:
+                    view = GiveawayEntryView(gw.id)
+                    view.entry_button.label = f"Enter Giveaway ({len(gw.participants)})"
+                    self.bot.add_view(view, message_id=gw.message_id)
+            logger.info("Restored persistent views for active giveaways.")
+        except Exception as e:
+            logger.warning(f"Could not restore giveaway views: {e}")
 
     @tasks.loop(seconds=10)
     async def check_giveaways(self):
