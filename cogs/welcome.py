@@ -69,7 +69,11 @@ class WelcomeCog(commands.Cog, name="Welcome"):
                 except Exception as e:
                     logger.debug(f"Could not send welcome DM to user {member.id}: {e}")
 
-    welcome_group = app_commands.Group(name="welcome", description="Configure welcome messages and DMs")
+    welcome_group = app_commands.Group(
+        name="welcome",
+        description="Configure welcome messages and DMs",
+        default_permissions=discord.Permissions(administrator=True)
+    )
 
     @welcome_group.command(name="setup", description="Configure welcome channel and message template")
     @app_commands.describe(
