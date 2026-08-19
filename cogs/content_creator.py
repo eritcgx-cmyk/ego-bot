@@ -1,7 +1,10 @@
 """
-Content Creator (CC) Verification Cog for Ego Bot.
-Clean, minimal creator tiers (CC, CC Tier 2, CC Tier 3, Known, Famous, Star) with direct review tickets.
+Content Creator (CC) Verification & Custom Tier Requirements Cog for Ego Bot.
+Features configurable follower/view/like thresholds per tier,
+command to update requirements (/cc set_tier_req), clean verification tickets, and persistent storage.
 """
+import os
+import json
 from typing import Optional, List, Dict, Any
 import discord
 from discord import app_commands
@@ -16,7 +19,57 @@ from utils.embeds import (
 )
 from config import logger
 
-CC_TIERS = ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star"]
+CC_REQ_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cc_tier_requirements.json")
+
+DEFAULT_TIER_REQUIREMENTS = {
+    "CC": {
+        "followers": "1,000+",
+        "views": "5,000+",
+        "desc": "Entry level creator (1k+ Followers or 5k+ Views)"
+    },
+    "CC Tier 2": {
+        "followers": "5,000+",
+        "views": "20,000+",
+        "desc": "Established creator (5k+ Followers or 20k+ Views)"
+    },
+    "CC Tier 3": {
+        "followers": "20,000+",
+        "views": "50,000+",
+        "desc": "High performing creator (20k+ Followers or 50k+ Views)"
+    },
+    "Known": {
+        "followers": "50,000+",
+        "views": "150,000+",
+        "desc": "Recognized influencer (50k+ Followers or 150k+ Views)"
+    },
+    "Famous": {
+        "followers": "100,000+",
+        "views": "300,000+",
+        "desc": "Prominent creator (100k+ Followers or 300k+ Views)"
+    },
+    "Star": {
+        "followers": "500,000+",
+        "views": "1,000,000+",
+        "desc": "Apex creator icon (500k+ Followers or 1M+ Views)"
+    }
+}
+
+def load_tier_requirements() -> Dict[str, Any]:
+    os.makedirs(os.path.dirname(CC_REQ_FILE), exist_ok=True)
+    if not os.path.exists(CC_REQ_FILE):
+        with open(CC_REQ_FILE, "w", encoding="utf-8") as f:
+            json.dump(DEFAULT_TIER_REQUIREMENTS, f, indent=2)
+        return DEFAULT_TIER_REQUIREMENTS.copy()
+    try:
+        with open(CC_REQ_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return DEFAULT_TIER_REQUIREMENTS.copy()
+
+def save_tier_requirements(data: Dict[str, Any]):
+    os.makedirs(os.path.dirname(CC_REQ_FILE), exist_ok=True)
+    with open(CC_REQ_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
 
 class CCTicketReviewView(discord.ui.View):
     def __init__(self, applicant_id: int, platform: str, profile_url: str, video_url: str, requested_tier: str):
@@ -225,32 +278,86 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
     ):
         await interaction.response.send_modal(CCVerificationModal(platform=platform.value, tier=tier.value))
 
-    @cc_group.command(name="tiers", description="View all available Content Creator tiers")
+    @cc_group.command(name="tiers", description="View all Creator tiers and follower / view requirements")
     async def cc_tiers(self, interaction: discord.Interaction):
+        reqs = load_tier_requirements()
         embed = ego_embed(
-            title="Content Creator Tiers",
+            title="Content Creator Tiers & Requirements",
             description=(
-                "> Verified Creators receive role badges and media permissions.\n"
+                "> Verified Creators receive exclusive role badges and media permissions.\n"
                 "> Run `/cc verify` to submit your profile and video proof.\n"
             ),
             color=COLOR_VIOLET
         )
 
-        for t in CC_TIERS:
+        for t_name in ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star"]:
+            t_data = reqs.get(t_name, {})
+            f_req = t_data.get("followers", "Any")
+            v_req = t_data.get("views", "Any")
+            desc = t_data.get("desc", f"Followers: {f_req} | Views: {v_req}")
+
             embed.add_field(
-                name=f"› {t}",
-                value=f"• **Role:** `{t}`",
+                name=f"› {t_name}",
+                value=(
+                    f"• **Followers:** `{f_req}`\n"
+                    f"• **Views / Likes:** `{v_req}`\n"
+                    f"• **Description:** *{desc}*"
+                ),
                 inline=True
             )
 
         await interaction.response.send_message(embed=embed)
+
+    @cc_group.command(name="set_tier_req", description="[Admin/Mods] Change follower, like, or view requirements for a Creator tier")
+    @app_commands.describe(
+        tier="Creator tier to update",
+        followers="Required follower count (e.g. 2,500+)",
+        views_or_likes="Required views or likes (e.g. 15,000+)",
+        description="Custom description for this tier (optional)"
+    )
+    @app_commands.choices(tier=[
+        app_commands.Choice(name="CC", value="CC"),
+        app_commands.Choice(name="CC Tier 2", value="CC Tier 2"),
+        app_commands.Choice(name="CC Tier 3", value="CC Tier 3"),
+        app_commands.Choice(name="Known", value="Known"),
+        app_commands.Choice(name="Famous", value="Famous"),
+        app_commands.Choice(name="Star", value="Star")
+    ])
+    @is_admin_or_has_role()
+    async def cc_set_tier_req(
+        self,
+        interaction: discord.Interaction,
+        tier: app_commands.Choice[str],
+        followers: str,
+        views_or_likes: str,
+        description: Optional[str] = None
+    ):
+        reqs = load_tier_requirements()
+        t_name = tier.value
+        reqs[t_name] = {
+            "followers": followers.strip(),
+            "views": views_or_likes.strip(),
+            "desc": description.strip() if description else f"{followers.strip()} Followers or {views_or_likes.strip()} Views"
+        }
+        save_tier_requirements(reqs)
+
+        await interaction.response.send_message(
+            embed=success_embed(
+                "Tier Requirements Updated",
+                f"Updated requirements for **{t_name}**:\n"
+                f"› **Followers:** `{followers.strip()}`\n"
+                f"› **Views / Likes:** `{views_or_likes.strip()}`\n"
+                f"› **Description:** *{reqs[t_name]['desc']}*"
+            ),
+            ephemeral=True
+        )
 
     @cc_group.command(name="setup_roles", description="Auto-create all 6 Creator roles in your server")
     @is_guild_owner()
     async def cc_setup_roles(self, interaction: discord.Interaction):
         guild = interaction.guild
         created = []
-        for t in CC_TIERS:
+        for t in ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star"]:
             existing = discord.utils.get(guild.roles, name=t)
             if not existing:
                 try:
