@@ -140,17 +140,19 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                 await session.commit()
 
                 # Welcome embed in text channel
-                embed = ego_embed(
-                    title=f"✨ Welcome to {fg_db.name}!",
+                members_mentions = ", ".join(f"<@{m}>" for m in all_member_ids)
+                welcome_embed = ego_embed(
+                    title=f"👑 Welcome to {fg_db.name}",
                     description=(
-                        f"Your private Friend Group space is fully unlocked!\n\n"
-                        f"👑 **Owner:** <@{fg_db.creator_id}>\n"
-                        f"👥 **Members:** {', '.join(f'<@{m}>' for m in all_member_ids)}\n\n"
-                        f"Use `/fg invite` to add more friends, or `/fg rename` to change names."
+                        f"> **Private Friend Group Circle Initialized!**\n"
+                        f"› **Leader:** <@{fg_db.creator_id}>\n"
+                        f"› **Members:** {members_mentions}\n\n"
+                        f"This category, text lounge, and voice suite are exclusively configured for your squad.\n"
+                        f"Use `/fg invite` to add more friends, `/fg rename` to update branding, or `/fg kick` to manage roster."
                     ),
-                    color=SUCCESS_COLOR
+                    color=COLOR_VIOLET
                 )
-                await text_ch.send(content=f"<@{fg_db.creator_id}>", embed=embed)
+                await text_ch.send(content=f"<@{fg_db.creator_id}>", embed=welcome_embed)
                 logger.info(f"Provisioned Friend Group channels for {fg_db.name} (Guild: {guild.id})")
         except Exception as e:
             logger.error(f"Failed to provision Friend Group channels: {e}")
