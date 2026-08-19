@@ -293,7 +293,11 @@ class RolesSystemCog(commands.Cog, name="Roles"):
                     except Exception as e:
                         logger.error(f"Error editing board message in #{ch.name}: {e}")
 
-    roles_group = app_commands.Group(name="roles", description="Role library, presets, perks, and live panels")
+    roles_group = app_commands.Group(
+        name="roles",
+        description="Role library, presets, perks, and live panels",
+        default_permissions=discord.Permissions(manage_roles=True)
+    )
 
     @roles_group.command(name="board", description="Deploy the live auto-updating Roles Board listing all server roles and members")
     @app_commands.describe(channel="Target channel for the Roles Board")
@@ -322,12 +326,14 @@ class RolesSystemCog(commands.Cog, name="Roles"):
 
     @app_commands.command(name="roles_board", description="Deploy the live auto-updating Roles Board to a channel")
     @app_commands.describe(channel="Target channel for the Roles Board")
+    @app_commands.default_permissions(manage_roles=True)
     @is_admin_or_has_role()
     async def roles_board_alias(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
         await self.roles_board(interaction, channel)
 
     @app_commands.command(name="roleboard", description="Deploy the live auto-updating Roles Board to a channel (alias)")
     @app_commands.describe(channel="Target channel for the Roles Board")
+    @app_commands.default_permissions(manage_roles=True)
     @is_admin_or_has_role()
     async def roleboard_alias(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
         await self.roles_board(interaction, channel)
@@ -404,8 +410,10 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         )
 
     @app_commands.command(name="clean_server", description="Safely scan and remove duplicate unused roles from the server")
+    @app_commands.default_permissions(administrator=True)
     @is_guild_owner()
     async def clean_server(self, interaction: discord.Interaction):
+
         """Scans for duplicate roles with identical names, safely merges members, and removes clones."""
         await interaction.response.defer(ephemeral=True)
         guild = interaction.guild
