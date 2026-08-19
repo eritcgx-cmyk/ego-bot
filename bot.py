@@ -105,14 +105,13 @@ class EgoBot(commands.Bot):
         logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
         logger.info(f"Serving {len(self.guilds)} guilds.")
 
-        # Clear any stale guild-scoped command copies that override global default_permissions
         for guild in self.guilds:
             try:
-                self.tree.clear_commands(guild=guild)
+                self.tree.copy_global_to(guild=guild)
                 await self.tree.sync(guild=guild)
-                logger.info(f"Cleared guild-scoped overrides for '{guild.name}' ({guild.id}). Global permissions now authoritative.")
+                logger.info(f"Instantly synced slash commands to guild '{guild.name}' ({guild.id}).")
             except Exception as e:
-                logger.debug(f"Guild command clear skipped: {e}")
+                logger.debug(f"Guild sync error: {e}")
 
 
 bot = EgoBot()
