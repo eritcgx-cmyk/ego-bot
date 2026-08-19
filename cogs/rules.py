@@ -96,14 +96,17 @@ class RulesCog(commands.Cog, name="Rules"):
 
     async def restore_rules_views(self):
         """Restore persistent views for rules verification."""
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(RulesConfig).where(RulesConfig.enabled == True))
-            configs = res.scalars().all()
+        try:
+            async with AsyncSessionLocal() as session:
+                res = await session.execute(select(RulesConfig).where(RulesConfig.enabled == True))
+                configs = res.scalars().all()
 
-            for cfg in configs:
-                if cfg.message_id:
-                    view = RulesAgreeView(cfg.guild_id, cfg.agree_role_id)
-                    self.bot.add_view(view, message_id=cfg.message_id)
+                for cfg in configs:
+                    if cfg.message_id:
+                        view = RulesAgreeView(cfg.guild_id, cfg.agree_role_id)
+                        self.bot.add_view(view, message_id=cfg.message_id)
+        except Exception as e:
+            logger.warning(f"Could not restore rules views: {e}")
 
     def _build_rules_embed(self, guild: discord.Guild, rules: List[Dict[str, Any]]) -> discord.Embed:
         embed = ego_embed(
