@@ -263,12 +263,19 @@ class FGInviteView(discord.ui.View):
                 fg.members_json = json.dumps(members)
                 await session.commit()
 
-            # If FG is already active, assign the private role directly to the new member
-            if fg.status == "active" and fg.role_id and guild:
-                role = guild.get_role(fg.role_id)
-                if role:
+            # If FG is already active, assign the private role and base FG role
+            if fg.status == "active" and guild:
+                roles_to_add = []
+                if fg.role_id:
+                    p_role = guild.get_role(fg.role_id)
+                    if p_role and p_role not in user.roles:
+                        roles_to_add.append(p_role)
+                base_fg = discord.utils.get(guild.roles, name="FG")
+                if base_fg and base_fg not in user.roles:
+                    roles_to_add.append(base_fg)
+                if roles_to_add:
                     try:
-                        await user.add_roles(role, reason="Joined Active Friend Group")
+                        await user.add_roles(*roles_to_add, reason="Joined Active Friend Group")
                     except Exception:
                         pass
 
@@ -283,6 +290,8 @@ class FGInviteView(discord.ui.View):
 
             # Check if FG reached 4 members while in pending status -> Create Staff Review Ticket!
             if len(members) >= 4 and fg.status == "pending" and not fg.ticket_channel_id and guild:
+                fg.status = "under_review"
+                await session.commit()
                 await trigger_fg_staff_ticket(guild, fg)
 
     @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger, custom_id="fg_invite_decline")
@@ -323,8 +332,8 @@ async def trigger_fg_staff_ticket(guild: discord.Guild, fg_record: FriendGroup):
                 f"> **FG ID:** `#{fg_record.id}`\n"
                 f"> **Leader:** <@{fg_record.creator_id}>\n"
                 f"> **Members ({len(fg_record.members)}/4+ ready):**\n{members_mentions}\n\n"
-                f"› **Status:** Ready for Staff Approval\n"
-                f"Click **Approve & Unlock FG** below to create private role, category, and voice/text lounges."
+                f"› **Status:** Ready for Staff Review\n"
+                f"Click **Approve & Unlock FG** to create the dedicated private suite, FG roles, and private channels, or **Decline** to reject."
             ),
             color=COLOR_VIOLET
         )
@@ -353,9 +362,19 @@ async def trigger_fg_staff_ticket(guild: discord.Guild, fg_record: FriendGroup):
         logger.error(f"Failed to create FG staff ticket: {e}")
 
 async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
-    """Creates private role, category, text lounge with Control Panel, and voice lounge."""
+    """Creates private role, base FG role, category, text lounge with Control Panel, and voice lounge."""
     try:
-        # 1. Create Private Role for FG
+        # 1. Base FG Role
+        base_fg_role = discord.utils.get(guild.roles, name="FG")
+        if not base_fg_role:
+            base_fg_role = await guild.create_role(
+                name="FG",
+                color=discord.Color(0x3B82F6),
+                mentionable=True,
+                reason="Ego Base Friend Group Role"
+            )
+
+        # 2. Create Private Role for FG
         private_role = discord.utils.get(guild.roles, name=f"👑 ︱ {fg_record.name}")
         if not private_role:
             private_role = await guild.create_role(
@@ -365,16 +384,18 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
                 reason="Ego Friend Group Private Role"
             )
 
-        # Assign Private Role to all members
+        # Assign Private Role and Base FG Role to all members
         for uid in fg_record.members:
             m = guild.get_member(uid)
             if m:
                 try:
-                    await m.add_roles(private_role, reason="Joined Friend Group")
+                    roles_to_add = [r for r in (private_role, base_fg_role) if r and r not in m.roles]
+                    if roles_to_add:
+                        await m.add_roles(*roles_to_add, reason="Joined Friend Group")
                 except Exception:
                     pass
 
-        # 2. Overwrites scoped exclusively to private role + staff
+        # 3. Overwrites scoped exclusively to private role + staff
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False, connect=False),
             private_role: discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True, speak=True),
@@ -384,12 +405,12 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
             if r.permissions.manage_guild or r.permissions.administrator:
                 overwrites[r] = discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True)
 
-        # 3. Create Category, Text Lounge, and Voice Suite
+        # 4. Create Category, Text Lounge, and Voice Suite
         cat = await guild.create_category(name=f"👑 ︱ {fg_record.name}", overwrites=overwrites)
         text_ch = await guild.create_text_channel(name="💬-lounge", category=cat, topic=f"Private FG lounge for {fg_record.name}")
         voice_ch = await guild.create_voice_channel(name="🔊-voice", category=cat)
 
-        # 4. Save IDs to DB
+        # 5. Save IDs to DB
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_record.id))
             fg = res.scalar_one_or_none()
@@ -400,6 +421,7 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
                 fg.role_id = private_role.id
                 fg.status = "active"
                 await session.commit()
+
 
         # 5. Post Dedicated Interactive Control Panel
         members_mentions = ", ".join(f"<@{m}>" for m in fg_record.members)
