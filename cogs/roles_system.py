@@ -1,7 +1,8 @@
 """
-Role Presets, Special FG Roles, Live Updating Roles Board, and Custom Role Descriptions Cog for Ego Bot.
-Features auto-updating roles board (live member sync), custom role descriptions (/roles set_description),
-special FG milestone roles (Com FG, Known FG, Huge FG, Giant FG), and role presets.
+Role Presets, Special FG Roles, Live Auto-Updating Roles Board, and Custom Role Descriptions Cog for Ego Bot.
+Features comprehensive Roles Board listing ALL server roles with descriptions & member lists,
+live auto-updating on member/role events, custom role descriptions (/roles set_description),
+and special FG milestone roles.
 """
 import os
 import json
@@ -26,7 +27,6 @@ CC_REQ_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "
 ROLE_DESC_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "custom_role_descriptions.json")
 ROLE_BOARD_STATE_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "role_boards.json")
 
-# Special FG Milestone Roles
 FG_SPECIAL_ROLES = [
     {"name": "Com FG", "color": 0x3B82F6, "desc": "Competitive Friend Group Circle"},
     {"name": "Known FG", "color": 0x8B5CF6, "desc": "Recognized Community Friend Group"},
@@ -91,95 +91,89 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         except Exception:
             return []
 
-    async def build_roles_board_embed(self, guild: discord.Guild) -> discord.Embed:
-        """Constructs the live Roles Board with descriptions, requirements, and user mentions."""
+    async def build_roles_board_embeds(self, guild: discord.Guild) -> List[discord.Embed]:
+        """Constructs rich Roles Board embeds listing ALL server roles, descriptions, and members."""
         reqs = get_tier_requirements()
         custom_descs = load_role_descriptions()
 
-        embed = ego_embed(
+        # Get all non-managed roles sorted from highest hierarchy position to lowest
+        valid_roles = [
+            r for r in guild.roles
+            if r.name != "@everyone" and not r.managed
+        ]
+        valid_roles.sort(key=lambda r: r.position, reverse=True)
+
+        if not valid_roles:
+            return [ego_embed(
+                title=f"Role Roster - Roles",
+                description=f"> No custom roles found in **{guild.name}**.\n> Create roles in Discord or use `/roles import_presets`!",
+                color=COLOR_VIOLET
+            )]
+
+        embeds = []
+        current_embed = ego_embed(
             title=f"Role Roster - Roles",
-            description=f"> Active roles, members, and descriptions in **{guild.name}**:\n",
+            description=f"> Complete directory of all **`{len(valid_roles)}`** server roles, descriptions, and members:\n",
             color=COLOR_VIOLET
         )
 
-        # 1. Content Creator Roles
-        cc_names = ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star"]
-        cc_entries = []
-        for name in cc_names:
-            role = discord.utils.get(guild.roles, name=name)
-            if role:
-                members_list = [m.mention for m in role.members[:15]]
-                members_str = ", ".join(members_list) if members_list else "*No members*"
-                if len(role.members) > 15:
-                    members_str += f" *(+{len(role.members) - 15} more)*"
+        field_count = 0
+        for role in valid_roles:
+            # 1. Resolve Description and Requirements
+            desc_text = ""
+            req_text = ""
 
-                r_data = reqs.get(name, {})
-                f_req = r_data.get("followers", "")
-                v_req = r_data.get("views", "")
-                desc_text = custom_descs.get(str(role.id), {}).get("desc", r_data.get("desc", ""))
+            if str(role.id) in custom_descs:
+                desc_text = custom_descs[str(role.id)].get("desc", "")
+                req_text = custom_descs[str(role.id)].get("req", "")
+            elif role.name in reqs:
+                r_info = reqs[role.name]
+                desc_text = r_info.get("desc", "")
+                f_val = r_info.get("followers", "")
+                v_val = r_info.get("views", "")
+                req_text = f"{f_val} Followers / {v_val} Views" if f_val or v_val else ""
+            else:
+                for fg_r in FG_SPECIAL_ROLES:
+                    if fg_r["name"] == role.name:
+                        desc_text = fg_r["desc"]
+                        break
 
-                line = f"› {role.mention} `({len(role.members)})` — {members_str}"
-                if f_req or v_req:
-                    line += f"\n  *Req: {f_req} Followers / {v_req} Views*"
-                if desc_text:
-                    line += f"\n  *{desc_text}*"
-                cc_entries.append(line)
+            # 2. Resolve Member mentions
+            members_list = [m.mention for m in role.members[:15]]
+            members_str = ", ".join(members_list) if members_list else "*No members*"
+            if len(role.members) > 15:
+                members_str += f" *(+{len(role.members) - 15} more)*"
 
-        if cc_entries:
-            embed.add_field(name="✦ Creator Roles (/cc verify)", value="\n\n".join(cc_entries), inline=False)
+            # 3. Format Field Value
+            val_lines = []
+            if desc_text:
+                val_lines.append(f"**Description:** *{desc_text}*")
+            if req_text:
+                val_lines.append(f"**Requirement:** `{req_text}`")
+            val_lines.append(f"**Members:** {members_str}")
 
-        # 2. Friend Group (FG) Roles
-        fg_names = ["Giant FG", "Huge FG", "Known FG", "Com FG"]
-        fg_entries = []
-        for name in fg_names:
-            role = discord.utils.get(guild.roles, name=name)
-            if role:
-                members_list = [m.mention for m in role.members[:15]]
-                members_str = ", ".join(members_list) if members_list else "*No members*"
-                if len(role.members) > 15:
-                    members_str += f" *(+{len(role.members) - 15} more)*"
+            field_val = "\n".join(val_lines)
+            if len(field_val) > 1020:
+                field_val = field_val[:1015] + "..."
 
-                desc_text = custom_descs.get(str(role.id), {}).get("desc", "")
-                line = f"› {role.mention} `({len(role.members)})` — {members_str}"
-                if desc_text:
-                    line += f"\n  *{desc_text}*"
-                fg_entries.append(line)
+            # Discord embeds allow max 25 fields
+            if field_count >= 24:
+                embeds.append(current_embed)
+                current_embed = ego_embed(
+                    title=f"Role Roster - Roles (Continued)",
+                    color=COLOR_VIOLET
+                )
+                field_count = 0
 
-        # Also add dynamic private FG roles (prefixed with 👑 ︱)
-        for role in guild.roles:
-            if role.name.startswith("👑 ︱ "):
-                members_list = [m.mention for m in role.members[:10]]
-                members_str = ", ".join(members_list) if members_list else "*No members*"
-                desc_text = custom_descs.get(str(role.id), {}).get("desc", "Private Friend Group Suite")
-                fg_entries.append(f"› {role.mention} `({len(role.members)})` — {members_str}\n  *{desc_text}*")
+            current_embed.add_field(
+                name=f"› {role.name} ({len(role.members)})",
+                value=field_val,
+                inline=False
+            )
+            field_count += 1
 
-        if fg_entries:
-            embed.add_field(name="✦ Friend Group Roles (/fg start)", value="\n\n".join(fg_entries[:12]), inline=False)
-
-        # 3. Custom Registered Roles (configured via /roles set_description)
-        custom_entries = []
-        for role_id_str, info in custom_descs.items():
-            try:
-                role = guild.get_role(int(role_id_str))
-                if role and role.name not in cc_names and role.name not in fg_names and not role.name.startswith("👑 ︱ "):
-                    members_list = [m.mention for m in role.members[:15]]
-                    members_str = ", ".join(members_list) if members_list else "*No members*"
-                    desc_text = info.get("desc", "")
-                    req_text = info.get("req", "")
-
-                    line = f"› {role.mention} `({len(role.members)})` — {members_str}"
-                    if req_text:
-                        line += f"\n  *Req: {req_text}*"
-                    if desc_text:
-                        line += f"\n  *{desc_text}*"
-                    custom_entries.append(line)
-            except Exception:
-                pass
-
-        if custom_entries:
-            embed.add_field(name="✦ Featured Server Roles", value="\n\n".join(custom_entries[:10]), inline=False)
-
-        return embed
+        embeds.append(current_embed)
+        return embeds
 
     @tasks.loop(minutes=2)
     async def auto_refresh_boards(self):
@@ -197,11 +191,10 @@ class RolesSystemCog(commands.Cog, name="Roles"):
 
             try:
                 msg = await channel.fetch_message(b.get("message_id", 0))
-                embed = await self.build_roles_board_embed(guild)
-                await msg.edit(embed=embed)
+                embeds = await self.build_roles_board_embeds(guild)
+                await msg.edit(embed=embeds[0])
                 updated_boards.append(b)
             except discord.NotFound:
-                # Message deleted, skip storing
                 pass
             except Exception as e:
                 logger.debug(f"Could not auto-refresh role board: {e}")
@@ -216,13 +209,20 @@ class RolesSystemCog(commands.Cog, name="Roles"):
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
-        """Trigger instant update when member roles change."""
+        """Trigger instant board update when member roles change."""
         if before.roles != after.roles:
             await self._trigger_board_refresh_for_guild(after.guild)
 
     @commands.Cog.listener()
+    async def on_guild_role_create(self, role: discord.Role):
+        await self._trigger_board_refresh_for_guild(role.guild)
+
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role: discord.Role):
+        await self._trigger_board_refresh_for_guild(role.guild)
+
+    @commands.Cog.listener()
     async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
-        """Trigger instant update when a role is modified."""
         await self._trigger_board_refresh_for_guild(after.guild)
 
     async def _trigger_board_refresh_for_guild(self, guild: discord.Guild):
@@ -233,26 +233,24 @@ class RolesSystemCog(commands.Cog, name="Roles"):
                 if ch and isinstance(ch, discord.TextChannel):
                     try:
                         msg = await ch.fetch_message(b.get("message_id", 0))
-                        embed = await self.build_roles_board_embed(guild)
-                        await msg.edit(embed=embed)
+                        embeds = await self.build_roles_board_embeds(guild)
+                        await msg.edit(embed=embeds[0])
                     except Exception:
                         pass
 
     roles_group = app_commands.Group(name="roles", description="Role library, presets, perks, and live panels")
 
-    @roles_group.command(name="board", description="Deploy the auto-updating Roles Board with live member roster")
+    @roles_group.command(name="board", description="Deploy the live auto-updating Roles Board listing all server roles and members")
     @app_commands.describe(channel="Target channel for the Roles Board")
     @is_admin_or_has_role()
     async def roles_board(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
         target_ch = channel or interaction.channel
         guild = interaction.guild
 
-        embed = await self.build_roles_board_embed(guild)
-        msg = await target_ch.send(embed=embed)
+        embeds = await self.build_roles_board_embeds(guild)
+        msg = await target_ch.send(embed=embeds[0])
 
-        # Save board state for auto-updates
         boards = load_board_states()
-        # Remove any existing board in the same channel
         boards = [b for b in boards if b.get("channel_id") != target_ch.id]
         boards.append({
             "guild_id": guild.id,
@@ -262,14 +260,14 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         save_board_states(boards)
 
         await interaction.response.send_message(
-            embed=success_embed("Roles Board Deployed", f"Live auto-updating Roles Board published in {target_ch.mention}."),
+            embed=success_embed("Roles Board Deployed", f"Live auto-updating Roles Board is active in {target_ch.mention}."),
             ephemeral=True
         )
 
     @roles_group.command(name="set_description", description="Set custom description and requirements for any role on the board")
     @app_commands.describe(
         role="The role to describe",
-        description="Description of perks / meaning",
+        description="Description of perks or meaning",
         requirements="Requirements to obtain this role (optional)"
     )
     @is_admin_or_has_role()
@@ -288,7 +286,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         }
         save_role_descriptions(custom_descs)
 
-        # Immediately refresh boards
+        # Immediately update all deployed boards
         await self._trigger_board_refresh_for_guild(interaction.guild)
 
         await interaction.response.send_message(
@@ -321,7 +319,6 @@ class RolesSystemCog(commands.Cog, name="Roles"):
                 except Exception as e:
                     logger.error(f"Error creating FG role {r_data['name']}: {e}")
 
-        # Refresh board
         await self._trigger_board_refresh_for_guild(guild)
 
         await interaction.response.send_message(
@@ -369,6 +366,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
                     created_roles.append(role.name)
                 except Exception as e:
                     logger.error(f"Failed to create role {p['name']}: {e}")
+
+        await self._trigger_board_refresh_for_guild(interaction.guild)
 
         await interaction.followup.send(
             embed=success_embed("Presets Imported", f"Created **{len(created_roles)}** roles for **{category.value}**.")
