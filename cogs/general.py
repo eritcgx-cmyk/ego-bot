@@ -103,26 +103,26 @@ class GeneralCog(commands.Cog, name="General"):
     @app_commands.command(name="commands", description="Public command board for members and community features")
     async def commands_cmd(self, interaction: discord.Interaction):
         embed = ego_embed(
-            title="Command Board",
+            title="Community Commands",
             description=(
-                "> **Ego Community Commands**\n"
-                "> Run any of the commands below to interact with community systems:\n"
+                "> **Ego Public Command Directory**\n"
+                "> Available slash commands for all server members:\n"
             ),
             color=COLOR_VIOLET
         )
 
         categories = [
-            ("Friend Groups", "`/fg start` — Form a 5-member circle with private text & voice lounges\n`/fg stats` — View your active squad cards\n`/fg rename` — Rename squad & sync channels"),
-            ("Creator Verification", "`/cc verify` — Submit profile & video proof for Creator tiers\n`/cc tiers` — View follower & view thresholds for all 6 tiers"),
-            ("Giveaways", "`/giveaway start` — Launch timed giveaway with button entry\n`/giveaway reroll` — Pick new winners\n`/giveaway end` — Conclude early"),
-            ("Invites & Tracking", "`/invites mystats` — Check your joins, leaves, and bonus invites\n`/invites leaderboard` — Top server inviters"),
-            ("Utilities & Custom Status", "`/poll` — Launch an interactive vote\n`/remind` — Set personal DM alert (`/remind 10m message`)\n`/avatar` — View full resolution profile image\n`/userinfo` — Member join date and roles\n`/serverinfo` — Server stats and metrics\n`/status set` — Set custom game activity (e.g. Roblox, GTA VI)"),
+            ("Friend Groups", "› `/fg start name:...` — Start a squad in pending state\n› `/fg invite member:...` — Invite friends to your squad (auto-ticket at 4 members)\n› `/fg stats` — View your personal squad cards"),
+            ("Creator Verification", "› `/cc verify` — Submit profile and video proof for Creator roles\n› `/cc tiers` — View follower and view requirements for all 6 tiers"),
+            ("Invites & Tracking", "› `/invites mystats` — Check your joins, leaves, and bonus invites\n› `/invites leaderboard` — Top server inviters"),
+            ("Utilities & Custom Status", "› `/poll` — Launch an interactive reaction poll\n› `/remind duration:... message:...` — Set personal DM alert (e.g. `/remind 10m check stream`)\n› `/avatar` — View member full-resolution profile picture\n› `/userinfo` — Member join date, account age, and roles\n› `/serverinfo` — Server stats and metrics\n› `/status set` — Set custom game activity (e.g. Roblox, GTA VI)\n› `/status list` — Select from saved custom game activities"),
         ]
 
         for cat_name, cat_desc in categories:
             embed.add_field(name=f"✦ {cat_name}", value=cat_desc, inline=False)
 
         await interaction.response.send_message(embed=embed)
+
 
     @app_commands.command(name="command_board", description="Deploy a permanent public command board to a channel")
     @app_commands.describe(channel="Target channel to post command board (defaults to current channel)")
