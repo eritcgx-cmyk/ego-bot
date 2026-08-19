@@ -100,8 +100,66 @@ class GeneralCog(commands.Cog, name="General"):
         self.bot = bot
         self.start_time = datetime.utcnow()
 
+    @app_commands.command(name="commands", description="Public command board for members and community features")
+    async def commands_cmd(self, interaction: discord.Interaction):
+        embed = ego_embed(
+            title="Command Board",
+            description=(
+                "> **Ego Community Commands**\n"
+                "> Run any of the commands below to interact with community systems:\n"
+            ),
+            color=COLOR_VIOLET
+        )
+
+        categories = [
+            ("Friend Groups", "`/fg start` — Form a 5-member circle with private text & voice lounges\n`/fg stats` — View your active squad cards\n`/fg rename` — Rename squad & sync channels"),
+            ("Creator Verification", "`/cc verify` — Submit profile & video proof for Creator tiers\n`/cc tiers` — View follower & view thresholds for all 6 tiers"),
+            ("Giveaways", "`/giveaway start` — Launch timed giveaway with button entry\n`/giveaway reroll` — Pick new winners\n`/giveaway end` — Conclude early"),
+            ("Invites & Tracking", "`/invites mystats` — Check your joins, leaves, and bonus invites\n`/invites leaderboard` — Top server inviters"),
+            ("Utilities & Custom Status", "`/poll` — Launch an interactive vote\n`/remind` — Set personal DM alert (`/remind 10m message`)\n`/avatar` — View full resolution profile image\n`/userinfo` — Member join date and roles\n`/serverinfo` — Server stats and metrics\n`/status set` — Set custom game activity (e.g. Roblox, GTA VI)"),
+        ]
+
+        for cat_name, cat_desc in categories:
+            embed.add_field(name=f"✦ {cat_name}", value=cat_desc, inline=False)
+
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="command_board", description="Deploy a permanent public command board to a channel")
+    @app_commands.describe(channel="Target channel to post command board (defaults to current channel)")
+    @is_admin_or_has_role()
+    async def command_board(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
+        target_ch = channel or interaction.channel
+        guild = interaction.guild
+
+        embed = ego_embed(
+            title=f"Command Directory • {guild.name}",
+            description=(
+                "> **Server Command Board**\n"
+                "> Available slash commands for members across the server:\n"
+            ),
+            color=COLOR_VIOLET
+        )
+
+        categories = [
+            ("Friend Groups", "› `/fg start` — Launch a private 5-member squad with secret lounge & voice\n› `/fg stats` — Inspect your squads\n› `/fg rename` — Update squad title"),
+            ("Content Creator", "› `/cc verify` — Apply for Creator roles (`CC`, `Known`, `Famous`, `Star`)\n› `/cc tiers` — Inspect follower and view requirements"),
+            ("Giveaways", "› `/giveaway start` — Enter button giveaways with auto-draw\n› `/gwannounce` — Spotlight active giveaways"),
+            ("Invites & Community", "› `/invites mystats` — Check invite progress & role rewards\n› `/invites leaderboard` — Top server inviters"),
+            ("Utilities", "› `/poll` — Create reaction poll\n› `/remind` — Set personal DM reminder\n› `/userinfo` — Member stats\n› `/avatar` — Full resolution profile picture\n› `/status list` — Select from saved custom game activities"),
+        ]
+
+        for cat_name, cat_desc in categories:
+            embed.add_field(name=f"✦ {cat_name}", value=cat_desc, inline=False)
+
+        await target_ch.send(embed=embed)
+        await interaction.response.send_message(
+            embed=success_embed("Command Board Deployed", f"Posted Command Board to {target_ch.mention}"),
+            ephemeral=True
+        )
+
     @app_commands.command(name="help", description="Explore all commands, systems, and features in Ego")
     async def help_cmd(self, interaction: discord.Interaction):
+
         embed = ego_embed(
             title="⚡ Ego Command Directory",
             description=(
