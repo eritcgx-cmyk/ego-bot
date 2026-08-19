@@ -40,6 +40,50 @@ class GiveawayEntryView(discord.ui.View):
         # Custom ID for persistence across bot reboots
         self.entry_button.custom_id = f"giveaway_entry:{giveaway_id}"
 
+    async def _build_embed(self) -> discord.Embed:
+        from database.engine import AsyncSessionLocal
+        from utils.embeds import ego_embed, COLOR_VIOLET, COLOR_EMERALD, COLOR_CRIMSON
+        
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(Giveaway).where(Giveaway.id == self.giveaway_id))
+            gw = res.scalar_one_or_none()
+            if not gw:
+                return ego_embed(title="✖ Giveaway Not Found", description="This giveaway record no longer exists.", color=COLOR_CRIMSON)
+
+            end_ts = int(gw.end_time.timestamp())
+            req_role_str = f"<@&{gw.required_role_id}>" if gw.required_role_id else "*None (Open to all)*"
+
+            if gw.status == "active":
+                desc = (
+                    f"### 🎉 **{gw.prize}**\n\n"
+                    f"› **Ends:** <t:{end_ts}:R> (<t:{end_ts}:f>)\n"
+                    f"› **Hosted by:** <@{gw.host_id}>\n"
+                    f"› **Winners:** `{gw.winners_count}`\n"
+                    f"› **Required Role:** {req_role_str}\n"
+                    f"› **Total Entries:** `{len(gw.participants)}`\n\n"
+                    f"*Click the button below to enter the draw!*"
+                )
+                embed = ego_embed(
+                    title="✨ EXCLUSIVE SERVER GIVEAWAY",
+                    description=desc,
+                    color=COLOR_VIOLET
+                )
+            else:
+                winners_mentions = ", ".join(f"<@{wid}>" for wid in gw.winners) if gw.winners else "*No valid entries*"
+                desc = (
+                    f"### 🏆 **{gw.prize}** *(Ended)*\n\n"
+                    f"› **Hosted by:** <@{gw.host_id}>\n"
+                    f"› **Winners:** {winners_mentions}\n"
+                    f"› **Total Participants:** `{len(gw.participants)}`\n"
+                )
+                embed = ego_embed(
+                    title="🎉 GIVEAWAY CONCLUDED",
+                    description=desc,
+                    color=COLOR_EMERALD
+                )
+
+            return embed
+
     @discord.ui.button(label="Enter Giveaway (0)", style=discord.ButtonStyle.primary, emoji="🎉")
     async def entry_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         async with AsyncSessionLocal() as session:
