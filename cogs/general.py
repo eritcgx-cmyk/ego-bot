@@ -182,6 +182,13 @@ class GeneralCog(commands.Cog, name="General"):
             ephemeral=True
         )
 
+    @app_commands.command(name="commandboard", description="Deploy a permanent command board to a channel (alias)")
+    @app_commands.describe(channel="Target channel to post command board")
+    @is_admin_or_has_role()
+    async def commandboard_alias(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
+        await self.command_board(interaction, channel)
+
+
     # Command Access Management Group
     command_access_group = app_commands.Group(name="command_access", description="Manage role-based permissions for individual commands")
 
