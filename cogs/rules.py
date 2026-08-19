@@ -125,7 +125,11 @@ class RulesCog(commands.Cog, name="Rules"):
             embed.set_thumbnail(url=guild.icon.url)
         return embed
 
-    rules_group = app_commands.Group(name="rules", description="Server rules configuration, wizard, and agreement gate")
+    rules_group = app_commands.Group(
+        name="rules",
+        description="Server rules configuration, wizard, and agreement gate",
+        default_permissions=discord.Permissions(administrator=True)
+    )
 
     @rules_group.command(name="setup", description="Deploy the server rules into a dedicated channel")
     @app_commands.describe(
