@@ -27,6 +27,7 @@ WARNING_COLOR = 0xFEE75C
 INFO_COLOR = 0x5865F2
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+BOT_VERSION = "2.0.0"
 
 logging.basicConfig(
     level=getattr(logging, LOG_LEVEL, logging.INFO),
