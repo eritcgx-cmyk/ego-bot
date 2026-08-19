@@ -199,6 +199,7 @@ class GeneralCog(commands.Cog, name="General"):
 
     @app_commands.command(name="command_board", description="Deploy a permanent command board to a channel")
     @app_commands.describe(channel="Target channel to post command board")
+    @app_commands.default_permissions(manage_guild=True)
     @is_admin_or_has_role()
     async def command_board(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
         target_ch = channel or interaction.channel
@@ -231,13 +232,19 @@ class GeneralCog(commands.Cog, name="General"):
 
     @app_commands.command(name="commandboard", description="Deploy a permanent command board to a channel (alias)")
     @app_commands.describe(channel="Target channel to post command board")
+    @app_commands.default_permissions(manage_guild=True)
     @is_admin_or_has_role()
     async def commandboard_alias(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
         await self.command_board(interaction, channel)
 
 
     # Command Access Management Group
-    command_access_group = app_commands.Group(name="command_access", description="Manage role-based permissions for individual commands")
+    command_access_group = app_commands.Group(
+        name="command_access",
+        description="Manage role-based permissions for individual commands",
+        default_permissions=discord.Permissions(administrator=True)
+    )
+
 
     @command_access_group.command(name="grant", description="Grant a role permission to use a specific command")
     @app_commands.describe(
@@ -426,6 +433,7 @@ class GeneralCog(commands.Cog, name="General"):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="poll", description="Create a polished community poll with reaction voting")
+    @app_commands.default_permissions(manage_messages=True)
     @is_admin_or_has_role()
     async def poll(self, interaction: discord.Interaction):
         await interaction.response.send_modal(PollOptionModal())
@@ -466,6 +474,7 @@ class GeneralCog(commands.Cog, name="General"):
 
     @app_commands.command(name="say", description="Broadcast a clean formatted message as the bot")
     @app_commands.describe(message="The message to send", channel="Target channel (optional)")
+    @app_commands.default_permissions(manage_messages=True)
     @is_admin_or_has_role()
     async def say(self, interaction: discord.Interaction, message: str, channel: Optional[discord.TextChannel] = None):
         target_ch = channel or interaction.channel
@@ -482,6 +491,7 @@ class GeneralCog(commands.Cog, name="General"):
         channel="Target Channel (optional)",
         role_ping="Optional role to ping"
     )
+    @app_commands.default_permissions(manage_messages=True)
     @is_admin_or_has_role()
     async def announce(
         self,
@@ -507,14 +517,17 @@ class GeneralCog(commands.Cog, name="General"):
         )
 
     @app_commands.command(name="embed_builder", description="Construct and send a custom rich embed via modal")
+    @app_commands.default_permissions(manage_messages=True)
     @is_admin_or_has_role()
     async def embed_builder(self, interaction: discord.Interaction):
         await interaction.response.send_modal(EmbedBuilderModal())
 
     @app_commands.command(name="purge", description="Bulk delete messages from the current channel")
     @app_commands.describe(amount="Number of messages to delete (1-100)", user_filter="Only delete messages from this user (optional)")
+    @app_commands.default_permissions(manage_messages=True)
     @is_admin_or_has_role()
     async def purge(self, interaction: discord.Interaction, amount: int, user_filter: Optional[discord.Member] = None):
+
         if amount < 1 or amount > 100:
             return await interaction.response.send_message(
                 embed=error_embed("Invalid Amount", "Please specify a number between 1 and 100."),
