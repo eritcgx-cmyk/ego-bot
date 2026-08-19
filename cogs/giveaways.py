@@ -358,6 +358,7 @@ class GiveawaysCog(commands.Cog, name="Giveaways"):
         channel="Channel to broadcast announcement in",
         ping_role="Optional role to ping"
     )
+    @app_commands.default_permissions(manage_guild=True)
     @is_mod_or_has_role()
     async def gwannounce(
         self,
