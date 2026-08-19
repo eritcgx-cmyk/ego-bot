@@ -1,8 +1,7 @@
 """
 Role Presets, Special FG Roles, Live Auto-Updating Roles Board, Custom Role Descriptions, and Clean Server for Ego Bot.
-Features comprehensive Roles Board listing ALL server roles with @mentions, descriptions & member lists,
-instant auto-updating on member/role events, custom role descriptions (/roles set_description),
-special FG milestone roles, and /clean_server duplicate role cleaner.
+Features compact single-embed architecture guaranteed to fit ALL server roles without hitting Discord character limits,
+instant real-time event updates, custom role descriptions (/roles set_description), and /clean_server duplicate role cleaner.
 """
 import os
 import json
@@ -27,12 +26,8 @@ CC_REQ_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "
 ROLE_DESC_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "custom_role_descriptions.json")
 ROLE_BOARD_STATE_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "role_boards.json")
 
-FG_SPECIAL_ROLES = [
-    {"name": "Com FG", "color": 0x3B82F6, "desc": "Competitive Friend Group Circle"},
-    {"name": "Known FG", "color": 0x8B5CF6, "desc": "Recognized Community Friend Group"},
-    {"name": "Huge FG", "color": 0xF59E0B, "desc": "Large Scale Active Friend Group"},
-    {"name": "Giant FG", "color": 0xEF4444, "desc": "Apex Tier Giant Friend Group"}
-]
+FG_SPECIAL_ROLES = ["Giant FG", "Huge FG", "Known FG", "Com FG", "FG"]
+CC_ROLE_NAMES = ["Star", "Famous", "Known", "CC Tier 3", "CC Tier 2", "CC"]
 
 def load_role_descriptions() -> Dict[str, Any]:
     os.makedirs(os.path.dirname(ROLE_DESC_FILE), exist_ok=True)
@@ -91,8 +86,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         except Exception:
             return []
 
-    async def build_roles_board_embeds(self, guild: discord.Guild) -> List[discord.Embed]:
-        """Constructs rich Roles Board embeds listing ALL server roles without duplicates."""
+    async def build_roles_board_embed(self, guild: discord.Guild) -> discord.Embed:
+        """Constructs the comprehensive Roles Board listing ALL server roles categorized and styled."""
         try:
             if not guild.chunked:
                 await guild.chunk()
@@ -102,87 +97,100 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         reqs = get_tier_requirements()
         custom_descs = load_role_descriptions()
 
-        # Get all roles deduplicated by ID, sorted by hierarchy position descending
+        # All server roles deduplicated, sorted by hierarchy position descending
         seen_ids = set()
-        valid_roles = []
+        all_roles = []
         for r in guild.roles:
             if r.name != "@everyone" and r.id not in seen_ids:
                 seen_ids.add(r.id)
-                valid_roles.append(r)
+                all_roles.append(r)
 
-        valid_roles.sort(key=lambda r: r.position, reverse=True)
+        all_roles.sort(key=lambda r: r.position, reverse=True)
 
-        if not valid_roles:
-            return [ego_embed(
+        if not all_roles:
+            return ego_embed(
                 title="Roles",
                 description=f"> No custom roles found in **{guild.name}**.\n> Create roles in Discord or use `/roles import_presets`!",
                 color=COLOR_VIOLET
-            )]
+            )
 
-        embeds = []
-        current_embed = ego_embed(
+        embed = ego_embed(
             title="Roles",
-            description=f"> Complete live directory of all **`{len(valid_roles)}`** server roles, descriptions, and members:\n",
+            description=f"> Complete directory of all **`{len(all_roles)}`** roles and active members in **{guild.name}**:\n",
             color=COLOR_VIOLET
         )
 
-        field_count = 0
-        for role in valid_roles:
-            # 1. Resolve Description and Requirements
-            desc_text = ""
-            req_text = ""
+        def format_role_line(role: discord.Role) -> str:
+            # Members list (first 8 mentions)
+            members = [m.mention for m in role.members[:8]]
+            members_str = ", ".join(members) if members else "*None*"
+            if len(role.members) > 8:
+                members_str += f" *(+{len(role.members) - 8} more)*"
 
+            # Resolve description or requirements
+            desc_sub = ""
             if str(role.id) in custom_descs:
-                desc_text = custom_descs[str(role.id)].get("desc", "")
-                req_text = custom_descs[str(role.id)].get("req", "")
+                d_info = custom_descs[str(role.id)]
+                d_text = d_info.get("desc", "")
+                r_text = d_info.get("req", "")
+                if r_text and d_text:
+                    desc_sub = f"  *Req: {r_text} | {d_text}*"
+                elif r_text:
+                    desc_sub = f"  *Req: {r_text}*"
+                elif d_text:
+                    desc_sub = f"  *{d_text}*"
             elif role.name in reqs:
                 r_info = reqs[role.name]
-                desc_text = r_info.get("desc", "")
                 f_val = r_info.get("followers", "")
                 v_val = r_info.get("views", "")
-                req_text = f"{f_val} Followers / {v_val} Views" if f_val or v_val else ""
-            else:
-                for fg_r in FG_SPECIAL_ROLES:
-                    if fg_r["name"].lower() == role.name.lower():
-                        desc_text = fg_r["desc"]
-                        break
+                d_val = r_info.get("desc", "")
+                if f_val or v_val:
+                    desc_sub = f"  *Req: {f_val} Followers / {v_val} | {d_val}*"
+                else:
+                    desc_sub = f"  *{d_val}*"
+            elif role.name in ["Giant FG", "Huge FG", "Known FG", "Com FG"]:
+                desc_sub = "  *Special FG Milestone Perk Role*"
+            elif role.name.startswith("👑 ︱ "):
+                desc_sub = "  *Private Friend Group Suite Role*"
 
-            # 2. Resolve Member mentions
-            members_list = [m.mention for m in role.members[:15]]
-            members_str = ", ".join(members_list) if members_list else "*No members*"
-            if len(role.members) > 15:
-                members_str += f" *(+{len(role.members) - 15} more)*"
+            line = f"› {role.mention} `({len(role.members)})` — {members_str}"
+            if desc_sub:
+                line += f"\n{desc_sub}"
+            return line
 
-            # 3. Format Field Value with direct @mention
-            val_lines = [f"• **Role:** {role.mention}"]
-            if desc_text:
-                val_lines.append(f"• **Description:** *{desc_text}*")
-            if req_text:
-                val_lines.append(f"• **Requirement:** `{req_text}`")
-            val_lines.append(f"• **Members ({len(role.members)}):** {members_str}")
+        # 1. Content Creator Roles Section
+        cc_roles = [r for r in all_roles if r.name in CC_ROLE_NAMES]
+        if cc_roles:
+            cc_lines = [format_role_line(r) for r in cc_roles]
+            val = "\n\n".join(cc_lines)
+            embed.add_field(name="✦ Content Creator Roles (/cc verify)", value=val[:1024], inline=False)
 
-            field_val = "\n".join(val_lines)
-            if len(field_val) > 1020:
-                field_val = field_val[:1015] + "..."
+        # 2. Friend Group Roles Section
+        fg_roles = [r for r in all_roles if r.name in FG_SPECIAL_ROLES or r.name.startswith("👑 ︱ ")]
+        if fg_roles:
+            fg_lines = [format_role_line(r) for r in fg_roles[:15]]
+            val = "\n\n".join(fg_lines)
+            embed.add_field(name="✦ Friend Group Roles (/fg start)", value=val[:1024], inline=False)
 
-            # Discord embeds allow max 25 fields per embed
-            if field_count >= 24:
-                embeds.append(current_embed)
-                current_embed = ego_embed(
-                    title="Roles (Continued)",
-                    color=COLOR_VIOLET
-                )
-                field_count = 0
+        # 3. All Other Server Roles Section
+        other_roles = [
+            r for r in all_roles
+            if r.name not in CC_ROLE_NAMES and r.name not in FG_SPECIAL_ROLES and not r.name.startswith("👑 ︱ ")
+        ]
+        if other_roles:
+            # Chunk other roles cleanly across up to 2 fields if needed
+            chunk1 = other_roles[:12]
+            lines1 = [format_role_line(r) for r in chunk1]
+            val1 = "\n\n".join(lines1)
+            embed.add_field(name="✦ Server Roles", value=val1[:1024], inline=False)
 
-            current_embed.add_field(
-                name=f"› {role.name}",
-                value=field_val,
-                inline=False
-            )
-            field_count += 1
+            if len(other_roles) > 12:
+                chunk2 = other_roles[12:24]
+                lines2 = [format_role_line(r) for r in chunk2]
+                val2 = "\n\n".join(lines2)
+                embed.add_field(name="✦ Server Roles (Continued)", value=val2[:1024], inline=False)
 
-        embeds.append(current_embed)
-        return embeds
+        return embed
 
     @tasks.loop(seconds=30)
     async def auto_refresh_boards(self):
@@ -200,8 +208,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
 
             try:
                 msg = await channel.fetch_message(b.get("message_id", 0))
-                embeds = await self.build_roles_board_embeds(guild)
-                await msg.edit(embeds=embeds)
+                embed = await self.build_roles_board_embed(guild)
+                await msg.edit(embed=embed)
                 updated_boards.append(b)
             except discord.NotFound:
                 pass
@@ -252,10 +260,10 @@ class RolesSystemCog(commands.Cog, name="Roles"):
                 if ch and isinstance(ch, discord.TextChannel):
                     try:
                         msg = await ch.fetch_message(b.get("message_id", 0))
-                        embeds = await self.build_roles_board_embeds(guild)
-                        await msg.edit(embeds=embeds)
+                        embed = await self.build_roles_board_embed(guild)
+                        await msg.edit(embed=embed)
                     except Exception as e:
-                        logger.debug(f"Error editing board message: {e}")
+                        logger.error(f"Error editing board message in #{ch.name}: {e}")
 
     roles_group = app_commands.Group(name="roles", description="Role library, presets, perks, and live panels")
 
@@ -267,8 +275,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         guild = interaction.guild
 
         await interaction.response.defer(ephemeral=True)
-        embeds = await self.build_roles_board_embeds(guild)
-        msg = await target_ch.send(embeds=embeds)
+        embed = await self.build_roles_board_embed(guild)
+        msg = await target_ch.send(embed=embed)
 
         boards = load_board_states()
         boards = [b for b in boards if b.get("channel_id") != target_ch.id]
@@ -335,8 +343,14 @@ class RolesSystemCog(commands.Cog, name="Roles"):
     @is_guild_owner()
     async def roles_setup_fg_roles(self, interaction: discord.Interaction):
         guild = interaction.guild
+        fg_special = [
+            {"name": "Com FG", "color": 0x3B82F6},
+            {"name": "Known FG", "color": 0x8B5CF6},
+            {"name": "Huge FG", "color": 0xF59E0B},
+            {"name": "Giant FG", "color": 0xEF4444}
+        ]
         created = []
-        for r_data in FG_SPECIAL_ROLES:
+        for r_data in fg_special:
             existing = discord.utils.find(lambda r: r.name.lower() == r_data["name"].lower(), guild.roles)
             if not existing:
                 try:
@@ -355,7 +369,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         await interaction.response.send_message(
             embed=success_embed(
                 "FG Roles Ready",
-                f"Configured all 4 special FG milestone roles in the server:\n"
+                f"Configured special FG milestone roles in the server:\n"
                 f"› `Com FG`, `Known FG`, `Huge FG`, `Giant FG`"
             ),
             ephemeral=True
@@ -373,7 +387,6 @@ class RolesSystemCog(commands.Cog, name="Roles"):
             except Exception:
                 pass
 
-        # Group non-system roles by normalized lowercase name
         groups: Dict[str, List[discord.Role]] = {}
         for r in guild.roles:
             if r.name == "@everyone" or r.managed:
@@ -384,14 +397,12 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         deleted = []
         for norm, roles_list in groups.items():
             if len(roles_list) > 1:
-                # Keep the role with the most members, or highest position
                 roles_list.sort(key=lambda r: (len(r.members), r.position), reverse=True)
                 primary = roles_list[0]
                 dupes = roles_list[1:]
 
                 for dup in dupes:
                     try:
-                        # Reassign any members on the duplicate to the primary role
                         for m in dup.members:
                             if primary not in m.roles:
                                 try:
