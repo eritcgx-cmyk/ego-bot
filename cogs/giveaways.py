@@ -204,7 +204,11 @@ class GiveawaysCog(commands.Cog, name="Giveaways"):
         except Exception as e:
             logger.error(f"Error updating ended giveaway message {gw.id}: {e}")
 
-    giveaway_group = app_commands.Group(name="giveaway", description="Manage server giveaways")
+    giveaway_group = app_commands.Group(
+        name="giveaway",
+        description="Manage server giveaways",
+        default_permissions=discord.Permissions(manage_guild=True)
+    )
 
     @giveaway_group.command(name="start", description="Start a new giveaway")
     @app_commands.describe(
