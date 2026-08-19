@@ -149,7 +149,11 @@ class AutomodCog(commands.Cog, name="Automod"):
                 await self._escalate_action(message, f"Spam detected ({len(user_history)} msgs in 5s)", cfg)
                 return
 
-    automod_group = app_commands.Group(name="automod", description="Configure Automod filters and escalation")
+    automod_group = app_commands.Group(
+        name="automod",
+        description="Configure Automod filters and escalation",
+        default_permissions=discord.Permissions(administrator=True)
+    )
 
     @automod_group.command(name="status", description="View current automod settings and thresholds")
     @is_mod_or_has_role()
