@@ -65,6 +65,10 @@ class RolesSystemCog(commands.Cog, name="RolesSystem"):
 
             await session.commit()
 
+    @refresh_role_panels.before_loop
+    async def before_refresh_role_panels(self):
+        await self.bot.wait_until_ready()
+
     async def _generate_panel_embed(self, guild: discord.Guild, panel: RolePanel) -> discord.Embed:
         """Helper to build role roster embed."""
         embed = ego_embed(
