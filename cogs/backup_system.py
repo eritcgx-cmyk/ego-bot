@@ -1,8 +1,7 @@
 """
 Comprehensive Server Backup and Disaster Recovery Engine for Ego Bot.
-Features /backup create, /backup list, /backup restore (Anti-Nuke Recovery),
-and /backup download. Reconstructs all roles, categories, channels, permissions,
-and reassigns roles to all members if a server is nuked or wiped.
+Features instant-defer disaster recovery (/backup restore), automated daily snapshots,
+and complete infrastructure reconstruction (Roles, Categories, Channels, Permissions, Member Roles).
 """
 import os
 import json
@@ -24,32 +23,6 @@ BACKUPS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "
 
 def ensure_backup_dir():
     os.makedirs(BACKUPS_DIR, exist_ok=True)
-
-class RestoreConfirmView(discord.ui.View):
-    def __init__(self, backup_id: str, cog_instance: "BackupSystemCog"):
-        super().__init__(timeout=60)
-        self.backup_id = backup_id
-        self.cog = cog_instance
-
-    @discord.ui.button(label="Confirm & Restore Server", style=discord.ButtonStyle.danger, custom_id="backup_confirm_restore")
-    async def confirm_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != interaction.guild.owner_id:
-            return await interaction.response.send_message("❌ Only the Server Owner can execute a full server restore.", ephemeral=True)
-
-        for item in self.children:
-            item.disabled = True
-        await interaction.message.edit(view=self)
-
-        await interaction.response.defer()
-        await self.cog.execute_server_restore(interaction, self.backup_id)
-
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary, custom_id="backup_cancel_restore")
-    async def cancel_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        for item in self.children:
-            item.disabled = True
-        await interaction.message.edit(view=self)
-        await interaction.response.send_message(embed=info_embed("Restore Cancelled", "Server restoration was aborted."), ephemeral=True)
-
 
 class BackupSystemCog(commands.Cog, name="Backup"):
     def __init__(self, bot: commands.Bot):
@@ -245,20 +218,24 @@ class BackupSystemCog(commands.Cog, name="Backup"):
         await interaction.followup.send(embed=embed, file=discord_file)
 
     @backup_group.command(name="restore", description="[Owner Only] Anti-Nuke: Reconstruct all roles, categories, channels, and re-assign member roles")
-    @app_commands.describe(backup_id="The ID of the backup to restore (use /backup list to view available IDs)")
+    @app_commands.describe(backup_id="The ID of the backup to restore (defaults to the latest backup)")
     @is_guild_owner()
     async def backup_restore_cmd(self, interaction: discord.Interaction, backup_id: Optional[str] = None):
+        # Immediate deferral to guarantee no 10062 Unknown Interaction timeouts
+        await interaction.response.defer(ephemeral=True)
+
         guild = interaction.guild
         ensure_backup_dir()
 
         # Find target backup file
         target_file = None
-        if backup_id:
+        if backup_id and backup_id.strip().lower() != "latest":
             clean_id = backup_id.strip().replace(".json", "")
             fpath = os.path.join(BACKUPS_DIR, f"{clean_id}.json")
             if os.path.exists(fpath):
                 target_file = fpath
-        else:
+        
+        if not target_file:
             # Pick latest backup for this guild
             files = [f for f in os.listdir(BACKUPS_DIR) if f.startswith(f"backup_{guild.id}_") and f.endswith(".json")]
             if files:
@@ -266,30 +243,12 @@ class BackupSystemCog(commands.Cog, name="Backup"):
                 target_file = os.path.join(BACKUPS_DIR, files[0])
 
         if not target_file or not os.path.exists(target_file):
-            return await interaction.response.send_message(
-                embed=error_embed("Backup Not Found", "Could not locate a backup file matching your request.\nRun `/backup list` to view available backup IDs."),
-                ephemeral=True
+            return await interaction.followup.send(
+                embed=error_embed("Backup Not Found", "Could not locate a backup file on disk.\nRun `/backup list` to view available backup IDs.")
             )
 
         bid = os.path.basename(target_file).replace(".json", "")
-
-        confirm_embed = ego_embed(
-            title="⚠️ Confirm Server Restoration",
-            description=(
-                f"**Disaster Recovery Reconstruction**\n\n"
-                f"> **Target Backup:** `{bid}`\n"
-                f"> **Server:** `{guild.name}`\n\n"
-                f"**This action will:**\n"
-                f"1. **Reconstruct all missing roles** with exact colors, permissions, and hierarchy.\n"
-                f"2. **Reconstruct all categories & channels** with exact slowmode, topics, and permissions.\n"
-                f"3. **Re-assign all roles to server members** based on the saved snapshot.\n\n"
-                f"Click **Confirm & Restore Server** below to begin reconstruction."
-            ),
-            color=COLOR_AMBER
-        )
-
-        view = RestoreConfirmView(backup_id=bid, cog_instance=self)
-        await interaction.response.send_message(embed=confirm_embed, view=view, ephemeral=True)
+        await self.execute_server_restore(interaction, bid)
 
     async def execute_server_restore(self, interaction: discord.Interaction, backup_id: str):
         """Reconstructs all server roles, channels, categories, and assigns roles to members."""
@@ -305,10 +264,18 @@ class BackupSystemCog(commands.Cog, name="Backup"):
             return await interaction.followup.send(embed=error_embed("Corrupt Backup", f"Failed to parse backup JSON: {e}"))
 
         status_msg = await interaction.followup.send(
-            embed=info_embed("Recovery Started", "⚙️ Reconstructing server infrastructure... Please wait.")
+            embed=info_embed(
+                "Disaster Recovery Started",
+                f"⚙️ Reconstructing server infrastructure from snapshot **`{backup_id}`**...\n"
+                f"• Restoring `{len(data.get('roles', []))}` roles\n"
+                f"• Restoring `{len(data.get('categories', []))}` categories\n"
+                f"• Restoring `{len(data.get('channels', []))}` channels\n"
+                f"• Restoring `{len(data.get('members', []))}` member profiles"
+            )
         )
 
         roles_created = 0
+        roles_existing = 0
         categories_created = 0
         channels_created = 0
         members_recovered = 0
@@ -329,6 +296,7 @@ class BackupSystemCog(commands.Cog, name="Backup"):
             existing = discord.utils.find(lambda r: r.name.lower() == r_name.lower() and not r.managed, guild.roles)
             if existing:
                 role_map[r_data["id"]] = existing
+                roles_existing += 1
             else:
                 try:
                     perms = discord.Permissions(r_data.get("permissions_value", 0))
@@ -343,7 +311,7 @@ class BackupSystemCog(commands.Cog, name="Backup"):
                     )
                     role_map[r_data["id"]] = new_role
                     roles_created += 1
-                    await asyncio.sleep(0.3)
+                    await asyncio.sleep(0.2)
                 except Exception as e:
                     logger.error(f"Failed to restore role {r_name}: {e}")
 
@@ -358,7 +326,6 @@ class BackupSystemCog(commands.Cog, name="Backup"):
                 category_map[c_data["id"]] = existing_cat
             else:
                 try:
-                    # Map overwrites
                     overwrites = {}
                     for old_tid_str, ow_info in c_data.get("overwrites", {}).items():
                         old_tid = int(old_tid_str)
@@ -371,7 +338,7 @@ class BackupSystemCog(commands.Cog, name="Backup"):
                     new_cat = await guild.create_category(name=c_name, overwrites=overwrites, reason="Anti-Nuke Server Restore")
                     category_map[c_data["id"]] = new_cat
                     categories_created += 1
-                    await asyncio.sleep(0.3)
+                    await asyncio.sleep(0.2)
                 except Exception as e:
                     logger.error(f"Failed to restore category {c_name}: {e}")
 
@@ -417,18 +384,18 @@ class BackupSystemCog(commands.Cog, name="Backup"):
                             reason="Anti-Nuke Server Restore"
                         )
                     channels_created += 1
-                    await asyncio.sleep(0.3)
+                    await asyncio.sleep(0.2)
                 except Exception as e:
                     logger.error(f"Failed to restore channel {ch_name}: {e}")
 
         # ----------------------------------------------------
         # STEP 4: Re-assign Roles to Members
         # ----------------------------------------------------
-        if not guild.chunked:
-            try:
+        try:
+            if not guild.chunked:
                 await guild.chunk()
-            except Exception:
-                pass
+        except Exception:
+            pass
 
         backed_up_members = data.get("members", [])
         for m_data in backed_up_members:
@@ -460,7 +427,7 @@ class BackupSystemCog(commands.Cog, name="Backup"):
                 except Exception as e:
                     logger.debug(f"Could not assign roles to {member.name}: {e}")
 
-        # Trigger Roles Board update
+        # Trigger live Roles Board update
         roles_cog = self.bot.get_cog("Roles")
         if roles_cog and hasattr(roles_cog, "_trigger_board_refresh_for_guild"):
             await roles_cog._trigger_board_refresh_for_guild(guild)
@@ -471,9 +438,9 @@ class BackupSystemCog(commands.Cog, name="Backup"):
                 f"> **Backup ID:** `{backup_id}`\n"
                 f"> **Target Server:** `{guild.name}`\n\n"
                 f"**✦ Reconstructed Infrastructure:**\n"
-                f"• **Roles Created:** `{roles_created}` roles\n"
-                f"• **Categories Created:** `{categories_created}` categories\n"
-                f"• **Channels Created:** `{channels_created}` text/voice channels\n"
+                f"• **Roles Restored:** `{roles_created}` created (`{roles_existing}` already active)\n"
+                f"• **Categories Restored:** `{categories_created}` categories created\n"
+                f"• **Channels Restored:** `{channels_created}` text/voice channels created\n"
                 f"• **Members Recovered:** `{members_recovered}` members re-assigned roles\n\n"
                 f"All channels, permissions, roles, and member assignments have been fully reconstructed."
             ),
