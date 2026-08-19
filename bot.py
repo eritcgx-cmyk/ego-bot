@@ -74,6 +74,15 @@ class EgoBot(commands.Bot):
         except Exception as e:
             logger.debug(f"Could not register RulesAgreeView: {e}")
 
+        try:
+            from cogs.friend_groups import FGControlPanelView, FGTicketReviewView, FGInviteView
+            self.add_view(FGControlPanelView())
+            self.add_view(FGTicketReviewView())
+            self.add_view(FGInviteView())
+            logger.info("Registered persistent Friend Group views.")
+        except Exception as e:
+            logger.debug(f"Could not register Friend Group views: {e}")
+
         # 4. Sync Slash Commands
         logger.info("Syncing application slash command tree with Discord...")
         try:
@@ -81,6 +90,7 @@ class EgoBot(commands.Bot):
             logger.info(f"Synced {len(synced)} global slash commands.")
         except Exception as e:
             logger.error(f"Failed to sync slash commands: {e}")
+
 
 
     async def on_ready(self):
