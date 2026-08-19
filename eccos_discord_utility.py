@@ -1,13 +1,12 @@
 """
-Ecco's Discord Utility - Bot Control, 1-Min Status Rotator, Game Presence & Whitelist Manager
-Interactive Local Control Console for Ego Discord Bot.
+Ecco's Discord Utility - Bot Control, Dynamic Custom Status & Activity Manager
+Interactive Command Prompt / CLI Console for Ego Discord Bot.
 """
 import os
 import sys
 import json
 import base64
 import time
-import threading
 import urllib.request
 import urllib.error
 import ssl
@@ -19,118 +18,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from config import BOT_TOKEN, CLIENT_ID, logger
 
 DISCORD_API_BASE = "https://discord.com/api/v10"
-
-# 100+ Categorized Presets
-STATUS_CATALOG = {
-    "🎮 Gaming & Custom Activities": [
-        "Playing Roblox • Grinding Blox Fruits",
-        "Playing Roblox • Developer Studio",
-        "Playing Roblox • Bedwars Ranked",
-        "Playing Valorant • Radiant Competitive",
-        "Playing Minecraft • Hardcore SMP",
-        "Playing Grand Theft Auto VI • Vice City",
-        "Playing League of Legends • Challenger",
-        "Playing Counter-Strike 2 • Premier Match",
-        "Playing Fortnite • Unreal Division",
-        "Playing Call of Duty: Warzone • Resurgence",
-        "Playing Overwatch 2 • Grandmaster",
-        "Playing Apex Legends • Predator Tier",
-        "Playing Cyberpunk 2077 • Night City",
-        "Playing Rocket League • Supersonic Legend",
-        "Playing Elden Ring • Shadow of the Erdtree",
-        "Playing Rust • Main Clan Base",
-        "Playing Rainbow Six Siege • Champion",
-        "Playing Garry's Mod • DarkRP Mayor",
-        "Playing Dead by Daylight • Survivor",
-        "Playing Phasmophobia • Nightmare Hunt",
-        "Playing Terraria • Calamity Infernum",
-        "Playing Helldivers 2 • Spreading Democracy",
-        "Playing The Finals • Tournament Finals",
-        "Playing Genshin Impact • Abyss Floor 12",
-        "Playing Osu! • 7 Star Pass"
-    ],
-    "📢 Advertisement Presets": [
-        "👑 Join our VIP Hub • /help",
-        "🎉 Active Giveaways • /giveaway",
-        "💎 Unlock Custom Roles • /roles perks",
-        "📈 Invite Leaderboards • /invites",
-        "🚀 Verified Creator Ranks • /cc verify",
-        "👥 Friend Groups • /fg start",
-        "📜 Read Server Rules • /rules",
-        "📝 Staff Applications Open • /applications",
-        "🛡️ Protected by Ego Automod",
-        "✨ Claim Your Roles in #verification",
-        "🔥 Elite Nitro Booster Perks",
-        "⚡ discord.gg/ecco • Join Now",
-        "🎁 Massive Server Drops Today",
-        "📢 Check #announcements for updates",
-        "🌟 Level Up Your Invites for Perks",
-        "💬 Active Voice & Text Channels",
-        "🏆 Host Your Own Private Friend Group",
-        "🎬 Content Creator Spotlight",
-        "🤖 Powered by Ego Production Engine",
-        "💎 Diamond & Obsidian VIP Status Tiers",
-        "🎵 24/7 Music, Gaming & Hangouts",
-        "🛡️ Zero-Tolerance Automod Defense",
-        "📊 Real-Time Server Growth Analytics",
-        "🎯 Daily Community Challenges",
-        "🚀 Explore 1,200+ Custom Role Presets"
-    ],
-    "💬 Community & Scale Presets": [
-        "Chatting with members across servers",
-        "Protecting verified communities",
-        "with active server members",
-        "over 50+ partner channels",
-        "Ego v2.0 • Serving the community",
-        "watching member counts grow",
-        "to community voice channels",
-        "in partner server hubs",
-        "welcoming new members daily",
-        "24/7 High-Performance Uptime",
-        "friend groups collaborate live",
-        "moderation logs & security filters",
-        "managing verified profiles",
-        "to staff tickets & reviews",
-        "leaderboard rankings shift live",
-        "supporting top creator communities",
-        "live role roster panels refresh",
-        "to verification requests",
-        "active across Discord servers",
-        "giveaways countdown to draw",
-        "Ego Central Management Engine",
-        "server analytics & audit logs",
-        "community engagement soar",
-        "exclusive perk holders",
-        "high-speed Discord interactions"
-    ],
-    "⚡ Aesthetic & Flex Presets": [
-        "⚡ Sovereign Authority",
-        "💎 The Obsidian Syndicate",
-        "🌙 Midnight Chroma Drift",
-        "🔮 Ethereal Resonance",
-        "🪐 Cosmic Horizon Phase",
-        "👑 Apex Status Achieved",
-        "✨ Neon Glitch Matrix",
-        "🏆 Monarch Dynasty",
-        "💠 Diamond Tier VIP",
-        "🛡️ Sentinel Security Shield",
-        "🌌 Astral Pulse Frequency",
-        "⚡ High Voltage Infrastructure",
-        "🔥 Infernal Sovereign",
-        "❄️ Frost Radiant Aura",
-        "🌀 Cyberpunk Synthwave Vibe",
-        "⚜️ Imperial Council",
-        "💎 Whale Status Lounge",
-        "🎯 Zero Tolerance Automod",
-        "🖤 Monochrome Aesthetic",
-        "🌟 Star Creator Spotlight",
-        "🚀 Quantum Execution Layer",
-        "👑 Legendary Rank Prestige",
-        "🔱 Celestial Authority",
-        "💠 Platinum Standard",
-        "⚡ Ego • Production Supreme"
-    ]
-}
+STATUS_FILE = os.path.join(os.path.dirname(__file__), "data", "saved_statuses.json")
 
 class EccoDiscordUtility:
     def __init__(self, token: Optional[str] = None):
@@ -138,6 +26,7 @@ class EccoDiscordUtility:
         self.ctx = ssl.create_default_context()
         self.whitelist_file = os.path.join(os.path.dirname(__file__), "whitelist_config.json")
         self.whitelist = self._load_whitelist()
+        self.statuses = self._load_statuses()
 
     def _load_whitelist(self) -> Dict[str, Any]:
         if os.path.exists(self.whitelist_file):
@@ -157,6 +46,25 @@ class EccoDiscordUtility:
         with open(self.whitelist_file, "w", encoding="utf-8") as f:
             json.dump(self.whitelist, f, indent=2)
         print("💾 Whitelist saved.")
+
+    def _load_statuses(self) -> List[Dict[str, Any]]:
+        if os.path.exists(STATUS_FILE):
+            try:
+                with open(STATUS_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return [
+            {"id": 1, "type": "playing", "text": "Roblox", "details": "Grinding Blox Fruits with friends", "url": None, "author": "Ecco"},
+            {"id": 2, "type": "playing", "text": "Grand Theft Auto VI", "details": "Exploring Vice City", "url": None, "author": "Ecco"},
+            {"id": 3, "type": "watching", "text": "you keep /egoing me", "details": None, "url": None, "author": "Ecco"}
+        ]
+
+    def save_statuses(self):
+        os.makedirs(os.path.dirname(STATUS_FILE), exist_ok=True)
+        with open(STATUS_FILE, "w", encoding="utf-8") as f:
+            json.dump(self.statuses, f, indent=2)
+        print("💾 Custom statuses saved.")
 
     def _api_request(self, method: str, endpoint: str, data: Optional[dict] = None) -> Any:
         headers = {
@@ -208,29 +116,38 @@ class EccoDiscordUtility:
             print(f"❌ Failed to set avatar: {e}")
         return False
 
+    def send_channel_message(self, channel_id: str, message: str) -> bool:
+        payload = {"content": message}
+        res = self._api_request("POST", f"/channels/{channel_id}/messages", payload)
+        if res:
+            print(f"✅ Message sent to channel {channel_id} (Message ID: {res.get('id')})")
+            return True
+        return False
+
     def print_menu(self):
         os.system("cls" if os.name == "nt" else "clear")
         user = self.get_current_bot_user()
         bot_tag = f"{user.get('username')}#{user.get('discriminator', '0')}" if user else "Offline"
         bot_id = user.get("id", "Unknown") if user else "N/A"
         guilds = self.get_bot_guilds()
+        self.statuses = self._load_statuses()
 
-        print("=" * 68)
+        print("=" * 70)
         print("  👑 ECCO'S DISCORD UTILITY • EGO BOT CONTROL CONSOLE")
-        print("=" * 68)
+        print("=" * 70)
         print(f"  🤖 Bot Name: {bot_tag} (ID: {bot_id})")
-        print(f"  🏰 Connected Guilds: {len(guilds)}")
+        print(f"  🏰 Connected Guilds ({len(guilds)}):")
         for g in guilds:
             print(f"     • {g.get('name')} (`{g.get('id')}`)")
-        print(f"  ⏱️ Status Interval: 1 Minute Cycle (100+ Presets)")
-        print("=" * 68)
-        print("  [1] 🎮 Custom Game Presence (e.g. Playing Roblox / Custom Activity)")
-        print("  [2] 🔄 1-Minute Status Rotator Catalog (100+ Presets)")
-        print("  [3] 👤 Bot Profile & Avatar Control")
-        print("  [4] 🛡️ Server & Role Whitelist Manager")
-        print("  [5] 🚀 Live Render Cloud Status")
+        print(f"  💾 Saved Custom Statuses in Library: {len(self.statuses)}")
+        print("=" * 70)
+        print("  [1] 🎮 Type & Save Custom Status / Activity (e.g. Playing Roblox)")
+        print("  [2] 📋 View & Apply from Saved Status Library")
+        print("  [3] 💬 Send Quick Chat Message into Server Channel")
+        print("  [4] 👤 Bot Profile & Avatar Manager")
+        print("  [5] 🛡️ Server & Role Whitelist Configuration")
         print("  [0] ❌ Exit")
-        print("=" * 68)
+        print("=" * 70)
 
     def run_cli(self):
         while True:
@@ -238,74 +155,108 @@ class EccoDiscordUtility:
             choice = input("Select an option (0-5): ").strip()
 
             if choice == "1":
-                self._menu_custom_game()
+                self._menu_add_custom_status()
             elif choice == "2":
-                self._menu_status_rotator()
+                self._menu_view_saved_statuses()
             elif choice == "3":
-                self._menu_profile()
+                self._menu_send_chat()
             elif choice == "4":
-                self._menu_whitelist()
+                self._menu_profile()
             elif choice == "5":
-                self._menu_render_status()
+                self._menu_whitelist()
             elif choice == "0":
                 print("Exiting Ecco's Discord Utility.")
                 break
             else:
                 input("Invalid option. Press Enter to continue...")
 
-    def _menu_custom_game(self):
-        print("\n--- 🎮 CUSTOM GAME PRESENCE (E.G. PLAYING ROBLOX) ---")
-        print("Quick Presets:")
-        print("  1. Playing Roblox (Grinding Blox Fruits)")
-        print("  2. Playing Roblox (Developer Studio)")
-        print("  3. Playing Valorant (Radiant Ranked)")
-        print("  4. Playing Minecraft (Hardcore SMP)")
-        print("  5. Playing Grand Theft Auto VI (Vice City)")
-        print("  6. Custom Game Name & Details Input")
-        print("  7. Back")
+    def _menu_add_custom_status(self):
+        print("\n--- 🎮 TYPE & AUTO-SAVE CUSTOM STATUS ---")
+        print("Select Type:")
+        print("  1. Playing (Game, e.g. Roblox, Minecraft, GTA VI)")
+        print("  2. Streaming (Twitch / YouTube live stream)")
+        print("  3. Watching (Anime, Movie, Server)")
+        print("  4. Listening (Spotify, Podcast)")
+        print("  5. Custom Status (Profile text)")
 
-        sub = input("Select (1-7): ").strip()
-        if sub == "1":
-            print("✅ Custom game presence set to: Playing Roblox (Blox Fruits)")
-        elif sub == "2":
-            print("✅ Custom game presence set to: Playing Roblox (Developer Studio)")
-        elif sub == "3":
-            print("✅ Custom game presence set to: Playing Valorant (Radiant Ranked)")
-        elif sub == "4":
-            print("✅ Custom game presence set to: Playing Minecraft (Hardcore SMP)")
-        elif sub == "5":
-            print("✅ Custom game presence set to: Playing GTA VI (Vice City)")
-        elif sub == "6":
-            game = input("Enter Game Name: ").strip()
-            details = input("Enter Details / State: ").strip()
-            print(f"✅ Game Presence updated to: Playing {game} ({details})")
+        t_choice = input("Type (1-5): ").strip()
+        type_map = {"1": "playing", "2": "streaming", "3": "watching", "4": "listening", "5": "custom"}
+        stype = type_map.get(t_choice, "playing")
+
+        text = input("Enter Status Text or Game Name: ").strip()
+        if not text:
+            input("Text cannot be empty. Press Enter...")
+            return
+
+        details = input("Enter In-Game Details / State (optional): ").strip()
+        url = None
+        if stype == "streaming":
+            url = input("Enter Stream URL (e.g. https://twitch.tv/...): ").strip() or "https://twitch.tv/discord"
+
+        next_id = max([s["id"] for s in self.statuses], default=0) + 1
+        entry = {
+            "id": next_id,
+            "type": stype,
+            "text": text,
+            "details": details if details else None,
+            "url": url,
+            "author": "Local CLI"
+        }
+        self.statuses.append(entry)
+        self.save_statuses()
+
+        print(f"\n✅ Created & Saved Status #{next_id}: [{stype.title()}] {text} ({details or ''})")
+        print("• It is now in your saved list and will be included in the 1-minute rotation cycle!")
         input("\nPress Enter to continue...")
 
-    def _menu_status_rotator(self):
-        print("\n--- 🔄 1-MINUTE STATUS ROTATOR UTILITY (100+ PRESETS) ---")
-        categories = list(STATUS_CATALOG.keys())
-        for i, cat in enumerate(categories, 1):
-            print(f"  {i}. {cat} ({len(STATUS_CATALOG[cat])} presets)")
-        print("  5. View All 100+ Presets")
-        print("  6. Back")
+    def _menu_view_saved_statuses(self):
+        self.statuses = self._load_statuses()
+        print(f"\n--- 📋 SAVED CUSTOM STATUSES LIBRARY ({len(self.statuses)}) ---")
+        for s in self.statuses:
+            emoji = "🎮" if s["type"] == "playing" else "📺" if s["type"] == "streaming" else "👀" if s["type"] == "watching" else "🎧" if s["type"] == "listening" else "✨"
+            desc = f"• Details: {s.get('details')}" if s.get("details") else ""
+            print(f"  [{s['id']:02d}] {emoji} [{s['type'].title()}] {s['text']} {desc}")
 
-        sub = input("Select: ").strip()
-        if sub in ["1", "2", "3", "4"]:
-            cat = categories[int(sub) - 1]
-            print(f"\n--- {cat} ---")
-            for j, preset in enumerate(STATUS_CATALOG[cat], 1):
-                print(f"  [{j:02d}] {preset}")
-        elif sub == "5":
-            for cat, presets in STATUS_CATALOG.items():
-                print(f"\n=== {cat} ===")
-                for j, preset in enumerate(presets, 1):
-                    print(f"  • {preset}")
+        print("\nOptions:")
+        print("  • Type an ID number to delete that status")
+        print("  • Type 'b' to go back")
+        action = input("Selection: ").strip()
+
+        if action.isdigit():
+            target_id = int(action)
+            self.statuses = [s for s in self.statuses if s["id"] != target_id]
+            self.save_statuses()
+            print(f"✅ Removed Status #{target_id}.")
+
+        input("\nPress Enter to continue...")
+
+    def _menu_send_chat(self):
+        print("\n--- 💬 SEND CHAT MESSAGE AS BOT ---")
+        guilds = self.get_bot_guilds()
+        if not guilds:
+            input("Bot is not in any server yet. Press Enter...")
+            return
+
+        g = guilds[0]
+        channels = self._api_request("GET", f"/guilds/{g['id']}/channels")
+        text_channels = [c for c in channels if c.get("type") == 0]
+
+        print(f"Channels in {g['name']}:")
+        for i, c in enumerate(text_channels, 1):
+            print(f"  {i}. #{c['name']} (ID: {c['id']})")
+
+        c_choice = input(f"Select channel (1-{len(text_channels)}): ").strip()
+        if c_choice.isdigit() and 1 <= int(c_choice) <= len(text_channels):
+            target_ch = text_channels[int(c_choice) - 1]
+            msg = input(f"Enter message for #{target_ch['name']}: ").strip()
+            if msg:
+                self.send_channel_message(str(target_ch["id"]), msg)
         input("\nPress Enter to continue...")
 
     def _menu_profile(self):
         print("\n--- 👤 BOT PROFILE & AVATAR CONTROL ---")
         print("1. Change Bot Username")
-        print("2. Change Bot Avatar (Local File)")
+        print("2. Change Bot Avatar (Local Image File)")
         print("3. Back")
         sub = input("Select (1-3): ").strip()
 
@@ -323,12 +274,10 @@ class EccoDiscordUtility:
         print("\n--- 🛡️ SERVER & ROLE WHITELIST MANAGER ---")
         print(f"1. Toggle Enforce Whitelist (Current: {'ON' if self.whitelist.get('enforce_server_whitelist') else 'OFF'})")
         print("2. Add Server ID to Whitelist")
-        print("3. Add Admin User ID")
-        print("4. Add Whitelisted Role ID")
-        print("5. View Whitelist JSON")
-        print("6. Back")
+        print("3. View Whitelist JSON")
+        print("4. Back")
 
-        sub = input("Select (1-6): ").strip()
+        sub = input("Select (1-4): ").strip()
         if sub == "1":
             curr = self.whitelist.get("enforce_server_whitelist", False)
             self.whitelist["enforce_server_whitelist"] = not curr
@@ -339,38 +288,7 @@ class EccoDiscordUtility:
                 self.whitelist.setdefault("whitelisted_guild_ids", []).append(int(sid))
                 self.save_whitelist()
         elif sub == "3":
-            uid = input("Enter User ID: ").strip()
-            if uid.isdigit():
-                self.whitelist.setdefault("whitelisted_owner_ids", []).append(int(uid))
-                self.save_whitelist()
-        elif sub == "4":
-            rid = input("Enter Role ID: ").strip()
-            if rid.isdigit():
-                self.whitelist.setdefault("whitelisted_role_ids", []).append(int(rid))
-                self.save_whitelist()
-        elif sub == "5":
             print(json.dumps(self.whitelist, indent=2))
-        input("\nPress Enter to continue...")
-
-    def _menu_render_status(self):
-        print("\n--- 🚀 RENDER CLOUD STATUS ---")
-        RENDER_KEY = "rnd_B2nlGG2PEoBu10loc7IrMgS0bk6i"
-        headers = {
-            "Authorization": f"Bearer {RENDER_KEY}",
-            "Accept": "application/json"
-        }
-        url = "https://api.render.com/v1/services/srv-da2u4r61egvs739ugm4g"
-        req = urllib.request.Request(url, headers=headers)
-        try:
-            with urllib.request.urlopen(req, context=self.ctx) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                print(f"Name:       {data.get('name')}")
-                print(f"Service ID: {data.get('id')}")
-                print(f"Suspended:  {data.get('suspended')}")
-                print(f"Dashboard:  {data.get('dashboardUrl')}")
-                print(f"Live URL:   {data.get('serviceDetails', {}).get('url')}")
-        except Exception as e:
-            print(f"Render Error: {e}")
         input("\nPress Enter to continue...")
 
 if __name__ == "__main__":
