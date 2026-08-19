@@ -1,8 +1,8 @@
 """
-Role Presets, Special FG Roles, Live Auto-Updating Roles Board, and Custom Role Descriptions Cog for Ego Bot.
+Role Presets, Special FG Roles, Live Auto-Updating Roles Board, Custom Role Descriptions, and Clean Server for Ego Bot.
 Features comprehensive Roles Board listing ALL server roles with @mentions, descriptions & member lists,
 instant auto-updating on member/role events, custom role descriptions (/roles set_description),
-and special FG milestone roles.
+special FG milestone roles, and /clean_server duplicate role cleaner.
 """
 import os
 import json
@@ -92,7 +92,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
             return []
 
     async def build_roles_board_embeds(self, guild: discord.Guild) -> List[discord.Embed]:
-        """Constructs rich Roles Board embeds listing ALL server roles with @mentions, descriptions, and members."""
+        """Constructs rich Roles Board embeds listing ALL server roles without duplicates."""
         try:
             if not guild.chunked:
                 await guild.chunk()
@@ -102,11 +102,14 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         reqs = get_tier_requirements()
         custom_descs = load_role_descriptions()
 
-        # Get all custom roles in the server sorted by hierarchy position descending
-        valid_roles = [
-            r for r in guild.roles
-            if r.name != "@everyone"
-        ]
+        # Get all roles deduplicated by ID, sorted by hierarchy position descending
+        seen_ids = set()
+        valid_roles = []
+        for r in guild.roles:
+            if r.name != "@everyone" and r.id not in seen_ids:
+                seen_ids.add(r.id)
+                valid_roles.append(r)
+
         valid_roles.sort(key=lambda r: r.position, reverse=True)
 
         if not valid_roles:
@@ -140,7 +143,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
                 req_text = f"{f_val} Followers / {v_val} Views" if f_val or v_val else ""
             else:
                 for fg_r in FG_SPECIAL_ROLES:
-                    if fg_r["name"] == role.name:
+                    if fg_r["name"].lower() == role.name.lower():
                         desc_text = fg_r["desc"]
                         break
 
@@ -293,7 +296,6 @@ class RolesSystemCog(commands.Cog, name="Roles"):
     async def roleboard_alias(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
         await self.roles_board(interaction, channel)
 
-
     @roles_group.command(name="set_description", description="Set custom description and requirements for any role on the board")
     @app_commands.describe(
         role="The role to describe",
@@ -316,7 +318,6 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         }
         save_role_descriptions(custom_descs)
 
-        # Immediately update all deployed boards
         await self._trigger_board_refresh_for_guild(interaction.guild)
 
         await interaction.response.send_message(
@@ -336,7 +337,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         guild = interaction.guild
         created = []
         for r_data in FG_SPECIAL_ROLES:
-            existing = discord.utils.get(guild.roles, name=r_data["name"])
+            existing = discord.utils.find(lambda r: r.name.lower() == r_data["name"].lower(), guild.roles)
             if not existing:
                 try:
                     role = await guild.create_role(
@@ -359,6 +360,61 @@ class RolesSystemCog(commands.Cog, name="Roles"):
             ),
             ephemeral=True
         )
+
+    @app_commands.command(name="clean_server", description="Safely scan and remove duplicate unused roles from the server")
+    @is_guild_owner()
+    async def clean_server(self, interaction: discord.Interaction):
+        """Scans for duplicate roles with identical names, safely merges members, and removes clones."""
+        await interaction.response.defer(ephemeral=True)
+        guild = interaction.guild
+        if not guild.chunked:
+            try:
+                await guild.chunk()
+            except Exception:
+                pass
+
+        # Group non-system roles by normalized lowercase name
+        groups: Dict[str, List[discord.Role]] = {}
+        for r in guild.roles:
+            if r.name == "@everyone" or r.managed:
+                continue
+            norm = r.name.strip().lower()
+            groups.setdefault(norm, []).append(r)
+
+        deleted = []
+        for norm, roles_list in groups.items():
+            if len(roles_list) > 1:
+                # Keep the role with the most members, or highest position
+                roles_list.sort(key=lambda r: (len(r.members), r.position), reverse=True)
+                primary = roles_list[0]
+                dupes = roles_list[1:]
+
+                for dup in dupes:
+                    try:
+                        # Reassign any members on the duplicate to the primary role
+                        for m in dup.members:
+                            if primary not in m.roles:
+                                try:
+                                    await m.add_roles(primary, reason="Merging duplicate role")
+                                except Exception:
+                                    pass
+                        await dup.delete(reason="Clean Server Duplicate Purge")
+                        deleted.append(f"@{dup.name} (`{dup.id}`)")
+                    except Exception as e:
+                        logger.error(f"Error purging duplicate role {dup.name}: {e}")
+
+        await self._trigger_board_refresh_for_guild(guild)
+
+        if deleted:
+            embed = success_embed(
+                "Server Cleaned",
+                f"Successfully deleted **`{len(deleted)}`** duplicate roles and merged member assignments:\n" +
+                "\n".join(f"› {d}" for d in deleted[:30])
+            )
+        else:
+            embed = info_embed("Server Clean", "No duplicate roles detected in this server.")
+
+        await interaction.followup.send(embed=embed)
 
     @roles_group.command(name="import_presets", description="Bulk import preset roles from catalog into server")
     @app_commands.describe(
@@ -388,7 +444,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
 
         created_roles = []
         for p in filtered[:count]:
-            existing = discord.utils.get(interaction.guild.roles, name=p["name"])
+            existing = discord.utils.find(lambda r: r.name.lower() == p["name"].lower(), interaction.guild.roles)
             if not existing:
                 try:
                     c = int(p["color_hex"].replace("#", ""), 16) if "color_hex" in p else 0x8B5CF6
