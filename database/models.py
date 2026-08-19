@@ -63,11 +63,19 @@ class WelcomeConfig(Base):
     guild_id = Column(BigInteger, primary_key=True, index=True)
     enabled = Column(Boolean, default=False)
     channel_id = Column(BigInteger, nullable=True)
-    title = Column(String(255), default="Welcome to {server}!")
-    message = Column(Text, default="Hey {user}, welcome! You are member #{membercount}.")
-    embed_color = Column(Integer, default=0x5865F2)
+    title = Column(String(255), default="✦ Welcome to {server}!")
+    message = Column(Text, default="> Welcome {mention} to **{server}**!\n> You were invited by **{inviter}**, who now has **`{invites_count}`** invites.\n> Server Member Count: **`#{membercount}`**")
+    embed_color = Column(Integer, default=0x8B5CF6)
     dm_enabled = Column(Boolean, default=False)
-    dm_message = Column(Text, default="Welcome to {server}! Make sure to read the rules.")
+    dm_message = Column(Text, default="Welcome to {server}! Make sure to read the rules and verify.")
+
+    # Goodbye / Leave Configuration
+    leave_enabled = Column(Boolean, default=False)
+    leave_channel_id = Column(BigInteger, nullable=True)
+    leave_title = Column(String(255), default="✦ Member Left • {server}")
+    leave_message = Column(Text, default="> **{user}** (`{mention}`) has left the server.\n> They were invited by **{inviter}** (now has **`{invites_count}`** invites).\n> Remaining Members: **`#{membercount}`**")
+    leave_color = Column(Integer, default=0xEF4444)
+
 
 class AutomodConfig(Base):
     __tablename__ = "automod_configs"
