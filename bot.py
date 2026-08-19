@@ -48,12 +48,17 @@ class EgoBot(commands.Bot):
         )
 
     async def setup_hook(self):
-        # 1. Initialize Database
+        # 1. Ensure Data Directories Exist
+        os.makedirs(os.path.join(os.path.dirname(__file__), "data"), exist_ok=True)
+        os.makedirs(os.path.join(os.path.dirname(__file__), "data", "backups"), exist_ok=True)
+
+        # 2. Initialize Database & Schemas
         logger.info("Connecting to database and verifying schema...")
         await init_db()
 
-        # 2. Load all 12 Cogs
+        # 3. Load all Extensions
         for ext in INITIAL_COGS:
+
             try:
                 await self.load_extension(ext)
                 logger.info(f"Loaded extension: {ext}")
