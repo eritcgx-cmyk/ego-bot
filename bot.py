@@ -179,34 +179,37 @@ async def config_status(interaction: discord.Interaction):
 
 bot.tree.add_command(config_group)
 
-import aiohttp.web
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import threading
 
-async def start_keepalive_server():
-    """Lightweight health check server for Render Free Web Service hosting."""
-    async def handle_ping(request):
-        return aiohttp.web.Response(text="Ego Bot Online & Healthy", status=200)
+class KeepaliveHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"Ego Bot Online & Healthy")
 
-    app = aiohttp.web.Application()
-    app.router.add_get("/", handle_ping)
-    app.router.add_get("/health", handle_ping)
-    
+    def log_message(self, format, *args):
+        pass # Suppress continuous health check logging
+
+def start_threaded_keepalive():
+    """Starts a robust background HTTP server on 0.0.0.0:$PORT for Render."""
     port = int(os.environ.get("PORT", 10000))
-    runner = aiohttp.web.AppRunner(app)
-    await runner.setup()
-    site = aiohttp.web.TCPSite(runner, "0.0.0.0", port)
-    await site.start()
-    logger.info(f"Keepalive web server listening on 0.0.0.0:{port}")
+    try:
+        server = HTTPServer(("0.0.0.0", port), KeepaliveHandler)
+        t = threading.Thread(target=server.serve_forever, daemon=True)
+        t.start()
+        logger.info(f"Threaded keepalive server listening on 0.0.0.0:{port}")
+    except Exception as e:
+        logger.warning(f"Could not bind keepalive port {port}: {e}")
 
 async def run_bot_with_server():
     if not BOT_TOKEN:
         logger.error("BOT_TOKEN environment variable is missing! Please set it in .env or your cloud environment.")
         sys.exit(1)
-    
-    # 1. Start HTTP Server immediately so Render health check succeeds instantly
-    try:
-        await start_keepalive_server()
-    except Exception as e:
-        logger.warning(f"Could not start keepalive server: {e}")
+
+    # 1. Start Threaded HTTP Server immediately (Answers Render healthcheck in <1ms)
+    start_threaded_keepalive()
 
     # 2. Initialize Database Schema
     logger.info("Verifying database schema...")
@@ -221,5 +224,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
