@@ -104,7 +104,12 @@ class InvitesCog(commands.Cog, name="Invites"):
                                 except Exception:
                                     pass
 
-    invites_group = app_commands.Group(name="invites", description="Invite tracking, leaderboards, and rewards")
+    invites_group = app_commands.Group(name="invites", description="Invite tracking, leaderboards, and statistics")
+    invites_admin_group = app_commands.Group(
+        name="invites_admin",
+        description="Staff administration controls for invite tiers",
+        default_permissions=discord.Permissions(manage_roles=True)
+    )
 
     @invites_group.command(name="mystats", description="Check your personal invite statistics")
     @app_commands.describe(user="User to check stats for (default yourself)")
@@ -166,13 +171,12 @@ class InvitesCog(commands.Cog, name="Invites"):
         embed.description = "\n".join(lines)
         await interaction.response.send_message(embed=embed)
 
-    @invites_group.command(name="config_tier", description="Configure an invite tier reward role (1 through 10)")
+    @invites_admin_group.command(name="config_tier", description="Configure an invite tier reward role (1 through 10)")
     @app_commands.describe(
         tier_number="Tier number (1-10)",
         threshold="Invite count required",
         role="Role to grant upon reaching threshold"
     )
-    @app_commands.default_permissions(manage_roles=True)
     @is_admin_or_has_role()
     async def invites_config_tier(
         self,
@@ -217,8 +221,7 @@ class InvitesCog(commands.Cog, name="Invites"):
             )
         )
 
-    @invites_group.command(name="panel", description="Post a summary panel of all invite reward tiers")
-    @app_commands.default_permissions(manage_guild=True)
+    @invites_admin_group.command(name="panel", description="Post a summary panel of all invite reward tiers")
     async def invites_panel(self, interaction: discord.Interaction):
         async with AsyncSessionLocal() as session:
             res = await session.execute(
@@ -252,3 +255,4 @@ class InvitesCog(commands.Cog, name="Invites"):
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(InvitesCog(bot))
+
