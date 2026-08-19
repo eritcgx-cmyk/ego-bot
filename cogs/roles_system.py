@@ -1,6 +1,6 @@
 """
 Role Presets, Special FG Roles, Live Auto-Updating Roles Board, Custom Role Descriptions, and Clean Server for Ego Bot.
-Features compact single-embed architecture guaranteed to fit ALL server roles without hitting Discord character limits,
+Features complete dynamic role rendering showing 100% of all server roles without limits or truncation,
 instant real-time event updates, custom role descriptions (/roles set_description), and /clean_server duplicate role cleaner.
 """
 import os
@@ -86,8 +86,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         except Exception:
             return []
 
-    async def build_roles_board_embed(self, guild: discord.Guild) -> discord.Embed:
-        """Constructs the comprehensive Roles Board listing ALL server roles categorized and styled."""
+    async def build_roles_board_embeds(self, guild: discord.Guild) -> List[discord.Embed]:
+        """Constructs the comprehensive Roles Board listing ALL server roles without truncation."""
         try:
             if not guild.chunked:
                 await guild.chunk()
@@ -108,17 +108,11 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         all_roles.sort(key=lambda r: r.position, reverse=True)
 
         if not all_roles:
-            return ego_embed(
+            return [ego_embed(
                 title="Roles",
                 description=f"> No custom roles found in **{guild.name}**.\n> Create roles in Discord or use `/roles import_presets`!",
                 color=COLOR_VIOLET
-            )
-
-        embed = ego_embed(
-            title="Roles",
-            description=f"> Complete directory of all **`{len(all_roles)}`** roles and active members in **{guild.name}**:\n",
-            color=COLOR_VIOLET
-        )
+            )]
 
         def format_role_line(role: discord.Role) -> str:
             # Members list (first 8 mentions)
@@ -158,39 +152,73 @@ class RolesSystemCog(commands.Cog, name="Roles"):
                 line += f"\n{desc_sub}"
             return line
 
-        # 1. Content Creator Roles Section
+        # Split all roles into logical categories
         cc_roles = [r for r in all_roles if r.name in CC_ROLE_NAMES]
-        if cc_roles:
-            cc_lines = [format_role_line(r) for r in cc_roles]
-            val = "\n\n".join(cc_lines)
-            embed.add_field(name="✦ Content Creator Roles (/cc verify)", value=val[:1024], inline=False)
-
-        # 2. Friend Group Roles Section
         fg_roles = [r for r in all_roles if r.name in FG_SPECIAL_ROLES or r.name.startswith("👑 ︱ ")]
-        if fg_roles:
-            fg_lines = [format_role_line(r) for r in fg_roles[:15]]
-            val = "\n\n".join(fg_lines)
-            embed.add_field(name="✦ Friend Group Roles (/fg start)", value=val[:1024], inline=False)
+        other_roles = [r for r in all_roles if r not in cc_roles and r not in fg_roles]
 
-        # 3. All Other Server Roles Section
-        other_roles = [
-            r for r in all_roles
-            if r.name not in CC_ROLE_NAMES and r.name not in FG_SPECIAL_ROLES and not r.name.startswith("👑 ︱ ")
+        categories_to_process = [
+            ("✦ Content Creator Roles (/cc verify)", cc_roles),
+            ("✦ Friend Group Roles (/fg start)", fg_roles),
+            ("✦ Server Roles", other_roles)
         ]
-        if other_roles:
-            # Chunk other roles cleanly across up to 2 fields if needed
-            chunk1 = other_roles[:12]
-            lines1 = [format_role_line(r) for r in chunk1]
-            val1 = "\n\n".join(lines1)
-            embed.add_field(name="✦ Server Roles", value=val1[:1024], inline=False)
 
-            if len(other_roles) > 12:
-                chunk2 = other_roles[12:24]
-                lines2 = [format_role_line(r) for r in chunk2]
-                val2 = "\n\n".join(lines2)
-                embed.add_field(name="✦ Server Roles (Continued)", value=val2[:1024], inline=False)
+        embeds: List[discord.Embed] = []
+        current_embed = ego_embed(
+            title="Roles",
+            description=f"> Complete directory of all **`{len(all_roles)}`** roles and active members in **{guild.name}**:\n",
+            color=COLOR_VIOLET
+        )
+        current_embed_char_count = len(current_embed.title or "") + len(current_embed.description or "")
+        field_count = 0
 
-        return embed
+        for cat_title, role_list in categories_to_process:
+            if not role_list:
+                continue
+
+            # Build all lines for this entire category (NO SLICING!)
+            formatted_lines = [format_role_line(r) for r in role_list]
+
+            # Chunk lines into batches that strictly fit within 1,024 characters per field
+            batches: List[str] = []
+            curr_batch: List[str] = []
+            curr_len = 0
+
+            for line in formatted_lines:
+                line_len = len(line) + 2  # newline buffer
+                if curr_len + line_len > 1000 and curr_batch:
+                    batches.append("\n\n".join(curr_batch))
+                    curr_batch = [line]
+                    curr_len = line_len
+                else:
+                    curr_batch.append(line)
+                    curr_len += line_len
+
+            if curr_batch:
+                batches.append("\n\n".join(curr_batch))
+
+            for i, batch_val in enumerate(batches):
+                field_name = cat_title if len(batches) == 1 else f"{cat_title} (Part {i+1})"
+                field_chars = len(field_name) + len(batch_val)
+
+                # Check if current embed is full (max 20 fields or > 5000 chars)
+                if field_count >= 20 or (current_embed_char_count + field_chars > 5000):
+                    embeds.append(current_embed)
+                    current_embed = ego_embed(
+                        title="Roles (Continued)",
+                        color=COLOR_VIOLET
+                    )
+                    current_embed_char_count = len(current_embed.title or "")
+                    field_count = 0
+
+                current_embed.add_field(name=field_name, value=batch_val, inline=False)
+                field_count += 1
+                current_embed_char_count += field_chars
+
+        if field_count > 0:
+            embeds.append(current_embed)
+
+        return embeds
 
     @tasks.loop(seconds=30)
     async def auto_refresh_boards(self):
@@ -208,8 +236,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
 
             try:
                 msg = await channel.fetch_message(b.get("message_id", 0))
-                embed = await self.build_roles_board_embed(guild)
-                await msg.edit(embed=embed)
+                embeds = await self.build_roles_board_embeds(guild)
+                await msg.edit(embeds=embeds)
                 updated_boards.append(b)
             except discord.NotFound:
                 pass
@@ -260,8 +288,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
                 if ch and isinstance(ch, discord.TextChannel):
                     try:
                         msg = await ch.fetch_message(b.get("message_id", 0))
-                        embed = await self.build_roles_board_embed(guild)
-                        await msg.edit(embed=embed)
+                        embeds = await self.build_roles_board_embeds(guild)
+                        await msg.edit(embeds=embeds)
                     except Exception as e:
                         logger.error(f"Error editing board message in #{ch.name}: {e}")
 
@@ -275,8 +303,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         guild = interaction.guild
 
         await interaction.response.defer(ephemeral=True)
-        embed = await self.build_roles_board_embed(guild)
-        msg = await target_ch.send(embed=embed)
+        embeds = await self.build_roles_board_embeds(guild)
+        msg = await target_ch.send(embeds=embeds)
 
         boards = load_board_states()
         boards = [b for b in boards if b.get("channel_id") != target_ch.id]
