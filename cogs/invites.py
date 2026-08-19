@@ -218,6 +218,7 @@ class InvitesCog(commands.Cog, name="Invites"):
         )
 
     @invites_group.command(name="panel", description="Post a summary panel of all invite reward tiers")
+    @app_commands.default_permissions(manage_guild=True)
     async def invites_panel(self, interaction: discord.Interaction):
         async with AsyncSessionLocal() as session:
             res = await session.execute(
