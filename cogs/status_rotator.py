@@ -174,6 +174,7 @@ class CustomStatusCog(commands.Cog, name="CustomStatus"):
         app_commands.Choice(name="Competing", value="competing"),
         app_commands.Choice(name="Custom", value="custom")
     ])
+    @is_admin_or_has_role()
     async def status_set(
         self,
         interaction: discord.Interaction,
@@ -215,7 +216,9 @@ class CustomStatusCog(commands.Cog, name="CustomStatus"):
         )
 
     @status_group.command(name="list", description="View all saved custom statuses and select one to apply")
+    @is_admin_or_has_role()
     async def status_list(self, interaction: discord.Interaction):
+
         self.statuses = CustomStatusManager.load_statuses()
         if not self.statuses:
             return await interaction.response.send_message(
