@@ -1,7 +1,8 @@
 """
 Friend Group (FG) System Cog for Ego Bot.
 Features instant owner creation (/fg create), public invitation flow with DM Accept/Decline buttons (/fg start),
-live group stats (/fg stats), and full channel provisioning (Category, Text Lounge, Voice Suite).
+personal squad stats (/fg stats - only your FGs), server squad directory with interactive dropdown (/fg overview),
+and full channel provisioning (Category, Text Lounge, Voice Suite).
 """
 import json
 from typing import Optional, List, Dict, Any
@@ -56,7 +57,6 @@ class FGInviteDMView(discord.ui.View):
 
             # Check if all required members accepted (Creator + 4 friends = 5)
             if len(members) >= 5 and fg.status == "pending":
-                # Trigger channel provisioning
                 bot = interaction.client
                 guild = bot.get_guild(self.guild_id)
                 if guild:
@@ -71,6 +71,51 @@ class FGInviteDMView(discord.ui.View):
             embed=error_embed("Invitation Declined", f"You declined the invitation to join **{self.fg_name}**.")
         )
 
+class FGSelectOverviewView(discord.ui.View):
+    def __init__(self, all_fgs: List[FriendGroup]):
+        super().__init__(timeout=180)
+        self.all_fgs = all_fgs
+
+        options = []
+        for fg in all_fgs[:25]: # Discord select menu max 25
+            status_str = "🟢 Active" if fg.status == "active" else "🟡 Pending"
+            options.append(discord.SelectOption(
+                label=f"#{fg.id} {fg.name[:65]}",
+                description=f"{status_str} • {len(fg.members)} Members",
+                value=str(fg.id),
+                emoji="👑"
+            ))
+
+        if options:
+            self.select_menu.options = options
+        else:
+            self.remove_item(self.select_menu)
+
+    @discord.ui.select(placeholder="Choose a squad to view detailed stats...", min_values=1, max_values=1)
+    async def select_menu(self, interaction: discord.Interaction, select_comp: discord.ui.Select):
+        chosen_id = int(select_comp.values[0])
+        fg = next((f for f in self.all_fgs if f.id == chosen_id), None)
+
+        if not fg:
+            return await interaction.response.send_message("❌ Squad record not found.", ephemeral=True)
+
+        members_mentions = ", ".join(f"<@{m}>" for m in fg.members) if fg.members else "*None*"
+        status_badge = "🟢 Active & Provisioned" if fg.status == "active" else "🟡 Pending Member Invites"
+        channels_str = f"<#{fg.text_channel_id}> • <#{fg.voice_channel_id}>" if fg.text_channel_id else "*Channels Not Provisioned Yet*"
+
+        embed = ego_embed(
+            title=f"👑 Squad Profile • {fg.name}",
+            description=(
+                f"> **Status:** {status_badge}\n"
+                f"> **Squad ID:** `#{fg.id}`\n\n"
+                f"› **Leader:** <@{fg.creator_id}>\n"
+                f"› **Total Members ({len(fg.members)}):**\n{members_mentions}\n\n"
+                f"› **Private Channels:**\n{channels_str}\n"
+            ),
+            color=COLOR_VIOLET
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
 async def provision_fg_channels(guild: discord.Guild, fg_record: FriendGroup):
     """Provisions private Category, Text Lounge, and Voice Suite for an approved FG."""
     try:
@@ -80,16 +125,13 @@ async def provision_fg_channels(guild: discord.Guild, fg_record: FriendGroup):
             guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_channels=True, connect=True)
         }
 
-        # Add all members to overwrites
         for m in members_list:
             overwrites[m] = discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True, speak=True)
 
-        # Add mods to overwrites
         for r in guild.roles:
             if r.permissions.manage_guild or r.permissions.administrator:
                 overwrites[r] = discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True)
 
-        # Create Category & Channels
         cat = await guild.create_category(name=f"👑 ︱ {fg_record.name}", overwrites=overwrites)
         text_ch = await guild.create_text_channel(name=f"💬-lounge", category=cat, topic=f"Private squad lounge for {fg_record.name}")
         voice_ch = await guild.create_voice_channel(name=f"🔊-voice", category=cat)
@@ -104,7 +146,6 @@ async def provision_fg_channels(guild: discord.Guild, fg_record: FriendGroup):
                 fg.status = "active"
                 await session.commit()
 
-        # Send squad welcome card
         members_mentions = ", ".join(f"<@{m}>" for m in fg_record.members)
         welcome_embed = ego_embed(
             title=f"👑 Squad Unlocked • {fg_record.name}",
@@ -193,7 +234,6 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
         user = interaction.user
         invitees = [member1, member2, member3, member4]
 
-        # Prevent duplicate users or self-invite
         if len(set([m.id for m in invitees])) < 4 or any(m.id == user.id for m in invitees):
             return await interaction.response.send_message(
                 embed=error_embed("Invalid Members", "Please select 4 unique server members (excluding yourself)."),
@@ -206,13 +246,12 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                 creator_id=user.id,
                 name=name.strip(),
                 status="pending",
-                members_json=json.dumps([user.id]) # Only creator accepted so far
+                members_json=json.dumps([user.id])
             )
             session.add(fg)
             await session.commit()
             await session.refresh(fg)
 
-        # Send DM Embeds with Accept/Decline Buttons to each invitee
         sent_count = 0
         for m in invitees:
             try:
@@ -241,39 +280,84 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             )
         )
 
-    @fg_group.command(name="stats", description="View all Friend Groups, pending invites, and active channel suites")
+    @fg_group.command(name="stats", description="View personal stats of the Friend Groups you belong to")
     async def fg_stats(self, interaction: discord.Interaction):
         guild = interaction.guild
+        user = interaction.user
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.guild_id == guild.id))
+            all_fgs = res.scalars().all()
+
+        user_fgs = [fg for fg in all_fgs if user.id in fg.members or fg.creator_id == user.id]
+
+        if not user_fgs:
+            return await interaction.response.send_message(
+                embed=info_embed("Your Squads", "You are not currently in any Friend Groups.\nRun `/fg start` to create your own squad!"),
+                ephemeral=True
+            )
+
+        embed = ego_embed(
+            title=f"👑 Your Friend Groups ({len(user_fgs)})",
+            description=f"Overview of all squads associated with {user.mention}:\n",
+            color=COLOR_VIOLET
+        )
+
+        for fg in user_fgs:
+            status_badge = "🟢 Active & Provisioned" if fg.status == "active" else "🟡 Pending Member Invites"
+            members_mentions = ", ".join(f"<@{m}>" for m in fg.members)
+            ch_info = f"• Channels: <#{fg.text_channel_id}> • <#{fg.voice_channel_id}>" if fg.text_channel_id else "• Channels: *Pending Provisioning*"
+            
+            embed.add_field(
+                name=f"› {fg.name} ({status_badge})",
+                value=(
+                    f"• **Role:** `{'👑 Leader' if fg.creator_id == user.id else '👥 Member'}`\n"
+                    f"• **Squad Size:** `{len(fg.members)}/5 Members`\n"
+                    f"• **Roster:** {members_mentions}\n"
+                    f"{ch_info}"
+                ),
+                inline=False
+            )
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    @fg_group.command(name="overview", description="Browse all server Friend Groups with an interactive dropdown selector")
+    async def fg_overview(self, interaction: discord.Interaction):
+        guild = interaction.guild
+
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.guild_id == guild.id))
             all_fgs = res.scalars().all()
 
         if not all_fgs:
             return await interaction.response.send_message(
-                embed=info_embed("Friend Groups", "No active or pending Friend Groups found in this server. Run `/fg start` to begin!"),
+                embed=info_embed("Server Squads", "No Friend Groups have been created in this server yet.\nRun `/fg start` to launch one!"),
                 ephemeral=True
             )
 
+        active_count = sum(1 for fg in all_fgs if fg.status == "active")
+        pending_count = sum(1 for fg in all_fgs if fg.status == "pending")
+
         embed = ego_embed(
-            title=f"👑 Server Friend Groups ({len(all_fgs)})",
-            description="Overview of all registered squads, status, and private channels:\n",
+            title=f"👑 Server Friend Groups Directory ({len(all_fgs)})",
+            description=(
+                f"> **Active Squads:** `{active_count}`\n"
+                f"> **Pending Creation:** `{pending_count}`\n\n"
+                f"Select any squad from the dropdown menu below to view its members, leader, and private channels:\n"
+            ),
             color=COLOR_VIOLET
         )
 
-        for fg in all_fgs[:15]:
-            status_badge = "🟢 Active & Provisioned" if fg.status == "active" else "🟡 Pending Invites"
-            ch_info = f"• Channels: <#{fg.text_channel_id}>" if fg.text_channel_id else "• Channels: *Pending*"
+        for fg in all_fgs[:10]:
+            status_badge = "🟢 Active" if fg.status == "active" else "🟡 Pending"
             embed.add_field(
-                name=f"› {fg.name} ({status_badge})",
-                value=(
-                    f"• **Leader:** <@{fg.creator_id}>\n"
-                    f"• **Members:** `{len(fg.members)}/5`\n"
-                    f"{ch_info}"
-                ),
+                name=f"› #{fg.id} {fg.name}",
+                value=f"• Status: {status_badge} • Members: `{len(fg.members)}` • Leader: <@{fg.creator_id}>",
                 inline=False
             )
 
-        await interaction.response.send_message(embed=embed)
+        view = FGSelectOverviewView(all_fgs)
+        await interaction.response.send_message(embed=embed, view=view)
 
     @fg_group.command(name="rename", description="Rename your Friend Group and sync channel names")
     @app_commands.describe(new_name="New squad name")
@@ -312,7 +396,6 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             if not fg:
                 return await interaction.response.send_message(embed=error_embed("Not Allowed", "You do not own a Friend Group."), ephemeral=True)
 
-            # Purge channels
             if fg.category_id:
                 cat = guild.get_channel(fg.category_id)
                 if cat:
