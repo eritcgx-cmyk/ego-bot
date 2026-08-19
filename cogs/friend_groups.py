@@ -884,7 +884,13 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
 
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @fg_group.command(name="create", description="[Admin/Owner] Instantly create and approve an active Friend Group")
+    fg_admin_group = app_commands.Group(
+        name="fg_admin",
+        description="Staff administration controls for Friend Groups",
+        default_permissions=discord.Permissions(manage_guild=True)
+    )
+
+    @fg_admin_group.command(name="create", description="[Admin/Owner] Instantly create and approve an active Friend Group")
     @app_commands.describe(
         name="Name of the FG",
         leader="Member who will lead the FG",
@@ -893,7 +899,6 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
         member4="Fourth member",
         member5="Fifth member"
     )
-    @app_commands.default_permissions(manage_guild=True)
     @is_admin_or_has_role()
     async def fg_create(
         self,
@@ -932,11 +937,9 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             )
         )
 
-    @fg_group.command(name="overview", description="[Admin/Mods] Directory of all Friend Groups in the server")
-    @app_commands.default_permissions(manage_guild=True)
+    @fg_admin_group.command(name="overview", description="[Admin/Mods] Directory of all Friend Groups in the server")
     @is_admin_or_has_role()
     async def fg_overview(self, interaction: discord.Interaction):
-
         guild = interaction.guild
         await interaction.response.defer(ephemeral=True)
 
@@ -977,3 +980,4 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(FriendGroupsCog(bot))
+
