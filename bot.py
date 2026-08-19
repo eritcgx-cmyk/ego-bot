@@ -59,13 +59,29 @@ class EgoBot(commands.Bot):
             except Exception as e:
                 logger.error(f"Failed to load extension {ext}: {e}")
 
-        # 3. Sync Slash Commands
+        # 3. Register Persistent UI Views (So buttons and tickets work forever across restarts)
+        try:
+            from cogs.content_creator import CCTicketReviewView
+            self.add_view(CCTicketReviewView())
+            logger.info("Registered persistent CCTicketReviewView.")
+        except Exception as e:
+            logger.debug(f"Could not register CCTicketReviewView: {e}")
+
+        try:
+            from cogs.rules import RulesAgreeView
+            self.add_view(RulesAgreeView())
+            logger.info("Registered persistent RulesAgreeView.")
+        except Exception as e:
+            logger.debug(f"Could not register RulesAgreeView: {e}")
+
+        # 4. Sync Slash Commands
         logger.info("Syncing application slash command tree with Discord...")
         try:
             synced = await self.tree.sync()
             logger.info(f"Synced {len(synced)} global slash commands.")
         except Exception as e:
             logger.error(f"Failed to sync slash commands: {e}")
+
 
     async def on_ready(self):
         logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
