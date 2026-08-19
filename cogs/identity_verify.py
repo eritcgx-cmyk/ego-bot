@@ -115,7 +115,11 @@ class IdentityVerifyCog(commands.Cog, name="IdentityVerify"):
         except Exception as e:
             logger.warning(f"Could not restore identity verification views: {e}")
 
-    verify_group = app_commands.Group(name="verify_panel", description="Identity & Gender role verification panel")
+    verify_group = app_commands.Group(
+        name="verify_panel",
+        description="Identity & Gender role verification panel",
+        default_permissions=discord.Permissions(administrator=True)
+    )
 
     @verify_group.command(name="setup", description="Deploy the identity & gender verification panel")
     @app_commands.describe(
