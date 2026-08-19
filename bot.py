@@ -61,11 +61,13 @@ class EgoBot(commands.Bot):
 
         # 3. Register Persistent UI Views (So buttons and tickets work forever across restarts)
         try:
-            from cogs.content_creator import CCTicketReviewView
+            from cogs.content_creator import CCTicketReviewView, CCPostReviewView
             self.add_view(CCTicketReviewView())
-            logger.info("Registered persistent CCTicketReviewView.")
+            self.add_view(CCPostReviewView())
+            logger.info("Registered persistent CCTicketReviewView and CCPostReviewView.")
         except Exception as e:
-            logger.debug(f"Could not register CCTicketReviewView: {e}")
+            logger.debug(f"Could not register CC views: {e}")
+
 
         try:
             from cogs.rules import RulesAgreeView
