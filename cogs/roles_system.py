@@ -93,13 +93,19 @@ class RolesSystemCog(commands.Cog, name="Roles"):
 
     async def build_roles_board_embeds(self, guild: discord.Guild) -> List[discord.Embed]:
         """Constructs rich Roles Board embeds listing ALL server roles with @mentions, descriptions, and members."""
+        try:
+            if not guild.chunked:
+                await guild.chunk()
+        except Exception:
+            pass
+
         reqs = get_tier_requirements()
         custom_descs = load_role_descriptions()
 
-        # Get all roles sorted from highest hierarchy position to lowest
+        # Get all custom roles in the server sorted by hierarchy position descending
         valid_roles = [
             r for r in guild.roles
-            if r.name != "@everyone" and not r.managed
+            if r.name != "@everyone"
         ]
         valid_roles.sort(key=lambda r: r.position, reverse=True)
 
@@ -113,7 +119,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         embeds = []
         current_embed = ego_embed(
             title="Roles",
-            description=f"> Complete directory of all **`{len(valid_roles)}`** server roles, descriptions, and members:\n",
+            description=f"> Complete live directory of all **`{len(valid_roles)}`** server roles, descriptions, and members:\n",
             color=COLOR_VIOLET
         )
 
@@ -156,7 +162,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
             if len(field_val) > 1020:
                 field_val = field_val[:1015] + "..."
 
-            # Discord embeds allow max 25 fields
+            # Discord embeds allow max 25 fields per embed
             if field_count >= 24:
                 embeds.append(current_embed)
                 current_embed = ego_embed(
@@ -175,7 +181,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         embeds.append(current_embed)
         return embeds
 
-    @tasks.loop(seconds=45)
+    @tasks.loop(seconds=30)
     async def auto_refresh_boards(self):
         """Automatically keeps all deployed Role Boards updated across channels."""
         boards = load_board_states()
@@ -192,7 +198,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
             try:
                 msg = await channel.fetch_message(b.get("message_id", 0))
                 embeds = await self.build_roles_board_embeds(guild)
-                await msg.edit(embed=embeds[0])
+                await msg.edit(embeds=embeds)
                 updated_boards.append(b)
             except discord.NotFound:
                 pass
@@ -234,6 +240,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         await self._trigger_board_refresh_for_guild(after.guild)
 
     async def _trigger_board_refresh_for_guild(self, guild: discord.Guild):
+        if not guild:
+            return
         boards = load_board_states()
         for b in boards:
             if b.get("guild_id") == guild.id:
@@ -242,9 +250,9 @@ class RolesSystemCog(commands.Cog, name="Roles"):
                     try:
                         msg = await ch.fetch_message(b.get("message_id", 0))
                         embeds = await self.build_roles_board_embeds(guild)
-                        await msg.edit(embed=embeds[0])
-                    except Exception:
-                        pass
+                        await msg.edit(embeds=embeds)
+                    except Exception as e:
+                        logger.debug(f"Error editing board message: {e}")
 
     roles_group = app_commands.Group(name="roles", description="Role library, presets, perks, and live panels")
 
@@ -255,8 +263,9 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         target_ch = channel or interaction.channel
         guild = interaction.guild
 
+        await interaction.response.defer(ephemeral=True)
         embeds = await self.build_roles_board_embeds(guild)
-        msg = await target_ch.send(embed=embeds[0])
+        msg = await target_ch.send(embeds=embeds)
 
         boards = load_board_states()
         boards = [b for b in boards if b.get("channel_id") != target_ch.id]
@@ -267,8 +276,8 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         })
         save_board_states(boards)
 
-        await interaction.response.send_message(
-            embed=success_embed("Roles Board Deployed", f"Live auto-updating Roles Board is active in {target_ch.mention}."),
+        await interaction.followup.send(
+            embed=success_embed("Roles Board Deployed", f"Live auto-updating Roles Board is active in {target_ch.mention} (listing all `{len(guild.roles) - 1}` roles)."),
             ephemeral=True
         )
 
