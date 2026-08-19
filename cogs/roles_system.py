@@ -12,8 +12,9 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from sqlalchemy import select
 from database.engine import AsyncSessionLocal
-from database.models import RolePreset, RolePanel, CustomRoleRequest, RolePerk
+from database.models import RolePanel, CustomRoleRequest, RolePerk
 from utils.permissions import is_admin_or_has_role, is_guild_owner
+
 from utils.embeds import (
     ego_embed, success_embed, error_embed, info_embed, card_embed,
     COLOR_VIOLET, COLOR_EMERALD, COLOR_CRIMSON, COLOR_CYAN, COLOR_AMBER, COLOR_ROSE
