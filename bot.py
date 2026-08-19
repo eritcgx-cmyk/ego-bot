@@ -202,6 +202,10 @@ async def run_bot_with_server():
         logger.error("BOT_TOKEN environment variable is missing! Please set it in .env or your cloud environment.")
         sys.exit(1)
     
+    # Initialize Database Schema before starting bot or keepalive
+    logger.info("Verifying database schema...")
+    await init_db()
+    
     # Start web server if PORT is set (Render environment)
     if "PORT" in os.environ:
         await start_keepalive_server()
