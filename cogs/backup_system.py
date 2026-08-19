@@ -60,7 +60,11 @@ class BackupSystemCog(commands.Cog, name="Backup"):
     def cog_unload(self):
         self.daily_backup_loop.cancel()
 
-    backup_group = app_commands.Group(name="backup", description="Server backup snapshots and disaster recovery reconstruction")
+    backup_group = app_commands.Group(
+        name="backup",
+        description="Server backup snapshots and disaster recovery reconstruction",
+        default_permissions=discord.Permissions(administrator=True)
+    )
 
     async def capture_guild_snapshot(self, guild: discord.Guild, note: Optional[str] = None) -> Dict[str, Any]:
         """Captures a complete dictionary payload of guild state."""
