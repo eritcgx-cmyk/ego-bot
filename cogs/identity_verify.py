@@ -1,8 +1,9 @@
 """
-Comprehensive Face, Video & Identity Verification Engine for Ego Bot.
+Comprehensive Face, Video & Identity Verification Engine for Ego Bot with Gender-Aware Role Rewards.
 Features:
 - Video & Selfie Proof verification with Server Vanity requirement
-- Dedicated staff review queue with live approve/deny interactive buttons
+- Gender-aware auto-assignment: Grants "Verified Boy" or "Verified Girl" based on Male/Female roles or Staff approval
+- Dedicated staff review queue with [Approve Boy], [Approve Girl], [Auto-Approve], and [Deny] buttons
 - Automated role assignment and member DM notifications
 - Persistent Verification Panel deployment
 """
@@ -10,7 +11,7 @@ import os
 import json
 import asyncio
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Tuple
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -41,8 +42,30 @@ def save_face_configs(data: Dict[str, Any]):
     with open(VERIFY_CONFIGS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
+def detect_member_gender(member: discord.Member, cfg: Dict[str, Any]) -> str:
+    """Detects whether member has Male or Female roles configured on server."""
+    male_role_id = cfg.get("male_role_id")
+    female_role_id = cfg.get("female_role_id")
 
-class FaceVerifySubmitModal(discord.ui.Modal, title="Face / Video Verification"):
+    user_role_ids = [r.id for r in member.roles]
+    user_role_names = [r.name.lower() for r in member.roles]
+
+    if female_role_id and female_role_id in user_role_ids:
+        return "girl"
+    if male_role_id and male_role_id in user_role_ids:
+        return "boy"
+
+    # Fallback to name pattern matching
+    for name in user_role_names:
+        if any(w in name for w in ["female", "girl", "she/her", "she", "woman", "lady"]):
+            return "girl"
+        if any(w in name for w in ["male", "boy", "he/him", "he", "man", "guy"]):
+            return "boy"
+
+    return "unknown"
+
+
+class FaceVerifySubmitModal(discord.ui.Modal, title="Face & Vanity Video Verification"):
     """Modal for submitting video proof showing user and server vanity."""
     def __init__(self, vanity_phrase: str):
         super().__init__()
@@ -53,6 +76,12 @@ class FaceVerifySubmitModal(discord.ui.Modal, title="Face / Video Verification")
         placeholder="https://streamable.com/... or Imgur / Discord CDN / YouTube / TikTok",
         required=True,
         max_length=512
+    )
+    gender_input = discord.ui.TextInput(
+        label="Gender / Pronouns (Boy / Girl / He / She)",
+        placeholder="Boy or Girl (helps assign Verified Boy / Verified Girl)",
+        required=False,
+        max_length=50
     )
     social_handle = discord.ui.TextInput(
         label="Social Profile / Handle (Optional)",
@@ -71,7 +100,7 @@ class FaceVerifySubmitModal(discord.ui.Modal, title="Face / Video Verification")
     async def on_submit(self, interaction: discord.Interaction):
         user = interaction.user
         guild = interaction.guild
-        if not guild:
+        if not guild or not isinstance(user, discord.Member):
             return
 
         cfg = load_face_configs().get(str(guild.id), {})
@@ -89,6 +118,11 @@ class FaceVerifySubmitModal(discord.ui.Modal, title="Face / Video Verification")
                 ephemeral=True
             )
 
+        # Detect role gender and user input gender
+        detected_gender = detect_member_gender(user, cfg)
+        gender_claim = self.gender_input.value.strip() if self.gender_input.value else "Not specified"
+        gender_display = f"`{detected_gender.upper()}` (detected from roles)" if detected_gender != "unknown" else f"`{gender_claim}` (claimed in modal)"
+
         # Calculate account age
         account_age_days = (datetime.now(timezone.utc) - user.created_at).days
         min_age = cfg.get("min_account_age_days", 7)
@@ -100,6 +134,7 @@ class FaceVerifySubmitModal(discord.ui.Modal, title="Face / Video Verification")
             title=f"📹 Face/Video Verification • {user.display_name}",
             description=(
                 f"> **Applicant:** {user.mention} (`{user.id}`)\n"
+                f"> **Gender Target:** {gender_display}\n"
                 f"> **Account Age:** {age_status}\n"
                 f"> **Joined Server:** <t:{int(user.joined_at.timestamp())}:R>\n"
                 f"> **Required Vanity:** `{self.vanity_phrase}`\n\n"
@@ -108,15 +143,14 @@ class FaceVerifySubmitModal(discord.ui.Modal, title="Face / Video Verification")
                 f"• **Raw URL:** `{video_link_clean}`\n"
                 + (f"• **Social Profile:** `{self.social_handle.value.strip()}`\n" if self.social_handle.value else "")
                 + (f"• **Applicant Notes:** *{self.notes.value.strip()}*\n" if self.notes.value else "")
-                + f"\n*Staff: Review the video to ensure user shows face and matches the vanity requirement.*"
+                + f"\n*Staff: Choose [Approve Boy], [Approve Girl], [Auto-Approve], or [Deny] below.*"
             ),
             color=COLOR_VIOLET
         )
         review_embed.set_thumbnail(url=user.display_avatar.url)
         review_embed.set_footer(text=f"Verification Ticket • {get_eastern_time()}")
 
-        verified_role_id = cfg.get("verified_role_id")
-        view = FaceVerifyReviewView(applicant_id=user.id, verified_role_id=verified_role_id)
+        view = FaceVerifyReviewView(applicant_id=user.id, detected_gender=detected_gender)
         await review_ch.send(embed=review_embed, view=view)
 
         await interaction.response.send_message(
@@ -147,10 +181,6 @@ class FaceVerifyDenyModal(discord.ui.Modal, title="Deny Verification"):
         guild = interaction.guild
         applicant = guild.get_member(self.applicant_id) or await interaction.client.fetch_user(self.applicant_id)
 
-        # Disable buttons on review card
-        for item in self.msg.components:
-            for child in item.children:
-                child.disabled = True
         try:
             await self.msg.edit(view=None)
         except Exception:
@@ -178,16 +208,17 @@ class FaceVerifyDenyModal(discord.ui.Modal, title="Deny Verification"):
 
 
 class FaceVerifyReviewView(discord.ui.View):
-    """Staff review interactive buttons for Face/Video verification."""
-    def __init__(self, applicant_id: int = 0, verified_role_id: Optional[int] = None):
+    """Staff review interactive buttons for Face/Video verification with gender-aware role buttons."""
+    def __init__(self, applicant_id: int = 0, detected_gender: str = "unknown"):
         super().__init__(timeout=None)
         self.applicant_id = applicant_id
-        self.verified_role_id = verified_role_id
-        self.approve_btn.custom_id = f"face_approve:{applicant_id}"
+        self.detected_gender = detected_gender
+        self.boy_btn.custom_id = f"face_app_boy:{applicant_id}"
+        self.girl_btn.custom_id = f"face_app_girl:{applicant_id}"
+        self.auto_btn.custom_id = f"face_app_auto:{applicant_id}"
         self.deny_btn.custom_id = f"face_deny:{applicant_id}"
 
-    @discord.ui.button(label="Approve & Grant Role", style=discord.ButtonStyle.success, emoji="✅", custom_id="face_verify_approve")
-    async def approve_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def _execute_approval(self, interaction: discord.Interaction, target_gender: str):
         guild = interaction.guild
         if not interaction.user.guild_permissions.manage_roles and not interaction.user.guild_permissions.administrator:
             return await interaction.response.send_message("❌ Staff permissions required.", ephemeral=True)
@@ -200,27 +231,67 @@ class FaceVerifyReviewView(discord.ui.View):
 
         applicant = guild.get_member(applicant_id)
         cfg = load_face_configs().get(str(guild.id), {})
-        role_id = self.verified_role_id or cfg.get("verified_role_id")
-        role_granted_str = ""
 
-        if applicant and role_id:
-            role = guild.get_role(role_id)
-            if role:
-                try:
-                    await applicant.add_roles(role, reason=f"Face/Video Verification approved by {interaction.user.name}")
-                    role_granted_str = f" and assigned {role.mention}"
-                except Exception as e:
-                    logger.error(f"Failed to assign verified role: {e}")
+        # Resolve roles to assign
+        assigned_roles: List[discord.Role] = []
+
+        # 1. Base Verified Role
+        base_role_id = cfg.get("verified_role_id")
+        if base_role_id:
+            base_r = guild.get_role(base_role_id)
+            if base_r:
+                assigned_roles.append(base_r)
+
+        # 2. Gender Verified Role
+        if target_gender == "boy":
+            boy_role_id = cfg.get("verified_boy_role_id")
+            if boy_role_id:
+                boy_r = guild.get_role(boy_role_id)
+                if boy_r and boy_r not in assigned_roles:
+                    assigned_roles.append(boy_r)
+        elif target_gender == "girl":
+            girl_role_id = cfg.get("verified_girl_role_id")
+            if girl_role_id:
+                girl_r = guild.get_role(girl_role_id)
+                if girl_r and girl_r not in assigned_roles:
+                    assigned_roles.append(girl_r)
+        elif target_gender == "auto":
+            # Auto-detect from applicant's current roles
+            det = detect_member_gender(applicant, cfg) if applicant else "unknown"
+            if det == "girl":
+                girl_role_id = cfg.get("verified_girl_role_id")
+                if girl_role_id:
+                    girl_r = guild.get_role(girl_role_id)
+                    if girl_r and girl_r not in assigned_roles:
+                        assigned_roles.append(girl_r)
+            elif det == "boy":
+                boy_role_id = cfg.get("verified_boy_role_id")
+                if boy_role_id:
+                    boy_r = guild.get_role(boy_role_id)
+                    if boy_r and boy_r not in assigned_roles:
+                        assigned_roles.append(boy_r)
+
+        if applicant and assigned_roles:
+            try:
+                await applicant.add_roles(*assigned_roles, reason=f"Face/Video Verification approved by {interaction.user.name}")
+            except Exception as e:
+                logger.error(f"Failed to assign verified roles: {e}")
 
         # Disable buttons
         for item in self.children:
             item.disabled = True
-        await interaction.message.edit(view=self)
+        try:
+            await interaction.message.edit(view=self)
+        except Exception:
+            pass
+
+        roles_str = ", ".join(r.mention for r in assigned_roles) if assigned_roles else "*None*"
+        label_gender = "Verified Boy" if target_gender == "boy" else "Verified Girl" if target_gender == "girl" else "Auto-Verified"
 
         await interaction.response.send_message(
             embed=success_embed(
-                "Verification Approved",
-                f"✅ <@{applicant_id}> was **Approved** by {interaction.user.mention}{role_granted_str}."
+                f"Verification Approved ({label_gender})",
+                f"✅ <@{applicant_id}> was approved by {interaction.user.mention} and assigned: {roles_str}."
             )
         )
 
@@ -228,14 +299,26 @@ class FaceVerifyReviewView(discord.ui.View):
             try:
                 dm_embed = ego_embed(
                     title=f"🎉 Verification Approved • {guild.name}",
-                    description=f"Congratulations! Your Face/Video verification on **{guild.name}** has been **Approved**!{role_granted_str}",
+                    description=f"Congratulations! Your Face/Video verification on **{guild.name}** has been **Approved**!\nYou have received: {roles_str}.",
                     color=COLOR_EMERALD
                 )
                 await applicant.send(embed=dm_embed)
             except Exception:
                 pass
 
-    @discord.ui.button(label="Deny Verification", style=discord.ButtonStyle.danger, emoji="❌", custom_id="face_verify_deny")
+    @discord.ui.button(label="Approve Boy", style=discord.ButtonStyle.primary, emoji="👦", custom_id="face_app_boy")
+    async def boy_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self._execute_approval(interaction, target_gender="boy")
+
+    @discord.ui.button(label="Approve Girl", style=discord.ButtonStyle.primary, emoji="👧", custom_id="face_app_girl")
+    async def girl_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self._execute_approval(interaction, target_gender="girl")
+
+    @discord.ui.button(label="Auto-Approve", style=discord.ButtonStyle.success, emoji="⚡", custom_id="face_app_auto")
+    async def auto_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self._execute_approval(interaction, target_gender="auto")
+
+    @discord.ui.button(label="Deny", style=discord.ButtonStyle.danger, emoji="❌", custom_id="face_deny")
     async def deny_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not interaction.user.guild_permissions.manage_roles and not interaction.user.guild_permissions.administrator:
             return await interaction.response.send_message("❌ Staff permissions required.", ephemeral=True)
@@ -303,10 +386,14 @@ class IdentityVerifyCog(commands.Cog, name="IdentityVerify"):
         default_permissions=discord.Permissions(administrator=True)
     )
 
-    @verify_admin_group.command(name="setup", description="Configure Face/Video verification settings, role, and review channel")
+    @verify_admin_group.command(name="setup", description="Configure Verified Boy/Girl roles, review channel, and vanity")
     @app_commands.describe(
-        verified_role="Role automatically granted upon approval",
         review_channel="Channel where submitted video proof is sent for staff review",
+        verified_boy_role="Role given to verified boys / males (e.g. @Verified Boy)",
+        verified_girl_role="Role given to verified girls / females (e.g. @Verified Girl)",
+        base_verified_role="Optional base @Verified role granted to all approved applicants",
+        male_role="Optional @Male role used for automatic gender detection",
+        female_role="Optional @Female role used for automatic gender detection",
         vanity_phrase="Required vanity text (e.g. .gg/ego or server vanity)",
         min_account_age="Minimum account age in days (default: 7)"
     )
@@ -314,8 +401,12 @@ class IdentityVerifyCog(commands.Cog, name="IdentityVerify"):
     async def verify_admin_setup(
         self,
         interaction: discord.Interaction,
-        verified_role: discord.Role,
         review_channel: discord.TextChannel,
+        verified_boy_role: Optional[discord.Role] = None,
+        verified_girl_role: Optional[discord.Role] = None,
+        base_verified_role: Optional[discord.Role] = None,
+        male_role: Optional[discord.Role] = None,
+        female_role: Optional[discord.Role] = None,
         vanity_phrase: Optional[str] = None,
         min_account_age: Optional[int] = 7
     ):
@@ -326,25 +417,94 @@ class IdentityVerifyCog(commands.Cog, name="IdentityVerify"):
         phrase = vanity_phrase.strip() if vanity_phrase else getattr(guild, "vanity_url_code", None) or f"discord.gg/{guild.name.lower().replace(' ', '')}"
 
         configs[g_id] = {
-            "verified_role_id": verified_role.id,
             "review_channel_id": review_channel.id,
+            "verified_boy_role_id": verified_boy_role.id if verified_boy_role else None,
+            "verified_girl_role_id": verified_girl_role.id if verified_girl_role else None,
+            "verified_role_id": base_verified_role.id if base_verified_role else None,
+            "male_role_id": male_role.id if male_role else None,
+            "female_role_id": female_role.id if female_role else None,
             "vanity_phrase": phrase,
             "min_account_age_days": min_account_age or 7,
             "enabled": True
         }
         save_face_configs(configs)
 
+        boy_str = verified_boy_role.mention if verified_boy_role else "*Unset*"
+        girl_str = verified_girl_role.mention if verified_girl_role else "*Unset*"
+        base_str = base_verified_role.mention if base_verified_role else "*Unset*"
+
         await interaction.response.send_message(
             embed=success_embed(
-                "Face Verification Configured",
+                "Face & Gender Verification Configured",
                 f"✅ **Configuration Live:**\n"
-                f"• **Verified Role:** {verified_role.mention}\n"
                 f"• **Review Channel:** {review_channel.mention}\n"
+                f"• **Verified Boy Role:** {boy_str}\n"
+                f"• **Verified Girl Role:** {girl_str}\n"
+                f"• **Base Verified Role:** {base_str}\n"
                 f"• **Required Vanity Phrase:** `{phrase}`\n"
                 f"• **Min Account Age:** `{min_account_age or 7}` days\n\n"
-                f"Run `/verify_admin post_panel` to drop the verification panel in your welcome/verify channel!"
+                f"Run `/verify_admin post_panel` to deploy the verification panel in your verify channel!"
             ),
             ephemeral=True
+        )
+
+    @verify_admin_group.command(name="setup_roles", description="Auto-create Verified Boy, Verified Girl, Verified, Male, Female roles")
+    @is_guild_owner()
+    async def verify_admin_auto_roles(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        await interaction.response.defer(ephemeral=True)
+
+        role_specs = [
+            ("Verified Boy", 0x3B82F6),
+            ("Verified Girl", 0xEC4899),
+            ("Verified", 0x10B981),
+            ("Male", 0x60A5FA),
+            ("Female", 0xF472B6)
+        ]
+
+        created = []
+        found_map = {}
+        for r_name, r_color in role_specs:
+            existing = discord.utils.find(lambda r, n=r_name: r.name.lower() == n.lower(), guild.roles)
+            if not existing:
+                try:
+                    new_r = await guild.create_role(name=r_name, color=discord.Color(r_color), reason="Ego Verification Role Setup")
+                    created.append(r_name)
+                    found_map[r_name] = new_r
+                except Exception as e:
+                    logger.error(f"Could not create role {r_name}: {e}")
+            else:
+                found_map[r_name] = existing
+
+        # Update configs with detected/created roles
+        configs = load_face_configs()
+        g_id = str(guild.id)
+        if g_id not in configs:
+            configs[g_id] = {}
+
+        if "Verified Boy" in found_map:
+            configs[g_id]["verified_boy_role_id"] = found_map["Verified Boy"].id
+        if "Verified Girl" in found_map:
+            configs[g_id]["verified_girl_role_id"] = found_map["Verified Girl"].id
+        if "Verified" in found_map:
+            configs[g_id]["verified_role_id"] = found_map["Verified"].id
+        if "Male" in found_map:
+            configs[g_id]["male_role_id"] = found_map["Male"].id
+        if "Female" in found_map:
+            configs[g_id]["female_role_id"] = found_map["Female"].id
+
+        save_face_configs(configs)
+
+        await interaction.followup.send(
+            embed=success_embed(
+                "Verification Roles Ready",
+                f"✅ Verified & bound roles for this server:\n"
+                f"• **Verified Boy:** {found_map.get('Verified Boy', 'None').mention if 'Verified Boy' in found_map else 'None'}\n"
+                f"• **Verified Girl:** {found_map.get('Verified Girl', 'None').mention if 'Verified Girl' in found_map else 'None'}\n"
+                f"• **Verified (Base):** {found_map.get('Verified', 'None').mention if 'Verified' in found_map else 'None'}\n"
+                f"• **Male:** {found_map.get('Male', 'None').mention if 'Male' in found_map else 'None'}\n"
+                f"• **Female:** {found_map.get('Female', 'None').mention if 'Female' in found_map else 'None'}"
+            )
         )
 
     @verify_admin_group.command(name="post_panel", description="Deploy the aesthetic permanent Face Verification Panel to a channel")
@@ -358,19 +518,22 @@ class IdentityVerifyCog(commands.Cog, name="IdentityVerify"):
 
         cfg = load_face_configs().get(str(guild.id), {})
         vanity_phrase = cfg.get("vanity_phrase") or getattr(guild, "vanity_url_code", None) or f"discord.gg/{guild.name.lower().replace(' ', '')}"
-        role_id = cfg.get("verified_role_id")
-        role_mention = f"<@&{role_id}>" if role_id else "@Verified"
+
+        boy_r = f"<@&{cfg.get('verified_boy_role_id')}>" if cfg.get('verified_boy_role_id') else "`@Verified Boy`"
+        girl_r = f"<@&{cfg.get('verified_girl_role_id')}>" if cfg.get('verified_girl_role_id') else "`@Verified Girl`"
 
         embed = ego_embed(
             title=f"📹 Face & Video Verification • {guild.name}",
             description=(
                 f"> **Get Authenticated & Verified in {guild.name}**\n\n"
                 f"✦ **Verification Requirements:**\n"
-                f"1. Record a short video/selfie of yourself.\n"
-                f"2. Hold a paper showing the server vanity: **`{vanity_phrase}`** along with your Discord username & today's date.\n"
+                f"1. Record a short video/selfie showing your face.\n"
+                f"2. Hold a paper with the server vanity: **`{vanity_phrase}`** along with your Discord username & today's date.\n"
                 f"3. Upload to Streamable, Imgur, Discord, Drive, YouTube, or TikTok and submit your link below.\n\n"
-                f"✦ **Reward:** Unlocks the **{role_mention}** role and access to all private server channels!\n\n"
-                f"Click **Start Face / Video Verification** below to begin."
+                f"✦ **Reward Roles:**\n"
+                f"• Boys receive {boy_r}\n"
+                f"• Girls receive {girl_r}\n\n"
+                f"Click **Start Face / Video Verification** below to submit your proof!"
             ),
             color=COLOR_VIOLET
         )
