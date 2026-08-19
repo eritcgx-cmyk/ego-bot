@@ -1,10 +1,8 @@
-"""
-General Utilities, Information, Public Command Directory, and Role-Based Command Access for Ego Bot.
-"""
+import re
 import os
 import json
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, List, Dict, Any
 import discord
 from discord import app_commands
@@ -12,10 +10,26 @@ from discord.ext import commands
 from utils.permissions import is_admin_or_has_role, is_guild_owner, load_command_access, save_command_access
 from utils.embeds import (
     ego_embed, success_embed, error_embed, info_embed, card_embed,
-    COLOR_VIOLET, COLOR_CYAN, COLOR_AMBER, COLOR_EMERALD, COLOR_ROSE
+    COLOR_VIOLET, COLOR_CYAN, COLOR_AMBER, COLOR_EMERALD, COLOR_ROSE, get_eastern_time
 )
-from utils.validators import parse_duration_seconds
 from config import VERSION, DEFAULT_PREFIX, BOT_NAME
+
+def parse_duration_seconds(time_str: str) -> Optional[int]:
+    time_str = time_str.strip().lower()
+    match = re.match(r"^(\d+)([smhd])$", time_str)
+    if not match:
+        return None
+    val, unit = int(match.group(1)), match.group(2)
+    if unit == "s":
+        return val
+    elif unit == "m":
+        return val * 60
+    elif unit == "h":
+        return val * 3600
+    elif unit == "d":
+        return val * 86400
+    return None
+
 
 class EmbedBuilderModal(discord.ui.Modal, title="Embed Builder"):
     embed_title = discord.ui.TextInput(
