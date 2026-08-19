@@ -334,52 +334,11 @@ class GeneralCog(commands.Cog, name="General"):
             ephemeral=True
         )
 
-    @app_commands.command(name="gwannounce", description="Re-broadcast or highlight an active giveaway")
-    @app_commands.describe(giveaway_id="The ID of the active giveaway", channel="Channel to post highlight (optional)", role_ping="Role to ping (optional)")
-    @is_admin_or_has_role()
-    async def gwannounce(
-        self,
-        interaction: discord.Interaction,
-        giveaway_id: int,
-        channel: Optional[discord.TextChannel] = None,
-        role_ping: Optional[discord.Role] = None
-    ):
-        target_ch = channel or interaction.channel
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(Giveaway).where(Giveaway.id == giveaway_id, Giveaway.status == "active"))
-            gw = res.scalar_one_or_none()
-
-            if not gw:
-                return await interaction.response.send_message(
-                    embed=error_embed("Giveaway Not Found", f"No active giveaway found with ID #{giveaway_id}."),
-                    ephemeral=True
-                )
-
-            end_ts = int(gw.end_time.timestamp())
-            orig_msg_url = f"https://discord.com/channels/{gw.guild_id}/{gw.channel_id}/{gw.message_id}"
-
-            embed = ego_embed(
-                title="🎁 ACTIVE GIVEAWAY SPOTLIGHT",
-                description=(
-                    f"### 🎉 **{gw.prize}**\n\n"
-                    f"› **Ends:** <t:{end_ts}:R>\n"
-                    f"› **Hosted by:** <@{gw.host_id}>\n"
-                    f"› **Winners:** `{gw.winners_count}`\n"
-                    f"› **Jump to Enter:** [Click Here to Join Giveaway]({orig_msg_url})\n"
-                ),
-                color=COLOR_AMBER
-            )
-            content = role_ping.mention if role_ping else None
-            await target_ch.send(content=content, embed=embed)
-            await interaction.response.send_message(
-                embed=success_embed("Giveaway Broadcasted", f"Spotlight sent to {target_ch.mention}"),
-                ephemeral=True
-            )
-
     @app_commands.command(name="embed_builder", description="Construct and send a custom rich embed via modal")
     @is_admin_or_has_role()
     async def embed_builder(self, interaction: discord.Interaction):
         await interaction.response.send_modal(EmbedBuilderModal())
+
 
     @app_commands.command(name="purge", description="Bulk delete messages from the current channel")
     @app_commands.describe(amount="Number of messages to delete (1-100)", user_filter="Only delete messages from this user (optional)")
