@@ -156,23 +156,23 @@ class CustomStatusCog(commands.Cog, name="CustomStatus"):
     async def before_rotator(self):
         await self.bot.wait_until_ready()
 
-    status_group = app_commands.Group(name="status", description="Custom status & activity manager (Auto-saves to reusable list)")
+    status_group = app_commands.Group(name="status", description="Custom status & activity manager")
 
-    @status_group.command(name="set", description="Set a custom status or activity and auto-save it to your list")
+    @status_group.command(name="set", description="Set a custom status or activity")
     @app_commands.describe(
-        activity_type="Activity Type (Playing, Streaming, Watching, Listening, Competing, Custom)",
-        text="Status text or game name (e.g. Roblox, Minecraft, discord.gg/ecco)",
-        details="In-game state or details (e.g. Grinding Blox Fruits, Level 100)",
+        activity_type="Activity Type",
+        text="Status text or game name",
+        details="In-game state or details",
         stream_url="Stream link if activity is Streaming",
-        save_to_list="Auto-save to your reusable status library (Default: True)"
+        save_to_list="Save to your reusable status library"
     )
     @app_commands.choices(activity_type=[
-        app_commands.Choice(name="Playing (Game)", value="playing"),
+        app_commands.Choice(name="Playing", value="playing"),
         app_commands.Choice(name="Streaming", value="streaming"),
         app_commands.Choice(name="Watching", value="watching"),
         app_commands.Choice(name="Listening", value="listening"),
         app_commands.Choice(name="Competing", value="competing"),
-        app_commands.Choice(name="Custom Status", value="custom")
+        app_commands.Choice(name="Custom", value="custom")
     ])
     async def status_set(
         self,
@@ -183,6 +183,7 @@ class CustomStatusCog(commands.Cog, name="CustomStatus"):
         stream_url: Optional[str] = None,
         save_to_list: bool = True
     ):
+
         stype = activity_type.value
         entry = {
             "type": stype,
