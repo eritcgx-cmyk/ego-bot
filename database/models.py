@@ -121,9 +121,12 @@ class FriendGroup(Base):
     category_id = Column(BigInteger, nullable=True)
     text_channel_id = Column(BigInteger, nullable=True)
     voice_channel_id = Column(BigInteger, nullable=True)
+    role_id = Column(BigInteger, nullable=True)
+    ticket_channel_id = Column(BigInteger, nullable=True)
     status = Column(String(32), default="pending", index=True) # pending, active, disbanded
     members_json = Column(Text, default="[]") # List of user IDs accepted
     invited_json = Column(Text, default="[]") # List of user IDs pending
+
 
     @property
     def members(self) -> List[int]:
