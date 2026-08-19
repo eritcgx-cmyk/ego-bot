@@ -281,6 +281,19 @@ class RolesSystemCog(commands.Cog, name="Roles"):
             ephemeral=True
         )
 
+    @app_commands.command(name="roles_board", description="Deploy the live auto-updating Roles Board to a channel")
+    @app_commands.describe(channel="Target channel for the Roles Board")
+    @is_admin_or_has_role()
+    async def roles_board_alias(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
+        await self.roles_board(interaction, channel)
+
+    @app_commands.command(name="roleboard", description="Deploy the live auto-updating Roles Board to a channel (alias)")
+    @app_commands.describe(channel="Target channel for the Roles Board")
+    @is_admin_or_has_role()
+    async def roleboard_alias(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
+        await self.roles_board(interaction, channel)
+
+
     @roles_group.command(name="set_description", description="Set custom description and requirements for any role on the board")
     @app_commands.describe(
         role="The role to describe",
