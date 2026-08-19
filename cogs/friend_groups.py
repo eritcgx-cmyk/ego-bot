@@ -28,7 +28,7 @@ class FGInviteDMView(discord.ui.View):
         self.creator_id = creator_id
         self.fg_name = fg_name
 
-    @discord.ui.button(label="Accept Invitation", style=discord.ButtonStyle.success, emoji="👑", custom_id="fg_accept_invite")
+    @discord.ui.button(label="Accept Invitation", style=discord.ButtonStyle.success, custom_id="fg_accept_invite")
     async def accept_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         user = interaction.user
         async with AsyncSessionLocal() as session:
@@ -36,10 +36,10 @@ class FGInviteDMView(discord.ui.View):
             fg = res.scalar_one_or_none()
 
             if not fg:
-                return await interaction.response.send_message("❌ This Friend Group no longer exists.", ephemeral=True)
+                return await interaction.response.send_message("This Friend Group no longer exists.", ephemeral=True)
 
             if fg.status == "active":
-                return await interaction.response.send_message("✅ You are already in this active Friend Group!", ephemeral=True)
+                return await interaction.response.send_message("You are already in this active Friend Group.", ephemeral=True)
 
             members = fg.members
             if user.id not in members:
@@ -52,7 +52,7 @@ class FGInviteDMView(discord.ui.View):
 
             await interaction.message.edit(view=self)
             await interaction.response.send_message(
-                embed=success_embed("Invitation Accepted", f"You joined **{self.fg_name}**! ({len(members)}/5 members ready)")
+                embed=success_embed("Invitation Accepted", f"You joined **{self.fg_name}**. ({len(members)}/5 members ready)")
             )
 
             # Check if all required members accepted (Creator + 4 friends = 5)
@@ -62,7 +62,7 @@ class FGInviteDMView(discord.ui.View):
                 if guild:
                     await provision_fg_channels(guild, fg)
 
-    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger, emoji="✖", custom_id="fg_decline_invite")
+    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger, custom_id="fg_decline_invite")
     async def decline_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         for item in self.children:
             item.disabled = True
@@ -70,6 +70,7 @@ class FGInviteDMView(discord.ui.View):
         await interaction.response.send_message(
             embed=error_embed("Invitation Declined", f"You declined the invitation to join **{self.fg_name}**.")
         )
+
 
 class FGSelectOverviewView(discord.ui.View):
     def __init__(self, all_fgs: List[FriendGroup]):
