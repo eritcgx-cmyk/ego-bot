@@ -96,8 +96,16 @@ class EgoBot(commands.Bot):
     async def on_ready(self):
         logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
         logger.info(f"Serving {len(self.guilds)} guilds.")
-        activity = discord.Activity(type=discord.ActivityType.watching, name="/help • Ego Engine")
-        await self.change_presence(status=discord.Status.online, activity=activity)
+        
+        # Fast guild sync for immediate Discord client cache update
+        for guild in self.guilds:
+            try:
+                self.tree.copy_global_to(guild=guild)
+                await self.tree.sync(guild=guild)
+                logger.info(f"Instantly synced slash commands to guild '{guild.name}' ({guild.id}).")
+            except Exception as e:
+                logger.debug(f"Guild sync skipped: {e}")
+
 
 bot = EgoBot()
 
