@@ -178,11 +178,38 @@ async def config_status(interaction: discord.Interaction):
 
 bot.tree.add_command(config_group)
 
-def main():
+import aiohttp.web
+
+async def start_keepalive_server():
+    """Lightweight health check server for Render hosting."""
+    async def handle_ping(request):
+        return aiohttp.web.Response(text="Ego Bot Online", status=200)
+
+    app = aiohttp.web.Application()
+    app.router.add_get("/", handle_ping)
+    app.router.add_get("/health", handle_ping)
+    
+    port = int(os.environ.get("PORT", 8080))
+    runner = aiohttp.web.AppRunner(app)
+    await runner.setup()
+    site = aiohttp.web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    logger.info(f"Keepalive web server listening on port {port}")
+
+async def run_bot_with_server():
     if not BOT_TOKEN:
         logger.error("BOT_TOKEN environment variable is missing! Please set it in .env or your cloud environment.")
         sys.exit(1)
-    bot.run(BOT_TOKEN)
+    
+    # Start web server if PORT is set (Render environment)
+    if "PORT" in os.environ:
+        await start_keepalive_server()
+    
+    await bot.start(BOT_TOKEN)
+
+def main():
+    asyncio.run(run_bot_with_server())
 
 if __name__ == "__main__":
     main()
+
