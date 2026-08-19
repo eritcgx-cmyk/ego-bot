@@ -100,19 +100,19 @@ class GeneralCog(commands.Cog, name="General"):
         self.bot = bot
         self.start_time = datetime.utcnow()
 
-    @app_commands.command(name="commands", description="Public command board for members and community features")
+    @app_commands.command(name="commands", description="Command directory for members and community features")
     async def commands_cmd(self, interaction: discord.Interaction):
         embed = ego_embed(
             title="Community Commands",
             description=(
-                "> **Ego Public Command Directory**\n"
+                "> **Ego Command Directory**\n"
                 "> Available slash commands for all server members:\n"
             ),
             color=COLOR_VIOLET
         )
 
         categories = [
-            ("Friend Groups", "› `/fg start name:...` — Start a squad in pending state\n› `/fg invite member:...` — Invite friends to your squad (auto-ticket at 4 members)\n› `/fg stats` — View your personal squad cards"),
+            ("Friend Groups", "› `/fg start name:...` — Start an FG in pending state\n› `/fg invite member:...` — Invite friends to your FG (auto-ticket at 4 members)\n› `/fg stats` — View your personal FG cards"),
             ("Creator Verification", "› `/cc verify` — Submit profile and video proof for Creator roles\n› `/cc tiers` — View follower and view requirements for all 6 tiers"),
             ("Invites & Tracking", "› `/invites mystats` — Check your joins, leaves, and bonus invites\n› `/invites leaderboard` — Top server inviters"),
             ("Utilities & Custom Status", "› `/poll` — Launch an interactive reaction poll\n› `/remind duration:... message:...` — Set personal DM alert (e.g. `/remind 10m check stream`)\n› `/avatar` — View member full-resolution profile picture\n› `/userinfo` — Member join date, account age, and roles\n› `/serverinfo` — Server stats and metrics\n› `/status set` — Set custom game activity (e.g. Roblox, GTA VI)\n› `/status list` — Select from saved custom game activities"),
@@ -123,9 +123,8 @@ class GeneralCog(commands.Cog, name="General"):
 
         await interaction.response.send_message(embed=embed)
 
-
-    @app_commands.command(name="command_board", description="Deploy a permanent public command board to a channel")
-    @app_commands.describe(channel="Target channel to post command board (defaults to current channel)")
+    @app_commands.command(name="command_board", description="Deploy a permanent command board to a channel")
+    @app_commands.describe(channel="Target channel to post command board")
     @is_admin_or_has_role()
     async def command_board(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
         target_ch = channel or interaction.channel
@@ -135,13 +134,13 @@ class GeneralCog(commands.Cog, name="General"):
             title=f"Command Directory • {guild.name}",
             description=(
                 "> **Server Command Board**\n"
-                "> Available slash commands for members across the server:\n"
+                "> Available slash commands across the server:\n"
             ),
             color=COLOR_VIOLET
         )
 
         categories = [
-            ("Friend Groups", "› `/fg start` — Launch a private 5-member squad with secret lounge & voice\n› `/fg stats` — Inspect your squads\n› `/fg rename` — Update squad title"),
+            ("Friend Groups", "› `/fg start` — Launch an FG with private lounge & voice\n› `/fg stats` — Inspect your FGs\n› `/fg rename` — Update FG title"),
             ("Content Creator", "› `/cc verify` — Apply for Creator roles (`CC`, `Known`, `Famous`, `Star`)\n› `/cc tiers` — Inspect follower and view requirements"),
             ("Giveaways", "› `/giveaway start` — Enter button giveaways with auto-draw\n› `/gwannounce` — Spotlight active giveaways"),
             ("Invites & Community", "› `/invites mystats` — Check invite progress & role rewards\n› `/invites leaderboard` — Top server inviters"),
@@ -156,6 +155,7 @@ class GeneralCog(commands.Cog, name="General"):
             embed=success_embed("Command Board Deployed", f"Posted Command Board to {target_ch.mention}"),
             ephemeral=True
         )
+
 
     @app_commands.command(name="help", description="Explore all commands, systems, and features in Ego")
     async def help_cmd(self, interaction: discord.Interaction):
