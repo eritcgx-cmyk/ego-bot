@@ -127,28 +127,75 @@ class GeneralCog(commands.Cog, name="General"):
         self.bot = bot
         self.start_time = datetime.utcnow()
 
-    @app_commands.command(name="commands", description="Command directory for members and community features")
+    @app_commands.command(name="commands", description="Command directory for members, creators, and staff")
     async def commands_cmd(self, interaction: discord.Interaction):
+        user = interaction.user
+        member_roles = [r.name for r in user.roles] if isinstance(user, discord.Member) else []
+        is_staff = user.guild_permissions.administrator or user.id == (interaction.guild.owner_id if interaction.guild else 0) or any("mod" in r.lower() or "admin" in r.lower() for r in member_roles)
+        has_cc = any(r in ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star"] for r in member_roles) or is_staff
+        has_fg = any(r == "FG" or r.startswith("👑 ︱ ") for r in member_roles) or is_staff
+
         embed = ego_embed(
-            title="Community Commands",
-            description=(
-                "> **Ego Command Directory**\n"
-                "> Public commands available to all server members (safe utilities):\n"
-            ),
+            title="Available Commands",
+            description=f"> Commands tailored for {user.mention} in **{interaction.guild.name if interaction.guild else 'Ego'}**:\n",
             color=COLOR_VIOLET
         )
 
-        categories = [
-            ("Friend Groups", "› `/fg start name:...` — Start a pending FG\n› `/fg invite member:...` — Invite friends to your FG\n› `/fg stats` — View your personal FG cards"),
-            ("Creator Verification", "› `/cc verify` — Submit profile and video proof for Creator roles\n› `/cc tiers` — View follower and view requirements for all 6 tiers"),
-            ("Invites & Stats", "› `/invites mystats` — Check your personal joins, leaves, and bonus invites\n› `/invites leaderboard` — Top server inviters"),
-            ("Member Utilities", "› `/avatar` — Full resolution profile picture\n› `/userinfo` — Member join date, account age, and roles\n› `/serverinfo` — Server stats, channel totals, and boost level\n› `/remind duration:... message:...` — Set personal DM alert (e.g. `/remind 10m check stream`)\n› `/ping` — WebSocket heartbeat latency\n› `/uptime` — Bot continuous online duration timer\n› `/botinfo` — Bot system specs and metrics"),
-        ]
+        # 1. Base Community Commands
+        base_desc = (
+            "› `/invites mystats` — Check your joins, leaves, and bonus invites\n"
+            "› `/invites leaderboard` — Top server inviters ranking\n"
+            "› `/avatar [user]` — Full resolution profile picture\n"
+            "› `/userinfo [user]` — Member join date, account age, and roles\n"
+            "› `/serverinfo` — Server metrics and nitro boost level\n"
+            "› `/remind duration:... message:...` — Set personal DM alert\n"
+            "› `/ping` & `/uptime` — Live latency and bot online timer"
+        )
+        embed.add_field(name="✦ Public Member Utilities", value=base_desc, inline=False)
 
-        for cat_name, cat_desc in categories:
-            embed.add_field(name=f"✦ {cat_name}", value=cat_desc, inline=False)
+        # 2. Friend Group Commands
+        fg_desc = (
+            "› `/fg start name:...` — Start a pending Friend Group\n"
+            "› `/fg invite member:...` — Invite members (auto-ticket at 4 members)\n"
+            "› `/fg stats` — View stats for your personal FGs"
+        )
+        if has_fg:
+            fg_desc += "\n› Control Panel in your `#💬-lounge` — Rename, inspect roster, or disband"
+        embed.add_field(name="✦ Friend Group System", value=fg_desc, inline=False)
 
-        await interaction.response.send_message(embed=embed)
+        # 3. Creator Commands (Highlight for Creators)
+        if has_cc:
+            cc_desc = (
+                "› `/post video_link:... description:...` — Broadcast video (CC/Tier 2 submits review ticket; Tier 3+ auto-posts)\n"
+                "› `/cc verify platform:... tier:...` — Apply for Creator roles\n"
+                "› `/cc tiers` — View follower and view requirements"
+            )
+            embed.add_field(name="✦ Content Creator Suite (/post)", value=cc_desc, inline=False)
+        else:
+            embed.add_field(
+                name="✦ Content Creator Verification",
+                value="› `/cc verify` — Apply for Creator roles\n› `/cc tiers` — View follower requirements",
+                inline=False
+            )
+
+        # 4. Staff & Admin Operations
+        if is_staff:
+            staff_desc = (
+                "› `/clean_server` — Safely purge duplicate unused roles\n"
+                "› `/command_access grant/revoke/list` — Grant role-based command access\n"
+                "› `/roles set_description` — Custom description/requirements per role\n"
+                "› `/roles board` *(or `/roleboard`)* — Deploy auto-updating Roles Board\n"
+                "› `/command_board` *(or `/commandboard`)* — Deploy public command board\n"
+                "› `/cc set_video_channel` — Set target channel for approved videos\n"
+                "› `/cc set_tier_req` — Modify tier requirements\n"
+                "› `/poll` — Launch interactive reaction poll\n"
+                "› `/status set` & `/status list` — Custom activity rotator\n"
+                "› `/purge amount:...` — Bulk message deletion"
+            )
+            embed.add_field(name="✦ Staff & Owner Operations", value=staff_desc, inline=False)
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
     @app_commands.command(name="command_board", description="Deploy a permanent command board to a channel")
     @app_commands.describe(channel="Target channel to post command board")
