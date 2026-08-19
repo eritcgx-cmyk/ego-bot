@@ -28,7 +28,8 @@ INITIAL_COGS = [
     "cogs.general",
     "cogs.rules",
     "cogs.onboarding",
-    "cogs.applications"
+    "cogs.applications",
+    "cogs.status_rotator"
 ]
 
 class EgoBot(commands.Bot):
