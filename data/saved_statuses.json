@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "type": "playing",
+    "text": "Roblox",
+    "details": "Grinding with friends",
+    "url": null,
+    "author": "Default"
+  },
+  {
+    "id": 2,
+    "type": "playing",
+    "text": "Grand Theft Auto VI",
+    "details": "Exploring Vice City",
+    "url": null,
+    "author": "Default"
+  },
+  {
+    "id": 3,
+    "type": "watching",
+    "text": "you keep /egoing me",
+    "details": null,
+    "url": null,
+    "author": "Default"
+  },
+  {
+    "id": 4,
+    "type": "playing",
+    "text": "Valorant",
+    "details": "Ranked Radiant",
+    "url": null,
+    "author": "Default"
+  },
+  {
+    "id": 5,
+    "type": "streaming",
+    "text": "Live Stream Highlights",
+    "details": null,
+    "url": "https://twitch.tv/discord",
+    "author": "Default"
+  }
+]
