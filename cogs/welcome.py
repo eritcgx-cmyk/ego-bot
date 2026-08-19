@@ -1,14 +1,14 @@
 """
-Comprehensive Welcome & Leave (Goodbye) System Cog for Ego Bot.
+Comprehensive Welcome & Leave (Goodbye) System Cog for Ego Bot with Server Banner & Presets.
 Features:
-- Real-time join & leave cards with inviter and invite count resolution
-- Server Banner embed presentation (Guild banner, splash, or custom banner image)
-- Aesthetic join cards and leave/goodbye cards with member count tracking
-- Direct Message notifications on join
+- Dedicated preset templates for Welcome & Goodbye cards
+- Embedded Server Banner (Defaults to official server banner)
+- Dynamic inviter & invite count resolution ({inviter}, {invites_count})
+- Preset selector & live test commands
 """
 import os
 import json
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict, Any
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -18,24 +18,68 @@ from database.models import WelcomeConfig, UserInviteStat
 from utils.permissions import is_admin_or_has_role
 from utils.embeds import (
     ego_embed, success_embed, error_embed, info_embed,
-    COLOR_VIOLET, COLOR_CRIMSON, COLOR_EMERALD, get_eastern_time
+    COLOR_VIOLET, COLOR_CRIMSON, COLOR_EMERALD, COLOR_AMBER, COLOR_CYAN, get_eastern_time
 )
 from utils.logger import log_action
 from config import logger
 
-DEFAULT_WELCOME_TITLE = "✦ Welcome to {server}!"
-DEFAULT_WELCOME_MSG = (
-    "> Welcome {mention} to **{server}**!\n"
-    "> You were invited by **{inviter}**, who now has **`{invites_count}`** invites.\n"
-    "> Server Member Count: **`#{membercount}`**"
-)
+# Official Server Banner URL
+DEFAULT_BANNER_URL = "https://cdn.discordapp.com/banners/1539142640891732051/106d651a4f8b37b596c2c29a1a612239.webp?size=480"
 
-DEFAULT_LEAVE_TITLE = "✦ Member Left • {server}"
-DEFAULT_LEAVE_MSG = (
-    "> **{user}** (`{mention}`) has left the server.\n"
-    "> They were invited by **{inviter}** (now has **`{invites_count}`** invites).\n"
-    "> Remaining Members: **`#{membercount}`**"
-)
+WELCOME_PRESETS: Dict[str, Dict[str, Any]] = {
+    "standard": {
+        "title": "✦ Welcome to {server}!",
+        "message": (
+            "> Hey {mention}, welcome to **{server}**!\n"
+            "> You were invited by **{inviter}**, who now has **`{invites_count}`** invites.\n"
+            "> Server Member Count: **`#{membercount}`**"
+        ),
+        "color": 0x8B5CF6
+    },
+    "compact": {
+        "title": "👋 Welcome {user}!",
+        "message": "Welcome {mention} to **{server}**! Invited by **{inviter}** (`{invites_count}` invites). Member **#{membercount}**.",
+        "color": 0x3B82F6
+    },
+    "aesthetic": {
+        "title": "👑 Welcome to {server} • {user}",
+        "message": (
+            "╭✦ **New Member Arrival**\n"
+            "┊ › **User:** {mention} (`{user}`)\n"
+            "┊ › **Invited By:** {inviter} (`{invites_count}` total)\n"
+            "┊ › **Server Roster:** `#{membercount}`\n"
+            "╰✦ Make sure to verify in <#1539142640891732051>!"
+        ),
+        "color": 0xEC4899
+    }
+}
+
+LEAVE_PRESETS: Dict[str, Dict[str, Any]] = {
+    "standard": {
+        "title": "✦ Member Left • {server}",
+        "message": (
+            "> **{user}** (`{mention}`) has left the server.\n"
+            "> They were invited by **{inviter}** (now has **`{invites_count}`** invites).\n"
+            "> Remaining Members: **`#{membercount}`**"
+        ),
+        "color": 0xEF4444
+    },
+    "compact": {
+        "title": "👋 Goodbye {user}",
+        "message": "**{user}** left **{server}**. Invited by **{inviter}** (now `{invites_count}`). `{membercount}` members remaining.",
+        "color": 0xF97316
+    },
+    "aesthetic": {
+        "title": "🥀 Member Departure • {server}",
+        "message": (
+            "╭✦ **Departure Log**\n"
+            "┊ › **User:** `{user}`\n"
+            "┊ › **Original Inviter:** {inviter} (`{invites_count}` left)\n"
+            "╰✦ **Remaining Roster:** `{membercount}` members"
+        ),
+        "color": 0x991B1B
+    }
+}
 
 def format_welcome_string(
     template: str,
@@ -63,6 +107,7 @@ def format_welcome_string(
     for key, val in replacements.items():
         result = result.replace(key, val)
     return result
+
 
 class WelcomeCog(commands.Cog, name="Welcome"):
     def __init__(self, bot: commands.Bot):
@@ -111,7 +156,7 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         inviter: Optional[discord.Member | discord.User] = None,
         invites_count: int = 0
     ) -> discord.Embed:
-        """Constructs an aesthetic welcome embed featuring server banner and avatar."""
+        """Constructs an aesthetic welcome embed featuring the official server banner and avatar."""
         title = format_welcome_string(title_tmpl, member, inviter, invites_count)
         description = format_welcome_string(msg_tmpl, member, inviter, invites_count)
 
@@ -122,11 +167,10 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         )
         embed.set_thumbnail(url=member.display_avatar.url)
 
+        # Set Server Banner (Guild banner, splash, or fallback official banner)
         guild = member.guild
-        if guild.banner:
-            embed.set_image(url=guild.banner.url)
-        elif guild.splash:
-            embed.set_image(url=guild.splash.url)
+        banner_url = (guild.banner.url if guild.banner else None) or (guild.splash.url if guild.splash else None) or DEFAULT_BANNER_URL
+        embed.set_image(url=banner_url)
 
         embed.set_footer(
             text=f"{guild.name} • Member #{guild.member_count} • {get_eastern_time()}",
@@ -143,7 +187,7 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         inviter: Optional[discord.Member | discord.User] = None,
         invites_count: int = 0
     ) -> discord.Embed:
-        """Constructs an aesthetic leave/goodbye embed."""
+        """Constructs an aesthetic leave/goodbye embed with banner."""
         title = format_welcome_string(title_tmpl, member, inviter, invites_count)
         description = format_welcome_string(msg_tmpl, member, inviter, invites_count)
 
@@ -155,10 +199,8 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         embed.set_thumbnail(url=member.display_avatar.url)
 
         guild = member.guild
-        if guild.banner:
-            embed.set_image(url=guild.banner.url)
-        elif guild.splash:
-            embed.set_image(url=guild.splash.url)
+        banner_url = (guild.banner.url if guild.banner else None) or (guild.splash.url if guild.splash else None) or DEFAULT_BANNER_URL
+        embed.set_image(url=banner_url)
 
         embed.set_footer(
             text=f"{guild.name} • {guild.member_count} Members Remaining • {get_eastern_time()}",
@@ -185,9 +227,9 @@ class WelcomeCog(commands.Cog, name="Welcome"):
                 channel = member.guild.get_channel(cfg.channel_id)
                 if channel and isinstance(channel, discord.TextChannel):
                     try:
-                        title_tmpl = cfg.title or DEFAULT_WELCOME_TITLE
-                        msg_tmpl = cfg.message or DEFAULT_WELCOME_MSG
-                        color_val = cfg.embed_color or 0x8B5CF6
+                        title_tmpl = cfg.title or WELCOME_PRESETS["standard"]["title"]
+                        msg_tmpl = cfg.message or WELCOME_PRESETS["standard"]["message"]
+                        color_val = cfg.embed_color or WELCOME_PRESETS["standard"]["color"]
 
                         embed = self._build_welcome_embed(member, title_tmpl, msg_tmpl, color_val, inviter, invites_count)
                         await channel.send(content=member.mention, embed=embed)
@@ -205,8 +247,7 @@ class WelcomeCog(commands.Cog, name="Welcome"):
                     )
                     if member.guild.icon:
                         dm_embed.set_thumbnail(url=member.guild.icon.url)
-                    if member.guild.banner:
-                        dm_embed.set_image(url=member.guild.banner.url)
+                    dm_embed.set_image(url=DEFAULT_BANNER_URL)
                     await member.send(embed=dm_embed)
                 except discord.Forbidden:
                     pass
@@ -234,9 +275,9 @@ class WelcomeCog(commands.Cog, name="Welcome"):
                 return
 
             inviter, invites_count = await self._resolve_inviter_info(member)
-            title_tmpl = getattr(cfg, "leave_title", None) or DEFAULT_LEAVE_TITLE
-            msg_tmpl = getattr(cfg, "leave_message", None) or DEFAULT_LEAVE_MSG
-            color_val = getattr(cfg, "leave_color", None) or COLOR_CRIMSON
+            title_tmpl = getattr(cfg, "leave_title", None) or LEAVE_PRESETS["standard"]["title"]
+            msg_tmpl = getattr(cfg, "leave_message", None) or LEAVE_PRESETS["standard"]["message"]
+            color_val = getattr(cfg, "leave_color", None) or LEAVE_PRESETS["standard"]["color"]
 
             try:
                 embed = self._build_leave_embed(member, title_tmpl, msg_tmpl, color_val, inviter, invites_count)
@@ -267,8 +308,8 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         self,
         interaction: discord.Interaction,
         channel: discord.TextChannel,
-        title: Optional[str] = DEFAULT_WELCOME_TITLE,
-        message: Optional[str] = DEFAULT_WELCOME_MSG,
+        title: Optional[str] = WELCOME_PRESETS["standard"]["title"],
+        message: Optional[str] = WELCOME_PRESETS["standard"]["message"],
         color: Optional[str] = "#8B5CF6",
         dm_enabled: Optional[bool] = False,
         dm_message: Optional[str] = "Welcome to {server}! Be sure to review our rules and verify."
@@ -297,15 +338,15 @@ class WelcomeCog(commands.Cog, name="Welcome"):
 
         sample_embed = self._build_welcome_embed(
             interaction.user,
-            title or DEFAULT_WELCOME_TITLE,
-            message or DEFAULT_WELCOME_MSG,
+            title or WELCOME_PRESETS["standard"]["title"],
+            message or WELCOME_PRESETS["standard"]["message"],
             embed_color,
             inviter=interaction.user,
             invites_count=5
         )
 
         await interaction.response.send_message(
-            content="✅ **Welcome System Configured!** Here is a live preview of how new joins will look:",
+            content="✅ **Welcome System Configured!** Live preview with Server Banner:",
             embed=sample_embed
         )
 
@@ -322,8 +363,8 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         self,
         interaction: discord.Interaction,
         channel: discord.TextChannel,
-        title: Optional[str] = DEFAULT_LEAVE_TITLE,
-        message: Optional[str] = DEFAULT_LEAVE_MSG,
+        title: Optional[str] = LEAVE_PRESETS["standard"]["title"],
+        message: Optional[str] = LEAVE_PRESETS["standard"]["message"],
         color: Optional[str] = "#EF4444",
         enabled: Optional[bool] = True
     ):
@@ -342,23 +383,59 @@ class WelcomeCog(commands.Cog, name="Welcome"):
 
             cfg.leave_enabled = enabled if enabled is not None else True
             cfg.leave_channel_id = channel.id
-            cfg.leave_title = title or DEFAULT_LEAVE_TITLE
-            cfg.leave_message = message or DEFAULT_LEAVE_MSG
+            cfg.leave_title = title or LEAVE_PRESETS["standard"]["title"]
+            cfg.leave_message = message or LEAVE_PRESETS["standard"]["message"]
             cfg.leave_color = embed_color
             await session.commit()
 
         sample_embed = self._build_leave_embed(
             interaction.user,
-            title or DEFAULT_LEAVE_TITLE,
-            message or DEFAULT_LEAVE_MSG,
+            title or LEAVE_PRESETS["standard"]["title"],
+            message or LEAVE_PRESETS["standard"]["message"],
             embed_color,
             inviter=interaction.user,
             invites_count=4
         )
 
         await interaction.response.send_message(
-            content="✅ **Leave / Goodbye System Configured!** Live preview:",
+            content="✅ **Leave / Goodbye System Configured!** Live preview with Server Banner:",
             embed=sample_embed
+        )
+
+    @welcome_group.command(name="apply_preset", description="Apply an aesthetic built-in preset to Welcome and Leave cards")
+    @app_commands.describe(preset="Preset style to apply (standard, compact, aesthetic)")
+    @app_commands.choices(preset=[
+        app_commands.Choice(name="Standard (Ego Invite Tracker + Banner)", value="standard"),
+        app_commands.Choice(name="Compact (2-Line Minimal)", value="compact"),
+        app_commands.Choice(name="Aesthetic (Framed Box Style)", value="aesthetic")
+    ])
+    @is_admin_or_has_role()
+    async def welcome_apply_preset(self, interaction: discord.Interaction, preset: app_commands.Choice[str]):
+        p_name = preset.value
+        w_preset = WELCOME_PRESETS.get(p_name, WELCOME_PRESETS["standard"])
+        l_preset = LEAVE_PRESETS.get(p_name, LEAVE_PRESETS["standard"])
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(WelcomeConfig).where(WelcomeConfig.guild_id == interaction.guild_id))
+            cfg = res.scalar_one_or_none()
+
+            if not cfg:
+                cfg = WelcomeConfig(guild_id=interaction.guild_id)
+                session.add(cfg)
+
+            cfg.title = w_preset["title"]
+            cfg.message = w_preset["message"]
+            cfg.embed_color = w_preset["color"]
+            cfg.leave_title = l_preset["title"]
+            cfg.leave_message = l_preset["message"]
+            cfg.leave_color = l_preset["color"]
+            await session.commit()
+
+        w_embed = self._build_welcome_embed(interaction.user, w_preset["title"], w_preset["message"], w_preset["color"], inviter=interaction.user, invites_count=5)
+
+        await interaction.response.send_message(
+            content=f"✅ Applied **{preset.name}** preset to Welcome & Leave cards!\nLive Welcome Preview:",
+            embed=w_embed
         )
 
     @welcome_group.command(name="preview", description="Preview current welcome and leave embed designs")
@@ -374,9 +451,9 @@ class WelcomeCog(commands.Cog, name="Welcome"):
                 ephemeral=True
             )
 
-        title_tmpl = cfg.title or DEFAULT_WELCOME_TITLE
-        msg_tmpl = cfg.message or DEFAULT_WELCOME_MSG
-        color_val = cfg.embed_color or 0x8B5CF6
+        title_tmpl = cfg.title or WELCOME_PRESETS["standard"]["title"]
+        msg_tmpl = cfg.message or WELCOME_PRESETS["standard"]["message"]
+        color_val = cfg.embed_color or WELCOME_PRESETS["standard"]["color"]
 
         w_embed = self._build_welcome_embed(interaction.user, title_tmpl, msg_tmpl, color_val, inviter=interaction.user, invites_count=3)
         await interaction.response.send_message(embed=w_embed, ephemeral=True)
