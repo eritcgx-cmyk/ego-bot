@@ -2,7 +2,7 @@
 Friend Group (FG) System Cog for Ego Bot.
 Features public initiation (/fg start), invitation tracking (/fg invite),
 automatic 4-member staff review ticket generation, instant owner creation (/fg create),
-private role creation, and dedicated interactive squad control panels.
+private role creation, and dedicated interactive FG control panels.
 """
 import os
 import json
@@ -27,7 +27,7 @@ class FGRenameModal(discord.ui.Modal, title="Rename Friend Group"):
         super().__init__()
         self.fg_id = fg_id
 
-    new_name = discord.ui.TextInput(label="New Squad Name", placeholder="e.g. Syndicate Elite", max_length=50, required=True)
+    new_name = discord.ui.TextInput(label="New FG Name", placeholder="e.g. Syndicate Elite", max_length=50, required=True)
 
     async def on_submit(self, interaction: discord.Interaction):
         guild = interaction.guild
@@ -38,7 +38,7 @@ class FGRenameModal(discord.ui.Modal, title="Rename Friend Group"):
             fg = res.scalar_one_or_none()
 
             if not fg or fg.creator_id != user.id:
-                return await interaction.response.send_message("Only the Squad Leader can rename this Friend Group.", ephemeral=True)
+                return await interaction.response.send_message("Only the FG Leader can rename this Friend Group.", ephemeral=True)
 
             old_name = fg.name
             fg.name = self.new_name.value.strip()
@@ -55,7 +55,7 @@ class FGRenameModal(discord.ui.Modal, title="Rename Friend Group"):
                     await role.edit(name=f"👑 ︱ {fg.name}")
 
         await interaction.response.send_message(
-            embed=success_embed("Squad Renamed", f"Renamed squad from **{old_name}** to **{self.new_name.value.strip()}**."),
+            embed=success_embed("FG Renamed", f"Renamed FG from **{old_name}** to **{self.new_name.value.strip()}**."),
             ephemeral=True
         )
 
@@ -69,22 +69,22 @@ class FGControlPanelView(discord.ui.View):
             return None
         embed = message.embeds[0]
         desc = embed.description or ""
-        match = re.search(r"Squad ID:\*\* `#(\d+)`", desc)
+        match = re.search(r"FG ID:\*\* `#(\d+)`", desc)
         if match:
             return int(match.group(1))
         return None
 
-    @discord.ui.button(label="Rename Squad", style=discord.ButtonStyle.primary, custom_id="fg_panel_rename")
+    @discord.ui.button(label="Rename FG", style=discord.ButtonStyle.primary, custom_id="fg_panel_rename")
     async def rename_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self.fg_id or self._extract_fg_id(interaction.message)
         if not fg_id:
-            return await interaction.response.send_message("Could not resolve Squad ID from this panel.", ephemeral=True)
+            return await interaction.response.send_message("Could not resolve FG ID from this panel.", ephemeral=True)
 
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
             if not fg or fg.creator_id != interaction.user.id:
-                return await interaction.response.send_message("Only the Squad Leader can rename the squad.", ephemeral=True)
+                return await interaction.response.send_message("Only the FG Leader can rename this FG.", ephemeral=True)
 
         await interaction.response.send_modal(FGRenameModal(fg_id=fg_id))
 
@@ -92,17 +92,17 @@ class FGControlPanelView(discord.ui.View):
     async def roster_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self.fg_id or self._extract_fg_id(interaction.message)
         if not fg_id:
-            return await interaction.response.send_message("Could not resolve Squad ID.", ephemeral=True)
+            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
 
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
             if not fg:
-                return await interaction.response.send_message("Squad record not found.", ephemeral=True)
+                return await interaction.response.send_message("FG record not found.", ephemeral=True)
 
             members_mentions = ", ".join(f"<@{m}>" for m in fg.members) if fg.members else "None"
             embed = ego_embed(
-                title=f"Squad Roster • {fg.name}",
+                title=f"FG Roster • {fg.name}",
                 description=(
                     f"> **Leader:** <@{fg.creator_id}>\n"
                     f"> **Total Members:** `{len(fg.members)}`\n\n"
@@ -112,11 +112,11 @@ class FGControlPanelView(discord.ui.View):
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @discord.ui.button(label="Disband Squad", style=discord.ButtonStyle.danger, custom_id="fg_panel_disband")
+    @discord.ui.button(label="Disband FG", style=discord.ButtonStyle.danger, custom_id="fg_panel_disband")
     async def disband_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self.fg_id or self._extract_fg_id(interaction.message)
         if not fg_id:
-            return await interaction.response.send_message("Could not resolve Squad ID.", ephemeral=True)
+            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
 
         guild = interaction.guild
         user = interaction.user
@@ -125,7 +125,7 @@ class FGControlPanelView(discord.ui.View):
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
             if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the Squad Leader or an Admin can disband this squad.", ephemeral=True)
+                return await interaction.response.send_message("Only the FG Leader or an Admin can disband this FG.", ephemeral=True)
 
             # Purge Category, Channels, and Role
             if fg.category_id:
@@ -144,7 +144,7 @@ class FGControlPanelView(discord.ui.View):
             await session.commit()
 
         await interaction.response.send_message(
-            embed=success_embed("Squad Disbanded", "Friend group disbanded and private channels purged."),
+            embed=success_embed("FG Disbanded", "Friend Group disbanded and private channels purged."),
             ephemeral=True
         )
 
@@ -158,7 +158,7 @@ class FGTicketReviewView(discord.ui.View):
             return None
         embed = message.embeds[0]
         desc = embed.description or ""
-        match = re.search(r"Squad ID:\*\* `#(\d+)`", desc)
+        match = re.search(r"FG ID:\*\* `#(\d+)`", desc)
         if match:
             return int(match.group(1))
         return None
@@ -167,7 +167,7 @@ class FGTicketReviewView(discord.ui.View):
     async def approve_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self.fg_id or self._extract_fg_id(interaction.message)
         if not fg_id:
-            return await interaction.response.send_message("Could not resolve Squad ID from this ticket.", ephemeral=True)
+            return await interaction.response.send_message("Could not resolve FG ID from this ticket.", ephemeral=True)
 
         guild = interaction.guild
         async with AsyncSessionLocal() as session:
@@ -175,7 +175,7 @@ class FGTicketReviewView(discord.ui.View):
             fg = res.scalar_one_or_none()
 
             if not fg:
-                return await interaction.response.send_message("Squad record not found in database.", ephemeral=True)
+                return await interaction.response.send_message("FG record not found in database.", ephemeral=True)
 
             if fg.status == "active":
                 return await interaction.response.send_message("This Friend Group is already approved and active.", ephemeral=True)
@@ -208,7 +208,7 @@ class FGTicketReviewView(discord.ui.View):
                     creator = guild.get_member(fg.creator_id)
                     if creator:
                         try:
-                            await creator.send(embed=error_embed("Friend Group Declined", f"Your application for squad **{fg.name}** was declined by staff."))
+                            await creator.send(embed=error_embed("Friend Group Declined", f"Your application for FG **{fg.name}** was declined by staff."))
                         except Exception:
                             pass
                     await session.delete(fg)
@@ -224,7 +224,7 @@ class FGTicketReviewView(discord.ui.View):
             embed.add_field(name="› Reviewed By", value=interaction.user.mention, inline=True)
             await interaction.message.edit(embed=embed, view=self)
 
-        await interaction.response.send_message("Declined squad application.", ephemeral=True)
+        await interaction.response.send_message("Declined FG application.", ephemeral=True)
 
 class FGInviteView(discord.ui.View):
     def __init__(self, fg_id: Optional[int] = None):
@@ -236,7 +236,7 @@ class FGInviteView(discord.ui.View):
             return None
         embed = message.embeds[0]
         desc = embed.description or ""
-        match = re.search(r"Squad ID:\*\* `#(\d+)`", desc)
+        match = re.search(r"FG ID:\*\* `#(\d+)`", desc)
         if match:
             return int(match.group(1))
         return None
@@ -247,7 +247,7 @@ class FGInviteView(discord.ui.View):
         user = interaction.user
 
         if not fg_id:
-            return await interaction.response.send_message("Could not resolve Squad ID.", ephemeral=True)
+            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
 
         guild = interaction.guild
         async with AsyncSessionLocal() as session:
@@ -277,11 +277,11 @@ class FGInviteView(discord.ui.View):
 
             await interaction.message.edit(view=self)
             await interaction.response.send_message(
-                embed=success_embed("Invitation Accepted", f"You joined **{fg.name}**! ({len(members)} members in squad)"),
+                embed=success_embed("Invitation Accepted", f"You joined **{fg.name}**! ({len(members)} members in FG)"),
                 ephemeral=True
             )
 
-            # Check if squad reached 4 members while in pending status -> Create Staff Review Ticket!
+            # Check if FG reached 4 members while in pending status -> Create Staff Review Ticket!
             if len(members) >= 4 and fg.status == "pending" and not fg.ticket_channel_id and guild:
                 await trigger_fg_staff_ticket(guild, fg)
 
@@ -313,14 +313,14 @@ async def trigger_fg_staff_ticket(guild: discord.Guild, fg_record: FriendGroup):
         ticket_ch = await guild.create_text_channel(
             name=f"fg-review-{fg_record.name[:12].lower().replace(' ', '-')}",
             overwrites=overwrites,
-            topic=f"Staff Review Ticket for Friend Group {fg_record.name} (Squad ID: #{fg_record.id})"
+            topic=f"Staff Review Ticket for Friend Group {fg_record.name} (FG ID: #{fg_record.id})"
         )
 
         members_mentions = ", ".join(f"<@{m}>" for m in fg_record.members)
         review_embed = ego_embed(
             title=f"Friend Group Application • {fg_record.name}",
             description=(
-                f"> **Squad ID:** `#{fg_record.id}`\n"
+                f"> **FG ID:** `#{fg_record.id}`\n"
                 f"> **Leader:** <@{fg_record.creator_id}>\n"
                 f"> **Members ({len(fg_record.members)}/4+ ready):**\n{members_mentions}\n\n"
                 f"› **Status:** Ready for Staff Approval\n"
@@ -330,7 +330,7 @@ async def trigger_fg_staff_ticket(guild: discord.Guild, fg_record: FriendGroup):
         )
 
         view = FGTicketReviewView(fg_id=fg_record.id)
-        await ticket_ch.send(content=f"📢 **New Squad Review:** <@{fg_record.creator_id}>", embed=review_embed, view=view)
+        await ticket_ch.send(content=f"📢 **New FG Review:** <@{fg_record.creator_id}>", embed=review_embed, view=view)
 
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_record.id))
@@ -344,7 +344,7 @@ async def trigger_fg_staff_ticket(guild: discord.Guild, fg_record: FriendGroup):
                 await creator.send(
                     embed=info_embed(
                         "Review Ticket Opened",
-                        f"Your squad **{fg_record.name}** reached 4 members! A staff review ticket has opened in {ticket_ch.mention}."
+                        f"Your FG **{fg_record.name}** reached 4 members! A staff review ticket has opened in {ticket_ch.mention}."
                     )
                 )
             except Exception:
@@ -386,7 +386,7 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
 
         # 3. Create Category, Text Lounge, and Voice Suite
         cat = await guild.create_category(name=f"👑 ︱ {fg_record.name}", overwrites=overwrites)
-        text_ch = await guild.create_text_channel(name="💬-lounge", category=cat, topic=f"Private squad lounge for {fg_record.name}")
+        text_ch = await guild.create_text_channel(name="💬-lounge", category=cat, topic=f"Private FG lounge for {fg_record.name}")
         voice_ch = await guild.create_voice_channel(name="🔊-voice", category=cat)
 
         # 4. Save IDs to DB
@@ -404,14 +404,14 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
         # 5. Post Dedicated Interactive Control Panel
         members_mentions = ", ".join(f"<@{m}>" for m in fg_record.members)
         panel_embed = ego_embed(
-            title=f"👑 Squad Control Panel • {fg_record.name}",
+            title=f"👑 FG Control Panel • {fg_record.name}",
             description=(
-                f"> **Squad ID:** `#{fg_record.id}`\n"
+                f"> **FG ID:** `#{fg_record.id}`\n"
                 f"> **Leader:** <@{fg_record.creator_id}>\n"
                 f"> **Private Role:** {private_role.mention}\n"
                 f"> **Roster ({len(fg_record.members)}):** {members_mentions}\n\n"
                 f"› **Exclusive Lounge:** Only members with the {private_role.mention} role can view this category.\n"
-                f"Use the control buttons below to manage your squad settings:"
+                f"Use the control buttons below to manage your FG settings:"
             ),
             color=COLOR_VIOLET
         )
@@ -426,21 +426,20 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    fg_group = app_commands.Group(name="fg", description="Friend Group squads, private channels, and control panels")
+    fg_group = app_commands.Group(name="fg", description="Friend Group private channels and control panels")
 
     @fg_group.command(name="start", description="[Public] Start a Friend Group in pending state")
-    @app_commands.describe(name="Name of your squad")
+    @app_commands.describe(name="Name of your FG")
     async def fg_start(self, interaction: discord.Interaction, name: str):
         guild = interaction.guild
         user = interaction.user
 
         async with AsyncSessionLocal() as session:
-            # Check if user already owns a squad
             res = await session.execute(select(FriendGroup).where(FriendGroup.guild_id == guild.id, FriendGroup.creator_id == user.id, FriendGroup.status != "disbanded"))
             existing = res.scalar_one_or_none()
             if existing:
                 return await interaction.response.send_message(
-                    embed=error_embed("Already Own Squad", f"You already have a squad: **{existing.name}** (Status: `{existing.status}`)."),
+                    embed=error_embed("Already Own FG", f"You already have an FG: **{existing.name}** (Status: `{existing.status}`)."),
                     ephemeral=True
                 )
 
@@ -456,10 +455,10 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             await session.refresh(fg)
 
         embed = ego_embed(
-            title=f"Squad Started • {name.strip()}",
+            title=f"FG Started • {name.strip()}",
             description=(
                 f"> **Status:** `Pending Member Invites (1/4)`\n"
-                f"> **Squad ID:** `#{fg.id}`\n\n"
+                f"> **FG ID:** `#{fg.id}`\n\n"
                 f"› **Leader:** {user.mention}\n"
                 f"› **Next Step:** Run `/fg invite member:@friend` to invite 3 or more friends.\n"
                 f"› Once you reach **4 members**, a staff review ticket will automatically open to unlock your private category and lounges!"
@@ -468,7 +467,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
         )
         await interaction.response.send_message(embed=embed)
 
-    @fg_group.command(name="invite", description="[Public] Invite a friend to your pending or active squad")
+    @fg_group.command(name="invite", description="[Public] Invite a friend to your pending or active FG")
     @app_commands.describe(member="The member to invite")
     async def fg_invite(self, interaction: discord.Interaction, member: discord.Member):
         guild = interaction.guild
@@ -482,20 +481,20 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             fg = res.scalar_one_or_none()
 
             if not fg:
-                return await interaction.response.send_message(embed=error_embed("No Squad Found", "You do not own an active squad. Run `/fg start` to create one!"), ephemeral=True)
+                return await interaction.response.send_message(embed=error_embed("No FG Found", "You do not own an active FG. Run `/fg start` to create one!"), ephemeral=True)
 
             if member.id in fg.members:
-                return await interaction.response.send_message(embed=error_embed("Already in Squad", f"{member.mention} is already in **{fg.name}**."), ephemeral=True)
+                return await interaction.response.send_message(embed=error_embed("Already in FG", f"{member.mention} is already in **{fg.name}**."), ephemeral=True)
 
         # Dispatch Invite Card with buttons
         invite_embed = ego_embed(
-            title=f"Squad Invitation • {fg.name}",
+            title=f"FG Invitation • {fg.name}",
             description=(
                 f"> **{user.display_name}** has invited you to join **{fg.name}** in **{guild.name}**!\n"
-                f"> **Squad ID:** `#{fg.id}`\n\n"
+                f"> **FG ID:** `#{fg.id}`\n\n"
                 f"› **Leader:** {user.mention}\n"
                 f"› **Current Members:** `{len(fg.members)}`\n\n"
-                f"*Click **Accept Invitation** below to join this circle!*"
+                f"*Click **Accept Invitation** below to join this FG!*"
             ),
             color=COLOR_VIOLET
         )
@@ -504,24 +503,23 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
         try:
             await member.send(embed=invite_embed, view=view)
             await interaction.response.send_message(
-                embed=success_embed("Invitation Dispatched", f"Sent a direct squad invite to {member.mention}."),
+                embed=success_embed("Invitation Dispatched", f"Sent a direct FG invite to {member.mention}."),
                 ephemeral=True
             )
         except Exception:
-            # If DMs are closed, post in channel with ephemeral confirmation
             await interaction.channel.send(content=member.mention, embed=invite_embed, view=view)
             await interaction.response.send_message(
-                embed=success_embed("Invitation Posted", f"Posted squad invite for {member.mention} in this channel (DMs closed)."),
+                embed=success_embed("Invitation Posted", f"Posted FG invite for {member.mention} in this channel (DMs closed)."),
                 ephemeral=True
             )
 
     @fg_group.command(name="create", description="[Owner/Admin Only] Instantly create and provision an approved Friend Group")
     @app_commands.describe(
         name="Name of the Friend Group",
-        member1="Squad Member 1",
-        member2="Squad Member 2",
-        member3="Squad Member 3",
-        member4="Squad Member 4"
+        member1="FG Member 1",
+        member2="FG Member 2",
+        member3="FG Member 3",
+        member4="FG Member 4"
     )
     @is_admin_or_has_role()
     async def fg_create(
@@ -549,13 +547,13 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             await session.refresh(fg)
 
             await interaction.response.send_message(
-                embed=info_embed("Provisioning Squad...", f"Creating private role, category, and lounges for **{name}**..."),
+                embed=info_embed("Provisioning FG...", f"Creating private role, category, and lounges for **{name}**..."),
                 ephemeral=True
             )
             await provision_fg_suite(guild, fg)
 
             await interaction.followup.send(
-                embed=success_embed("Squad Provisioned", f"✅ **{name}** is live with 5 members and private lounges!"),
+                embed=success_embed("FG Provisioned", f"✅ **{name}** is live with 5 members and private lounges!"),
                 ephemeral=True
             )
 
@@ -572,13 +570,13 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
 
         if not user_fgs:
             return await interaction.response.send_message(
-                embed=info_embed("Your Squads", "You are not currently in any Friend Groups.\nRun `/fg start` to begin your squad!"),
+                embed=info_embed("Your Friend Groups", "You are not currently in any Friend Groups.\nRun `/fg start` to begin your FG!"),
                 ephemeral=True
             )
 
         embed = ego_embed(
             title=f"Your Friend Groups ({len(user_fgs)})",
-            description=f"Active squad memberships for {user.mention}:\n",
+            description=f"Active FG memberships for {user.mention}:\n",
             color=COLOR_VIOLET
         )
 
@@ -601,7 +599,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @fg_group.command(name="overview", description="[Owner/Mods Only] Browse all server squads with interactive selector")
+    @fg_group.command(name="overview", description="[Owner/Mods Only] Browse all server FGs with directory selector")
     @is_admin_or_has_role()
     async def fg_overview(self, interaction: discord.Interaction):
         guild = interaction.guild
@@ -612,7 +610,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
 
         if not all_fgs:
             return await interaction.response.send_message(
-                embed=info_embed("Server Squads", "No Friend Groups registered in this server yet."),
+                embed=info_embed("Server FGs", "No Friend Groups registered in this server yet."),
                 ephemeral=True
             )
 
@@ -622,7 +620,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
         embed = ego_embed(
             title=f"Server Friend Groups Directory ({len(all_fgs)})",
             description=(
-                f"> **Active Squads:** `{active_count}`\n"
+                f"> **Active FGs:** `{active_count}`\n"
                 f"> **Pending Creation:** `{pending_count}`\n"
             ),
             color=COLOR_VIOLET
