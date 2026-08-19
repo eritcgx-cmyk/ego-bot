@@ -161,8 +161,13 @@ class ApplicationsCog(commands.Cog, name="Applications"):
         self.bot = bot
 
     apps_group = app_commands.Group(name="applications", description="Custom application forms and recruitment")
+    apps_admin_group = app_commands.Group(
+        name="apps_admin",
+        description="Staff administration controls for recruitment forms",
+        default_permissions=discord.Permissions(manage_roles=True)
+    )
 
-    @apps_group.command(name="setup", description="Create an application form with custom questions")
+    @apps_admin_group.command(name="setup", description="Create an application form with custom questions")
     @app_commands.describe(
         form_type="Type identifier (e.g. staff, mod, cc, partner)",
         title="Form Title",
@@ -174,7 +179,6 @@ class ApplicationsCog(commands.Cog, name="Applications"):
         question3="Third question (optional)",
         question4="Fourth question (optional)"
     )
-    @app_commands.default_permissions(manage_roles=True)
     @is_admin_or_has_role()
     async def app_setup(
         self,
@@ -271,8 +275,7 @@ class ApplicationsCog(commands.Cog, name="Applications"):
         modal = DynamicApplicationModal(form)
         await interaction.response.send_modal(modal)
 
-    @apps_group.command(name="list", description="List all pending applications")
-    @app_commands.default_permissions(manage_roles=True)
+    @apps_admin_group.command(name="list", description="List all pending applications")
     @is_mod_or_has_role()
     async def app_list(self, interaction: discord.Interaction):
         async with AsyncSessionLocal() as session:
@@ -300,12 +303,10 @@ class ApplicationsCog(commands.Cog, name="Applications"):
         embed.description = "\n".join(lines)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @apps_group.command(name="close", description="Close an application form from accepting new submissions")
+    @apps_admin_group.command(name="close", description="Close an application form from accepting new submissions")
     @app_commands.describe(form_id="ID of the form to close")
-    @app_commands.default_permissions(manage_roles=True)
     @is_admin_or_has_role()
     async def app_close(self, interaction: discord.Interaction, form_id: int):
-
         async with AsyncSessionLocal() as session:
             res = await session.execute(
                 select(ApplicationForm).where(ApplicationForm.id == form_id, ApplicationForm.guild_id == interaction.guild_id)
@@ -319,6 +320,7 @@ class ApplicationsCog(commands.Cog, name="Applications"):
             await session.commit()
 
         await interaction.response.send_message(embed=success_embed("Form Closed", f"Form **{form.title}** is now closed."))
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ApplicationsCog(bot))
