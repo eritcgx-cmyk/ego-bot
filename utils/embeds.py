@@ -1,19 +1,19 @@
 """
-Aesthetic & Humanized Embed Builder for Ego Bot.
-Features modern typography, rich colors, and clean layout patterns.
+Clean & Minimal Aesthetic Embed Builder for Ego Bot.
+Features sleek typography, curated dark-mode colors, and simple layouts.
 """
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 import discord
 
-# Curated Aesthetic Palette
+# Curated Palette
 COLOR_OBSIDIAN = 0x18181B   # Sleek Dark
 COLOR_VIOLET   = 0x8B5CF6   # Electric Violet / Brand Primary
 COLOR_EMERALD  = 0x10B981   # Clean Success Mint
 COLOR_CRIMSON  = 0xF43F5E   # Rose / Alert Red
 COLOR_AMBER    = 0xF59E0B   # Warm Warning
 COLOR_CYAN     = 0x06B6D4   # Neon Cyan
-COLOR_ROSE     = 0xFB7185   # Soft Aesthetic Pink
+COLOR_ROSE     = 0xFB7185   # Soft Pink
 COLOR_INDIGO   = 0x6366F1   # Indigo Blue
 
 def ego_embed(
@@ -25,7 +25,7 @@ def ego_embed(
     footer_text: Optional[str] = None,
     timestamp: bool = True
 ) -> discord.Embed:
-    """Builds a sleek modern Discord embed with humanized branding."""
+    """Builds a clean Discord embed with minimal branding."""
     embed = discord.Embed(
         title=title,
         description=description,
@@ -43,48 +43,47 @@ def ego_embed(
     embed.set_footer(text=footer)
     return embed
 
-
 def success_embed(title: str, description: str, **kwargs) -> discord.Embed:
-    """Aesthetic emerald success notification."""
+    """Clean success notification."""
     return ego_embed(
-        title=f"✦ {title}",
+        title=title,
         description=f"> {description}",
         color=COLOR_EMERALD,
         **kwargs
     )
 
 def error_embed(title: str, description: str, tip: Optional[str] = None, **kwargs) -> discord.Embed:
-    """Aesthetic rose/crimson error notification with friendly tip."""
+    """Clean error notification."""
     desc = f"> {description}"
     if tip:
-        desc += f"\n\n💡 **Tip:** *{tip}*"
+        desc += f"\n\n**Tip:** *{tip}*"
     return ego_embed(
-        title=f"✖ {title}",
+        title=title,
         description=desc,
         color=COLOR_CRIMSON,
         **kwargs
     )
 
 def warning_embed(title: str, description: str, **kwargs) -> discord.Embed:
-    """Aesthetic amber warning notification."""
+    """Clean warning notification."""
     return ego_embed(
-        title=f"▲ {title}",
+        title=title,
         description=f"> {description}",
         color=COLOR_AMBER,
         **kwargs
     )
 
 def info_embed(title: str, description: str, **kwargs) -> discord.Embed:
-    """Aesthetic violet/cyan informative notification."""
+    """Clean informative notification."""
     return ego_embed(
-        title=f"◆ {title}",
+        title=title,
         description=description,
         color=COLOR_CYAN,
         **kwargs
     )
 
 def card_embed(title: str, fields: List[tuple], color: int = COLOR_VIOLET, description: Optional[str] = None, **kwargs) -> discord.Embed:
-    """Multi-field structured card with neat alignment."""
+    """Structured card with neat alignment."""
     embed = ego_embed(title=title, description=description, color=color, **kwargs)
     for name, val, inline in fields:
         embed.add_field(name=f"› {name}", value=val, inline=inline)
