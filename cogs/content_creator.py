@@ -562,6 +562,7 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
 
     @cc_group.command(name="set_video_channel", description="Set the channel where approved Creator videos are published")
     @app_commands.describe(channel="Target video showcase channel")
+    @app_commands.default_permissions(manage_guild=True)
     @is_admin_or_has_role()
     async def cc_set_video_ch(self, interaction: discord.Interaction, channel: discord.TextChannel):
         cfg = load_cc_config()
@@ -617,6 +618,7 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
         app_commands.Choice(name="Famous", value="Famous"),
         app_commands.Choice(name="Star", value="Star")
     ])
+    @app_commands.default_permissions(manage_guild=True)
     @is_admin_or_has_role()
     async def cc_set_tier_req(
         self,
@@ -647,8 +649,10 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
         )
 
     @cc_group.command(name="setup_roles", description="Auto-create all 6 Creator roles in your server")
+    @app_commands.default_permissions(manage_guild=True)
     @is_guild_owner()
     async def cc_setup_roles(self, interaction: discord.Interaction):
+
         guild = interaction.guild
         created = []
         for t in ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star"]:
