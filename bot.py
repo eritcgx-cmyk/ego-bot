@@ -98,6 +98,14 @@ class EgoBot(commands.Bot):
         except Exception as e:
             logger.debug(f"Could not register InviteLeaderboardView: {e}")
 
+        try:
+            from cogs.identity_verify import FaceVerificationLaunchView, FaceVerifyReviewView
+            self.add_view(FaceVerificationLaunchView())
+            self.add_view(FaceVerifyReviewView())
+            logger.info("Registered persistent FaceVerification views.")
+        except Exception as e:
+            logger.debug(f"Could not register FaceVerification views: {e}")
+
         # 4. Global sync disabled to prevent 1-hour Discord global client caching; guild sync runs on_ready
 
 
