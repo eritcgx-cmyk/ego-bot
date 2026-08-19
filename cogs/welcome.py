@@ -1,31 +1,129 @@
 """
-Welcome System Cog for Ego Bot
+Comprehensive Welcome & Join Dispatcher Cog for Ego Bot.
+Features:
+- Dynamic inviter & invite count resolution ({inviter}, {invites_count})
+- Server Banner embed presentation (Guild banner, splash, or custom banner image)
+- Aesthetic welcome cards with member count tracking and optional DMs
 """
-from typing import Optional
+import os
+import json
+from typing import Optional, Tuple
 import discord
 from discord import app_commands
 from discord.ext import commands
 from sqlalchemy import select
 from database.engine import AsyncSessionLocal
-from database.models import WelcomeConfig
+from database.models import WelcomeConfig, UserInviteStat
 from utils.permissions import is_admin_or_has_role
-from utils.embeds import ego_embed, success_embed, error_embed, info_embed
+from utils.embeds import ego_embed, success_embed, error_embed, info_embed, COLOR_VIOLET, get_eastern_time
 from utils.logger import log_action
 from config import logger
 
-def format_welcome_string(template: str, member: discord.Member) -> str:
-    """Format template with member placeholders."""
-    return template.format(
-        user=member.name,
-        mention=member.mention,
-        membercount=member.guild.member_count,
-        server=member.guild.name,
-        server_id=member.guild.id
-    )
+DEFAULT_WELCOME_TITLE = "✦ Welcome to {server}!"
+DEFAULT_WELCOME_MSG = (
+    "> Welcome {mention} to **{server}**!\n"
+    "> You were invited by **{inviter}**, who now has **`{invites_count}`** invites.\n"
+    "> Server Member Count: **`#{membercount}`**"
+)
+
+def format_welcome_string(
+    template: str,
+    member: discord.Member,
+    inviter: Optional[discord.Member | discord.User] = None,
+    invites_count: int = 0
+) -> str:
+    """Format template with member, server, and dynamic inviter placeholders."""
+    inviter_str = inviter.mention if inviter else "Direct / Vanity Invite"
+    inviter_name = inviter.display_name if inviter else "Direct / Vanity"
+    vanity_code = getattr(member.guild, "vanity_url_code", None) or "Direct"
+
+    replacements = {
+        "{user}": member.name,
+        "{mention}": member.mention,
+        "{membercount}": str(member.guild.member_count),
+        "{server}": member.guild.name,
+        "{server_id}": str(member.guild.id),
+        "{inviter}": inviter_str,
+        "{inviter_name}": inviter_name,
+        "{invites_count}": str(invites_count),
+        "{vanity}": vanity_code
+    }
+    result = template
+    for key, val in replacements.items():
+        result = result.replace(key, val)
+    return result
 
 class WelcomeCog(commands.Cog, name="Welcome"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+
+    async def _resolve_inviter_info(self, member: discord.Member) -> Tuple[Optional[discord.User | discord.Member], int]:
+        """Resolves the inviter and their current total invite count for a joining member."""
+        guild = member.guild
+        inviter = None
+        invites_count = 0
+
+        # Check inviter map from Invites Cog
+        try:
+            inviters_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "member_inviters.json")
+            if os.path.exists(inviters_file):
+                with open(inviters_file, "r", encoding="utf-8") as f:
+                    inv_map = json.load(f)
+                inv_id = inv_map.get(f"{guild.id}_{member.id}")
+                if inv_id:
+                    inviter = guild.get_member(inv_id) or await self.bot.fetch_user(inv_id)
+        except Exception:
+            pass
+
+        if inviter:
+            try:
+                async with AsyncSessionLocal() as session:
+                    res = await session.execute(
+                        select(UserInviteStat).where(
+                            UserInviteStat.guild_id == guild.id,
+                            UserInviteStat.user_id == inviter.id
+                        )
+                    )
+                    stat = res.scalar_one_or_none()
+                    if stat:
+                        invites_count = stat.total
+            except Exception:
+                pass
+
+        return inviter, invites_count
+
+    def _build_welcome_embed(
+        self,
+        member: discord.Member,
+        title_tmpl: str,
+        msg_tmpl: str,
+        color_val: int,
+        inviter: Optional[discord.Member | discord.User] = None,
+        invites_count: int = 0
+    ) -> discord.Embed:
+        """Constructs an aesthetic welcome embed featuring server banner and avatar."""
+        title = format_welcome_string(title_tmpl, member, inviter, invites_count)
+        description = format_welcome_string(msg_tmpl, member, inviter, invites_count)
+
+        embed = ego_embed(
+            title=title,
+            description=description,
+            color=color_val or COLOR_VIOLET
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+
+        # Set Server Banner if available on guild
+        guild = member.guild
+        if guild.banner:
+            embed.set_image(url=guild.banner.url)
+        elif guild.splash:
+            embed.set_image(url=guild.splash.url)
+
+        embed.set_footer(
+            text=f"{guild.name} • Member #{guild.member_count} • {get_eastern_time()}",
+            icon_url=guild.icon.url if guild.icon else None
+        )
+        return embed
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
@@ -39,66 +137,74 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             if not cfg or not cfg.enabled:
                 return
 
-            # Guild Channel Message
+            inviter, invites_count = await self._resolve_inviter_info(member)
+
+            # Guild Channel Welcome Message
             if cfg.channel_id:
                 channel = member.guild.get_channel(cfg.channel_id)
                 if channel and isinstance(channel, discord.TextChannel):
                     try:
-                        title = format_welcome_string(cfg.title or "Welcome to {server}!", member)
-                        desc = format_welcome_string(cfg.message or "Welcome {user}!", member)
-                        embed = ego_embed(title=title, description=desc, color=cfg.embed_color or 0x5865F2)
-                        embed.set_thumbnail(url=member.display_avatar.url)
+                        title_tmpl = cfg.title or DEFAULT_WELCOME_TITLE
+                        msg_tmpl = cfg.message or DEFAULT_WELCOME_MSG
+                        color_val = cfg.embed_color or 0x8B5CF6
+
+                        embed = self._build_welcome_embed(member, title_tmpl, msg_tmpl, color_val, inviter, invites_count)
                         await channel.send(content=member.mention, embed=embed)
                     except Exception as e:
                         logger.error(f"Failed to send welcome message in guild {member.guild.id}: {e}")
 
-            # Optional DM
+            # Optional Welcome Direct Message
             if cfg.dm_enabled and cfg.dm_message:
                 try:
-                    dm_text = format_welcome_string(cfg.dm_message, member)
+                    dm_text = format_welcome_string(cfg.dm_message, member, inviter, invites_count)
                     dm_embed = ego_embed(
                         title=f"Welcome to {member.guild.name}!",
                         description=dm_text,
-                        color=cfg.embed_color or 0x5865F2
+                        color=cfg.embed_color or 0x8B5CF6
                     )
                     if member.guild.icon:
                         dm_embed.set_thumbnail(url=member.guild.icon.url)
+                    if member.guild.banner:
+                        dm_embed.set_image(url=member.guild.banner.url)
                     await member.send(embed=dm_embed)
                 except discord.Forbidden:
-                    pass # User has DMs closed
+                    pass
                 except Exception as e:
                     logger.debug(f"Could not send welcome DM to user {member.id}: {e}")
 
+    # =========================================================================
+    # WELCOME ADMINISTRATIVE GROUP (/welcome)
+    # =========================================================================
     welcome_group = app_commands.Group(
         name="welcome",
-        description="Configure welcome messages and DMs",
+        description="Configure automated server welcome cards, banners, and inviter tracking",
         default_permissions=discord.Permissions(administrator=True)
     )
 
-    @welcome_group.command(name="setup", description="Configure welcome channel and message template")
+    @welcome_group.command(name="setup", description="Deploy & configure the welcome channel and message template")
     @app_commands.describe(
-        channel="Channel to send welcome messages in",
-        title="Embed title ({user}, {server}, {membercount})",
-        message="Embed message body ({user}, {mention}, {server}, {membercount})",
-        color="Hex color (e.g. #5865F2)",
+        channel="Channel to send welcome embeds in",
+        title="Embed title ({user}, {server}, {membercount}, {inviter}, {invites_count})",
+        message="Embed message body ({mention}, {server}, {membercount}, {inviter}, {invites_count})",
+        color="Hex color (e.g. #8B5CF6)",
         dm_enabled="Send a welcome direct message to joining users",
-        dm_message="Message content for DM"
+        dm_message="Message content for direct message"
     )
     @is_admin_or_has_role()
     async def welcome_setup(
         self,
         interaction: discord.Interaction,
         channel: discord.TextChannel,
-        title: Optional[str] = "Welcome to {server}!",
-        message: Optional[str] = "Hey {mention}, welcome! You are member #{membercount}.",
-        color: Optional[str] = "#5865F2",
+        title: Optional[str] = DEFAULT_WELCOME_TITLE,
+        message: Optional[str] = DEFAULT_WELCOME_MSG,
+        color: Optional[str] = "#8B5CF6",
         dm_enabled: Optional[bool] = False,
-        dm_message: Optional[str] = "Welcome to {server}! Make sure to read the rules."
+        dm_message: Optional[str] = "Welcome to {server}! Be sure to review our rules and verify."
     ):
         try:
-            embed_color = int(color.lstrip("#"), 16) if color else 0x5865F2
+            embed_color = int(color.lstrip("#"), 16) if color else 0x8B5CF6
         except ValueError:
-            embed_color = 0x5865F2
+            embed_color = 0x8B5CF6
 
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(WelcomeConfig).where(WelcomeConfig.guild_id == interaction.guild_id))
@@ -117,41 +223,46 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             cfg.dm_message = dm_message
             await session.commit()
 
-        await interaction.response.send_message(
-            embed=success_embed(
-                "Welcome Setup Complete",
-                f"✅ Welcome messages active in {channel.mention}.\n"
-                f"DM Welcome: `{'Enabled' if dm_enabled else 'Disabled'}`\n\n"
-                f"**Placeholders:** `{{user}}`, `{{mention}}`, `{{server}}`, `{{membercount}}`"
-            )
-        )
-        await log_action(
-            interaction.guild,
-            title="Welcome System Configured",
-            description=f"Channel: {channel.mention} | DM Enabled: {dm_enabled}",
-            moderator=interaction.user
+        sample_embed = self._build_welcome_embed(
+            interaction.user,
+            title or DEFAULT_WELCOME_TITLE,
+            message or DEFAULT_WELCOME_MSG,
+            embed_color,
+            inviter=interaction.user,
+            invites_count=5
         )
 
-    @welcome_group.command(name="preview", description="Preview the current welcome embed")
+        await interaction.response.send_message(
+            content="✅ **Welcome System Configured!** Here is a live preview of how new joins will look:",
+            embed=sample_embed
+        )
+
+    @welcome_group.command(name="preview", description="Preview the current welcome embed design")
     @is_admin_or_has_role()
     async def welcome_preview(self, interaction: discord.Interaction):
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(WelcomeConfig).where(WelcomeConfig.guild_id == interaction.guild_id))
             cfg = res.scalar_one_or_none()
 
-            if not cfg:
-                return await interaction.response.send_message(
-                    embed=error_embed("Not Configured", "Welcome system is not configured yet. Run `/welcome setup`."),
-                    ephemeral=True
-                )
+        if not cfg or not cfg.enabled:
+            return await interaction.response.send_message(
+                embed=info_embed("Welcome Disabled", "Welcome system is not configured or disabled.\nRun `/welcome setup` to activate it."),
+                ephemeral=True
+            )
 
-            member = interaction.user
-            title = format_welcome_string(cfg.title or "Welcome to {server}!", member)
-            desc = format_welcome_string(cfg.message or "Welcome {user}!", member)
-            embed = ego_embed(title=f"👀 Preview: {title}", description=desc, color=cfg.embed_color or 0x5865F2)
-            embed.set_thumbnail(url=member.display_avatar.url)
+        title_tmpl = cfg.title or DEFAULT_WELCOME_TITLE
+        msg_tmpl = cfg.message or DEFAULT_WELCOME_MSG
+        color_val = cfg.embed_color or 0x8B5CF6
 
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+        embed = self._build_welcome_embed(
+            interaction.user,
+            title_tmpl,
+            msg_tmpl,
+            color_val,
+            inviter=interaction.user,
+            invites_count=3
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @welcome_group.command(name="toggle", description="Enable or disable the welcome system")
     @app_commands.describe(enabled="Enable (True) or Disable (False)")
@@ -162,22 +273,14 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             cfg = res.scalar_one_or_none()
 
             if not cfg:
-                cfg = WelcomeConfig(guild_id=interaction.guild_id, enabled=enabled)
-                session.add(cfg)
-            else:
-                cfg.enabled = enabled
+                return await interaction.response.send_message(embed=error_embed("Not Configured", "Please run `/welcome setup` first."), ephemeral=True)
+
+            cfg.enabled = enabled
             await session.commit()
 
         status_text = "Enabled" if enabled else "Disabled"
-        await interaction.response.send_message(
-            embed=success_embed("Welcome System Updated", f"Welcome system is now **{status_text}**.")
-        )
-        await log_action(
-            interaction.guild,
-            title=f"Welcome System {status_text}",
-            description=f"Status set to {status_text}",
-            moderator=interaction.user
-        )
+        await interaction.response.send_message(embed=success_embed("Welcome Updated", f"Welcome messages are now **{status_text}**."))
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(WelcomeCog(bot))
