@@ -172,6 +172,7 @@ class InvitesCog(commands.Cog, name="Invites"):
         threshold="Invite count required",
         role="Role to grant upon reaching threshold"
     )
+    @app_commands.default_permissions(manage_roles=True)
     @is_admin_or_has_role()
     async def invites_config_tier(
         self,
