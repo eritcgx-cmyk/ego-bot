@@ -91,10 +91,17 @@ class CustomStatusCog(commands.Cog, name="CustomStatus"):
         self.auto_rotate_enabled = True
         self.current_index = 0
         self.custom_override = None
-        self.rotator_task.start()
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        if not self.rotator_task.is_running():
+            self.rotator_task.start()
 
     def cog_unload(self):
-        self.rotator_task.cancel()
+        if self.rotator_task.is_running():
+            self.rotator_task.cancel()
+
+
 
     async def apply_status_entry(self, entry: Dict[str, Any]):
         """Apply a status dict to bot presence."""
