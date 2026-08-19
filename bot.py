@@ -182,34 +182,38 @@ bot.tree.add_command(config_group)
 import aiohttp.web
 
 async def start_keepalive_server():
-    """Lightweight health check server for Render hosting."""
+    """Lightweight health check server for Render Free Web Service hosting."""
     async def handle_ping(request):
-        return aiohttp.web.Response(text="Ego Bot Online", status=200)
+        return aiohttp.web.Response(text="Ego Bot Online & Healthy", status=200)
 
     app = aiohttp.web.Application()
     app.router.add_get("/", handle_ping)
     app.router.add_get("/health", handle_ping)
     
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 10000))
     runner = aiohttp.web.AppRunner(app)
     await runner.setup()
     site = aiohttp.web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    logger.info(f"Keepalive web server listening on port {port}")
+    logger.info(f"Keepalive web server listening on 0.0.0.0:{port}")
 
 async def run_bot_with_server():
     if not BOT_TOKEN:
         logger.error("BOT_TOKEN environment variable is missing! Please set it in .env or your cloud environment.")
         sys.exit(1)
     
-    # Initialize Database Schema before starting bot or keepalive
+    # 1. Start HTTP Server immediately so Render health check succeeds instantly
+    try:
+        await start_keepalive_server()
+    except Exception as e:
+        logger.warning(f"Could not start keepalive server: {e}")
+
+    # 2. Initialize Database Schema
     logger.info("Verifying database schema...")
     await init_db()
-    
-    # Start web server if PORT is set (Render environment)
-    if "PORT" in os.environ:
-        await start_keepalive_server()
-    
+
+    # 3. Start Discord Bot Gateway Connection
+    logger.info("Connecting to Discord Gateway...")
     await bot.start(BOT_TOKEN)
 
 def main():
@@ -217,4 +221,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
