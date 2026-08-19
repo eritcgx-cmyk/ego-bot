@@ -72,23 +72,22 @@ class RolesSystemCog(commands.Cog, name="RolesSystem"):
     async def _generate_panel_embed(self, guild: discord.Guild, panel: RolePanel) -> discord.Embed:
         """Helper to build role roster embed."""
         embed = ego_embed(
-            title=f"👑 Role Roster: {panel.category}",
-            description="Live overview of member role distributions.\n*Updates automatically every 11 minutes.*",
-            color=INFO_COLOR
+            title=f"Role Roster - Roles",
+            description=f"> Active members holding **{panel.title}** roles in {guild.name}:\n",
+            color=panel.color_hex
         )
 
-        role_ids = panel.role_ids
-        for rid in role_ids[:20]: # Show up to 20 roles per panel
-            role = guild.get_role(rid)
+        for role_id in panel.role_ids:
+            role = guild.get_role(role_id)
             if role:
-                member_count = len(role.members)
-                top_members = ", ".join(m.mention for m in role.members[:5])
-                val = f"**Members ({member_count}):** {top_members}" if member_count > 0 else "*No members*"
-                if member_count > 5:
-                    val += f" *and {member_count - 5} more...*"
-                embed.add_field(name=f"@{role.name}", value=val, inline=False)
+                members = [m.mention for m in role.members[:20]]
+                val = ", ".join(members) if members else "*No members*"
+                if len(role.members) > 20:
+                    val += f" *(+{len(role.members) - 20} more)*"
+                embed.add_field(name=f"› {role.name} ({len(role.members)})", value=val, inline=False)
 
         return embed
+
 
     roles_group = app_commands.Group(name="roles", description="Role library, presets, perks, and live panels")
 
