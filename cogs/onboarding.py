@@ -33,7 +33,11 @@ class OnboardingCog(commands.Cog, name="Onboarding"):
                     raise Exception(data.get("message", f"Discord API Error {resp.status}: {data}"))
                 return data
 
-    onboarding_group = app_commands.Group(name="onboarding", description="Configure native Discord Guild Onboarding")
+    onboarding_group = app_commands.Group(
+        name="onboarding",
+        description="Configure native Discord Guild Onboarding",
+        default_permissions=discord.Permissions(administrator=True)
+    )
 
     @onboarding_group.command(name="preview", description="View current native Discord Onboarding configuration")
     @is_admin_or_has_role()
