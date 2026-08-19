@@ -1,30 +1,65 @@
 """
 Humanized General & Utility Commands Cog for Ego Bot.
-Modern aesthetics, clean embeds, and interactive helpers.
+Includes announcement builder, giveaway broadcasts, poll creator, personal reminders, user/server info, and moderation shortcuts.
 """
+import asyncio
+import re
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timedelta
 import discord
 from discord import app_commands
 from discord.ext import commands
-from utils.embeds import ego_embed, success_embed, error_embed, info_embed, card_embed, COLOR_VIOLET, COLOR_CYAN, COLOR_EMERALD, COLOR_ROSE
+from sqlalchemy import select
+from database.engine import AsyncSessionLocal
+from database.models import Giveaway
+from utils.embeds import (
+    ego_embed, success_embed, error_embed, info_embed, card_embed,
+    COLOR_VIOLET, COLOR_CYAN, COLOR_EMERALD, COLOR_ROSE, COLOR_AMBER
+)
 from utils.permissions import is_admin_or_has_role
 from config import BOT_VERSION, logger
 
+def parse_duration_seconds(duration_str: str) -> Optional[int]:
+    """Parse string duration into seconds (e.g. 10m, 2h, 1d)."""
+    match = re.match(r"^(\d+)([smhd])$", duration_str.strip().lower())
+    if not match:
+        return None
+    val, unit = int(match.group(1)), match.group(2)
+    multipliers = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+    return val * multipliers[unit]
+
+class EmbedBuilderModal(discord.ui.Modal, title="🎨 Custom Embed Builder"):
+    embed_title = discord.ui.TextInput(label="Embed Title", placeholder="e.g. Server Updates & Changelog", max_length=250, required=True)
+    description = discord.ui.TextInput(label="Description / Body", style=discord.TextStyle.paragraph, placeholder="Type your message with markdown formatting...", max_length=4000, required=True)
+    color_hex = discord.ui.TextInput(label="Hex Color (Optional, e.g. #8B5CF6)", placeholder="#8B5CF6", max_length=7, required=False)
+    image_url = discord.ui.TextInput(label="Banner Image URL (Optional)", placeholder="https://...", max_length=500, required=False)
+    thumbnail_url = discord.ui.TextInput(label="Thumbnail URL (Optional)", placeholder="https://...", max_length=500, required=False)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        color = COLOR_VIOLET
+        if self.color_hex.value:
+            try:
+                hex_clean = self.color_hex.value.replace("#", "")
+                color = int(hex_clean, 16)
+            except Exception:
+                color = COLOR_VIOLET
+
+        embed = ego_embed(
+            title=self.embed_title.value,
+            description=self.description.value,
+            color=color,
+            image_url=self.image_url.value or None,
+            thumbnail_url=self.thumbnail_url.value or None
+        )
+        await interaction.channel.send(embed=embed)
+        await interaction.response.send_message(
+            embed=success_embed("Embed Sent", "Custom embed has been posted to this channel."),
+            ephemeral=True
+        )
+
 class PollOptionModal(discord.ui.Modal, title="📊 Create Interactive Poll"):
-    question = discord.ui.TextInput(
-        label="Poll Question",
-        placeholder="e.g. Which event should we host this weekend?",
-        max_length=200,
-        required=True
-    )
-    options_text = discord.ui.TextInput(
-        label="Options (one per line, up to 10)",
-        style=discord.TextStyle.paragraph,
-        placeholder="1. Gaming Tournament\n2. Movie Night\n3. Nitro Drop",
-        max_length=1000,
-        required=True
-    )
+    question = discord.ui.TextInput(label="Poll Question", placeholder="e.g. Which event should we host this weekend?", max_length=200, required=True)
+    options_text = discord.ui.TextInput(label="Options (one per line, up to 10)", style=discord.TextStyle.paragraph, placeholder="1. Gaming Tournament\n2. Movie Night\n3. Nitro Drop", max_length=1000, required=True)
 
     async def on_submit(self, interaction: discord.Interaction):
         raw_options = [opt.strip() for opt in self.options_text.value.strip().split("\n") if opt.strip()]
@@ -65,10 +100,10 @@ class GeneralCog(commands.Cog, name="General"):
         self.bot = bot
         self.start_time = datetime.utcnow()
 
-    @app_commands.command(name="help", description="Explore all commands, systems, and features available in Ego")
+    @app_commands.command(name="help", description="Explore all commands, systems, and features in Ego")
     async def help_cmd(self, interaction: discord.Interaction):
         embed = ego_embed(
-            title="⚡ Ego System Directory",
+            title="⚡ Ego Command Directory",
             description=(
                 "> **Welcome to Ego** — a next-generation Discord community & utility engine.\n"
                 "> Everything is built for speed, aesthetics, and reliability.\n"
@@ -77,27 +112,25 @@ class GeneralCog(commands.Cog, name="General"):
         )
 
         categories = [
-            ("🎉 Giveaways", "`/giveaway start`, `/giveaway reroll`, `/giveaway end`\n*Reaction & button entries with auto-draws.*"),
+            ("🎉 Giveaways", "`/giveaway start`, `/giveaway reroll`, `/giveaway end`, `/gwannounce`\n*Reaction & button entries with auto-draws.*"),
             ("👥 Friend Groups", "`/fg start`, `/fg invite`, `/fg rename`, `/fg kick`, `/fg disband`\n*Create 4-member circles with private channels.*"),
-            ("🚀 Creator Verification", "`/cc verify`, `/cc tiers`\n*Submit platform stats for verified creator perks.*"),
+            ("🚀 Creator Verification", "`/cc verify`, `/cc tiers`, `/cc config`\n*Submit platform stats for verified creator perks.*"),
             ("📈 Invites & Tracking", "`/invites mystats`, `/invites leaderboard`, `/invites panel`\n*Track joins, leaves, and bonus invites.*"),
             ("🎭 Role Presets", "`/roles import_presets`, `/roles perks`, `/roles panel`\n*Access over 1,200 curated aesthetic role themes.*"),
             ("📜 Server Rules", "`/rules setup`, `/rules addrule`, `/rules republish`\n*Deploy numbered rules with an 'I Agree' gate.*"),
             ("🎮 Custom Statuses", "`/status set`, `/status list`, `/status load`, `/status auto_rotate`\n*Custom game presence (Roblox, GTA VI) & 1-min rotation.*"),
-            ("🛡️ Moderation & Automod", "`/automod set_thresholds`, `/purge`, `/say`, `/announce`\n*Zero-tolerance spam, invites, and profanity defense.*"),
+            ("🛡️ Moderation & Automod", "`/automod set_thresholds`, `/purge`, `/say`, `/announce`, `/remind`\n*Zero-tolerance spam, invites, and profanity defense.*"),
             ("⚙️ Server Configuration", "`/config modlog`, `/config roles`, `/config status`\n*Bind mod-logs and customize server thresholds.*")
         ]
 
         for cat_name, cat_desc in categories:
             embed.add_field(name=f"✦ {cat_name}", value=cat_desc, inline=False)
 
-        embed.set_footer(text="ego • run any command with / to see parameter hints")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="ping", description="Check live gateway latency and API response time")
     async def ping(self, interaction: discord.Interaction):
         latency_ms = round(self.bot.latency * 1000, 1)
-        
         status_badge = "🟢 Excellent" if latency_ms < 60 else "🟡 Good" if latency_ms < 150 else "🔴 High"
         embed = ego_embed(
             title="📶 Gateway Heartbeat",
@@ -107,6 +140,20 @@ class GeneralCog(commands.Cog, name="General"):
                 f"> **Status:** `Operational & Synced`"
             ),
             color=COLOR_EMERALD if latency_ms < 100 else COLOR_CYAN
+        )
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="uptime", description="Check how long Ego has been online")
+    async def uptime(self, interaction: discord.Interaction):
+        uptime_delta = datetime.utcnow() - self.start_time
+        hours, remainder = divmod(int(uptime_delta.total_seconds()), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        uptime_str = f"{hours}h {minutes}m {seconds}s"
+
+        embed = ego_embed(
+            title="⏱️ Online Uptime",
+            description=f"> Ego has been continuously active for **`{uptime_str}`**.",
+            color=COLOR_CYAN
         )
         await interaction.response.send_message(embed=embed)
 
@@ -121,7 +168,7 @@ class GeneralCog(commands.Cog, name="General"):
         total_guilds = len(self.bot.guilds)
 
         embed = card_embed(
-            title="🤖 Ego Engine Statistics",
+            title="🤖 Ego Statistics",
             fields=[
                 ("Uptime", f"`{uptime_str}`", True),
                 ("Servers", f"`{total_guilds}`", True),
@@ -154,7 +201,6 @@ class GeneralCog(commands.Cog, name="General"):
     @app_commands.describe(member="The member to inspect (defaults to yourself)")
     async def userinfo(self, interaction: discord.Interaction, member: Optional[discord.Member] = None):
         target = member or interaction.user
-
         created_ts = int(target.created_at.timestamp())
         joined_ts = int(target.joined_at.timestamp()) if isinstance(target, discord.Member) and target.joined_at else None
 
@@ -212,6 +258,40 @@ class GeneralCog(commands.Cog, name="General"):
     async def poll(self, interaction: discord.Interaction):
         await interaction.response.send_modal(PollOptionModal())
 
+    @app_commands.command(name="remind", description="Set a personal reminder DM")
+    @app_commands.describe(duration="Time until reminder (e.g. 10m, 2h, 1d)", message="What should Ego remind you about?")
+    async def remind(self, interaction: discord.Interaction, duration: str, message: str):
+        sec = parse_duration_seconds(duration)
+        if not sec or sec <= 0 or sec > 86400 * 30:
+            return await interaction.response.send_message(
+                embed=error_embed("Invalid Duration", "Use formats like `10m`, `2h`, `1d` (Max 30 days)."),
+                ephemeral=True
+            )
+
+        target_time = datetime.utcnow() + timedelta(seconds=sec)
+        target_ts = int(target_time.timestamp())
+
+        await interaction.response.send_message(
+            embed=success_embed("Reminder Set", f"I will DM you <t:{target_ts}:R> about:\n> {message}"),
+            ephemeral=True
+        )
+
+        async def _reminder_task(user_id: int, rem_msg: str, wait_time: int):
+            await asyncio.sleep(wait_time)
+            user = self.bot.get_user(user_id)
+            if user:
+                try:
+                    embed = ego_embed(
+                        title="⏰ Personal Reminder",
+                        description=f"> {rem_msg}",
+                        color=COLOR_AMBER
+                    )
+                    await user.send(embed=embed)
+                except Exception:
+                    pass
+
+        asyncio.create_task(_reminder_task(interaction.user.id, message, sec))
+
     @app_commands.command(name="say", description="Broadcast a clean formatted message as the bot")
     @app_commands.describe(message="The message to send", channel="Target channel (optional)")
     @is_admin_or_has_role()
@@ -223,10 +303,22 @@ class GeneralCog(commands.Cog, name="General"):
             ephemeral=True
         )
 
-    @app_commands.command(name="announce", description="Send an aesthetic announcement embed to a channel")
-    @app_commands.describe(title="Announcement Title", message="Announcement Body", channel="Target Channel (optional)")
+    @app_commands.command(name="announce", description="Send an aesthetic announcement to a channel")
+    @app_commands.describe(
+        title="Announcement Title",
+        message="Announcement Body",
+        channel="Target Channel (optional)",
+        role_ping="Optional role to ping"
+    )
     @is_admin_or_has_role()
-    async def announce(self, interaction: discord.Interaction, title: str, message: str, channel: Optional[discord.TextChannel] = None):
+    async def announce(
+        self,
+        interaction: discord.Interaction,
+        title: str,
+        message: str,
+        channel: Optional[discord.TextChannel] = None,
+        role_ping: Optional[discord.Role] = None
+    ):
         target_ch = channel or interaction.channel
         embed = ego_embed(
             title=f"📢 {title}",
@@ -234,23 +326,78 @@ class GeneralCog(commands.Cog, name="General"):
             color=COLOR_VIOLET
         )
         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon.url if interaction.guild.icon else None)
-        await target_ch.send(embed=embed)
+        
+        content = role_ping.mention if role_ping else None
+        await target_ch.send(content=content, embed=embed)
         await interaction.response.send_message(
             embed=success_embed("Announcement Published", f"Posted to {target_ch.mention}"),
             ephemeral=True
         )
 
-    @app_commands.command(name="purge", description="Bulk delete messages from the current channel")
-    @app_commands.describe(amount="Number of messages to delete (1-100)")
+    @app_commands.command(name="gwannounce", description="Re-broadcast or highlight an active giveaway")
+    @app_commands.describe(giveaway_id="The ID of the active giveaway", channel="Channel to post highlight (optional)", role_ping="Role to ping (optional)")
     @is_admin_or_has_role()
-    async def purge(self, interaction: discord.Interaction, amount: int):
+    async def gwannounce(
+        self,
+        interaction: discord.Interaction,
+        giveaway_id: int,
+        channel: Optional[discord.TextChannel] = None,
+        role_ping: Optional[discord.Role] = None
+    ):
+        target_ch = channel or interaction.channel
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(Giveaway).where(Giveaway.id == giveaway_id, Giveaway.status == "active"))
+            gw = res.scalar_one_or_none()
+
+            if not gw:
+                return await interaction.response.send_message(
+                    embed=error_embed("Giveaway Not Found", f"No active giveaway found with ID #{giveaway_id}."),
+                    ephemeral=True
+                )
+
+            end_ts = int(gw.end_time.timestamp())
+            orig_msg_url = f"https://discord.com/channels/{gw.guild_id}/{gw.channel_id}/{gw.message_id}"
+
+            embed = ego_embed(
+                title="🎁 ACTIVE GIVEAWAY SPOTLIGHT",
+                description=(
+                    f"### 🎉 **{gw.prize}**\n\n"
+                    f"› **Ends:** <t:{end_ts}:R>\n"
+                    f"› **Hosted by:** <@{gw.host_id}>\n"
+                    f"› **Winners:** `{gw.winners_count}`\n"
+                    f"› **Jump to Enter:** [Click Here to Join Giveaway]({orig_msg_url})\n"
+                ),
+                color=COLOR_AMBER
+            )
+            content = role_ping.mention if role_ping else None
+            await target_ch.send(content=content, embed=embed)
+            await interaction.response.send_message(
+                embed=success_embed("Giveaway Broadcasted", f"Spotlight sent to {target_ch.mention}"),
+                ephemeral=True
+            )
+
+    @app_commands.command(name="embed_builder", description="Construct and send a custom rich embed via modal")
+    @is_admin_or_has_role()
+    async def embed_builder(self, interaction: discord.Interaction):
+        await interaction.response.send_modal(EmbedBuilderModal())
+
+    @app_commands.command(name="purge", description="Bulk delete messages from the current channel")
+    @app_commands.describe(amount="Number of messages to delete (1-100)", user_filter="Only delete messages from this user (optional)")
+    @is_admin_or_has_role()
+    async def purge(self, interaction: discord.Interaction, amount: int, user_filter: Optional[discord.Member] = None):
         if amount < 1 or amount > 100:
             return await interaction.response.send_message(
                 embed=error_embed("Invalid Amount", "Please specify a number between 1 and 100."),
                 ephemeral=True
             )
         await interaction.response.defer(ephemeral=True)
-        deleted = await interaction.channel.purge(limit=amount)
+
+        def check(m):
+            if user_filter:
+                return m.author.id == user_filter.id
+            return True
+
+        deleted = await interaction.channel.purge(limit=amount, check=check)
         await interaction.followup.send(
             embed=success_embed("Messages Purged", f"Successfully deleted `{len(deleted)}` messages."),
             ephemeral=True
