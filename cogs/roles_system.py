@@ -1,7 +1,7 @@
 """
 Role Presets, Special FG Roles, Live Auto-Updating Roles Board, and Custom Role Descriptions Cog for Ego Bot.
-Features comprehensive Roles Board listing ALL server roles with descriptions & member lists,
-live auto-updating on member/role events, custom role descriptions (/roles set_description),
+Features comprehensive Roles Board listing ALL server roles with @mentions, descriptions & member lists,
+instant auto-updating on member/role events, custom role descriptions (/roles set_description),
 and special FG milestone roles.
 """
 import os
@@ -92,11 +92,11 @@ class RolesSystemCog(commands.Cog, name="Roles"):
             return []
 
     async def build_roles_board_embeds(self, guild: discord.Guild) -> List[discord.Embed]:
-        """Constructs rich Roles Board embeds listing ALL server roles, descriptions, and members."""
+        """Constructs rich Roles Board embeds listing ALL server roles with @mentions, descriptions, and members."""
         reqs = get_tier_requirements()
         custom_descs = load_role_descriptions()
 
-        # Get all non-managed roles sorted from highest hierarchy position to lowest
+        # Get all roles sorted from highest hierarchy position to lowest
         valid_roles = [
             r for r in guild.roles
             if r.name != "@everyone" and not r.managed
@@ -105,14 +105,14 @@ class RolesSystemCog(commands.Cog, name="Roles"):
 
         if not valid_roles:
             return [ego_embed(
-                title=f"Role Roster - Roles",
+                title="Roles",
                 description=f"> No custom roles found in **{guild.name}**.\n> Create roles in Discord or use `/roles import_presets`!",
                 color=COLOR_VIOLET
             )]
 
         embeds = []
         current_embed = ego_embed(
-            title=f"Role Roster - Roles",
+            title="Roles",
             description=f"> Complete directory of all **`{len(valid_roles)}`** server roles, descriptions, and members:\n",
             color=COLOR_VIOLET
         )
@@ -144,13 +144,13 @@ class RolesSystemCog(commands.Cog, name="Roles"):
             if len(role.members) > 15:
                 members_str += f" *(+{len(role.members) - 15} more)*"
 
-            # 3. Format Field Value
-            val_lines = []
+            # 3. Format Field Value with direct @mention
+            val_lines = [f"• **Role:** {role.mention}"]
             if desc_text:
-                val_lines.append(f"**Description:** *{desc_text}*")
+                val_lines.append(f"• **Description:** *{desc_text}*")
             if req_text:
-                val_lines.append(f"**Requirement:** `{req_text}`")
-            val_lines.append(f"**Members:** {members_str}")
+                val_lines.append(f"• **Requirement:** `{req_text}`")
+            val_lines.append(f"• **Members ({len(role.members)}):** {members_str}")
 
             field_val = "\n".join(val_lines)
             if len(field_val) > 1020:
@@ -160,13 +160,13 @@ class RolesSystemCog(commands.Cog, name="Roles"):
             if field_count >= 24:
                 embeds.append(current_embed)
                 current_embed = ego_embed(
-                    title=f"Role Roster - Roles (Continued)",
+                    title="Roles (Continued)",
                     color=COLOR_VIOLET
                 )
                 field_count = 0
 
             current_embed.add_field(
-                name=f"› {role.name} ({len(role.members)})",
+                name=f"› {role.name}",
                 value=field_val,
                 inline=False
             )
@@ -175,7 +175,7 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         embeds.append(current_embed)
         return embeds
 
-    @tasks.loop(minutes=2)
+    @tasks.loop(seconds=45)
     async def auto_refresh_boards(self):
         """Automatically keeps all deployed Role Boards updated across channels."""
         boards = load_board_states()
@@ -212,6 +212,14 @@ class RolesSystemCog(commands.Cog, name="Roles"):
         """Trigger instant board update when member roles change."""
         if before.roles != after.roles:
             await self._trigger_board_refresh_for_guild(after.guild)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        await self._trigger_board_refresh_for_guild(member.guild)
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member: discord.Member):
+        await self._trigger_board_refresh_for_guild(member.guild)
 
     @commands.Cog.listener()
     async def on_guild_role_create(self, role: discord.Role):
