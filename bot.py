@@ -104,15 +104,15 @@ class EgoBot(commands.Bot):
     async def on_ready(self):
         logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
         logger.info(f"Serving {len(self.guilds)} guilds.")
-        
-        # Fast guild sync for immediate Discord client cache update
+
+        # Clear any stale guild-scoped command copies that override global default_permissions
         for guild in self.guilds:
             try:
-                self.tree.copy_global_to(guild=guild)
+                self.tree.clear_commands(guild=guild)
                 await self.tree.sync(guild=guild)
-                logger.info(f"Instantly synced slash commands to guild '{guild.name}' ({guild.id}).")
+                logger.info(f"Cleared guild-scoped overrides for '{guild.name}' ({guild.id}). Global permissions now authoritative.")
             except Exception as e:
-                logger.debug(f"Guild sync skipped: {e}")
+                logger.debug(f"Guild command clear skipped: {e}")
 
 
 bot = EgoBot()
@@ -141,7 +141,11 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
 
 
 # Central Guild Configuration Slash Command Group
-config_group = app_commands.Group(name="config", description="Configure core Ego Bot settings for this server")
+config_group = app_commands.Group(
+    name="config",
+    description="Configure core Ego Bot settings for this server",
+    default_permissions=discord.Permissions(administrator=True)
+)
 
 @config_group.command(name="modlog", description="Set the central mod-log and audit channel")
 @app_commands.describe(channel="Target logging channel")
