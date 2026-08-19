@@ -28,36 +28,37 @@ LOW_TIER_ROLES = ["CC", "CC Tier 2"]
 
 DEFAULT_TIER_REQUIREMENTS = {
     "CC": {
-        "followers": "1,000+",
-        "views": "5,000+",
-        "desc": "Entry level creator (1k+ Followers or 5k+ Views)"
+        "followers": "10+",
+        "views": "1,000+ Likes",
+        "desc": "Entry Creator (10 Followers / 1k Likes)"
     },
     "CC Tier 2": {
-        "followers": "5,000+",
-        "views": "20,000+",
-        "desc": "Established creator (5k+ Followers or 20k+ Views)"
+        "followers": "50+",
+        "views": "2,500+ Views",
+        "desc": "Established Creator (50 Followers / 2,500 Views)"
     },
     "CC Tier 3": {
-        "followers": "20,000+",
-        "views": "50,000+",
-        "desc": "High performing creator (20k+ Followers or 50k+ Views)"
+        "followers": "100+",
+        "views": "4,000+ Views / 100+ Likes",
+        "desc": "Active Creator (100 Followers / 100 Likes / 4k Views)"
     },
     "Known": {
-        "followers": "50,000+",
-        "views": "150,000+",
-        "desc": "Recognized influencer (50k+ Followers or 150k+ Views)"
+        "followers": "2,000+",
+        "views": "10,000+ Views / 1,000+ Likes",
+        "desc": "Recognized Influencer (2k Followers / 1k Likes / 10k Views)"
     },
     "Famous": {
-        "followers": "100,000+",
-        "views": "300,000+",
-        "desc": "Prominent creator (100k+ Followers or 300k+ Views)"
+        "followers": "20,000+",
+        "views": "30,000+ Views / 10,000+ Likes",
+        "desc": "Prominent Creator (20k Followers / 10k Likes / 30k Views)"
     },
     "Star": {
-        "followers": "500,000+",
-        "views": "1,000,000+",
-        "desc": "Apex creator icon (500k+ Followers or 1M+ Views)"
+        "followers": "50,000+",
+        "views": "100,000+ Views",
+        "desc": "Apex Star Icon (50k+ Followers / Top Tier Creator)"
     }
 }
+
 
 def load_tier_requirements() -> Dict[str, Any]:
     os.makedirs(os.path.dirname(CC_REQ_FILE), exist_ok=True)
