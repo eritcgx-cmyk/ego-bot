@@ -91,6 +91,13 @@ class EgoBot(commands.Bot):
         except Exception as e:
             logger.debug(f"Could not register Friend Group views: {e}")
 
+        try:
+            from cogs.invites import InviteLeaderboardView
+            self.add_view(InviteLeaderboardView())
+            logger.info("Registered persistent InviteLeaderboardView.")
+        except Exception as e:
+            logger.debug(f"Could not register InviteLeaderboardView: {e}")
+
         # 4. Global sync disabled to prevent 1-hour Discord global client caching; guild sync runs on_ready
 
 
