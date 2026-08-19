@@ -1,0 +1,32 @@
+{
+  "CC": {
+    "followers": "10",
+    "views": "1000",
+    "desc": "must have both"
+  },
+  "CC Tier 2": {
+    "followers": "5,000+",
+    "views": "20,000+",
+    "desc": "Established creator (5k+ Followers or 20k+ Views)"
+  },
+  "CC Tier 3": {
+    "followers": "20,000+",
+    "views": "50,000+",
+    "desc": "High performing creator (20k+ Followers or 50k+ Views)"
+  },
+  "Known": {
+    "followers": "50,000+",
+    "views": "150,000+",
+    "desc": "Recognized influencer (50k+ Followers or 150k+ Views)"
+  },
+  "Famous": {
+    "followers": "100,000+",
+    "views": "300,000+",
+    "desc": "Prominent creator (100k+ Followers or 300k+ Views)"
+  },
+  "Star": {
+    "followers": "500,000+",
+    "views": "1,000,000+",
+    "desc": "Apex creator icon (500k+ Followers or 1M+ Views)"
+  }
+}
