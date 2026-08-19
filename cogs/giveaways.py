@@ -114,6 +114,10 @@ class GiveawaysCog(commands.Cog, name="Giveaways"):
             for gw in ended_gws:
                 await self._end_giveaway(session, gw)
 
+    @check_giveaways.before_loop
+    async def before_check_giveaways(self):
+        await self.bot.wait_until_ready()
+
     async def _end_giveaway(self, session, gw: Giveaway) -> None:
         """Internal helper to end giveaway and draw winners."""
         gw.status = "ended"
