@@ -156,7 +156,11 @@ class CustomStatusCog(commands.Cog, name="CustomStatus"):
     async def before_rotator(self):
         await self.bot.wait_until_ready()
 
-    status_group = app_commands.Group(name="status", description="Custom status & activity manager")
+    status_group = app_commands.Group(
+        name="status",
+        description="Custom status & activity manager",
+        default_permissions=discord.Permissions(administrator=True)
+    )
 
     @status_group.command(name="set", description="Set a custom status or activity")
     @app_commands.describe(
