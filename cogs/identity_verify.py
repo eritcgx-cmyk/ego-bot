@@ -103,14 +103,17 @@ class IdentityVerifyCog(commands.Cog, name="IdentityVerify"):
 
     async def restore_verification_views(self):
         """Restore persistent buttons for verification panels."""
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(IdentityVerifyConfig).where(IdentityVerifyConfig.enabled == True))
-            configs = res.scalars().all()
+        try:
+            async with AsyncSessionLocal() as session:
+                res = await session.execute(select(IdentityVerifyConfig).where(IdentityVerifyConfig.enabled == True))
+                configs = res.scalars().all()
 
-            for cfg in configs:
-                if cfg.message_id and cfg.roles_map:
-                    view = IdentityVerificationView(cfg.guild_id, cfg.roles_map)
-                    self.bot.add_view(view, message_id=cfg.message_id)
+                for cfg in configs:
+                    if cfg.message_id and cfg.roles_map:
+                        view = IdentityVerificationView(cfg.guild_id, cfg.roles_map)
+                        self.bot.add_view(view, message_id=cfg.message_id)
+        except Exception as e:
+            logger.warning(f"Could not restore identity verification views: {e}")
 
     verify_group = app_commands.Group(name="verify_panel", description="Identity & Gender role verification panel")
 
