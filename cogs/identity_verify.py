@@ -1,194 +1,395 @@
 """
-Identity and Gender Verification System Cog for Ego Bot (Non-Photo)
+Comprehensive Face, Video & Identity Verification Engine for Ego Bot.
+Features:
+- Video & Selfie Proof verification with Server Vanity requirement
+- Dedicated staff review queue with live approve/deny interactive buttons
+- Automated role assignment and member DM notifications
+- Persistent Verification Panel deployment
 """
+import os
+import json
+import asyncio
 from datetime import datetime, timezone
-from typing import Optional, Dict
+from typing import Optional, Dict, Any, List
 import discord
 from discord import app_commands
 from discord.ext import commands
 from sqlalchemy import select
 from database.engine import AsyncSessionLocal
 from database.models import IdentityVerifyConfig
-from utils.permissions import is_admin_or_has_role
-from utils.embeds import ego_embed, success_embed, error_embed, info_embed
+from utils.permissions import is_admin_or_has_role, is_guild_owner
+from utils.embeds import (
+    ego_embed, success_embed, error_embed, info_embed, card_embed,
+    COLOR_VIOLET, COLOR_EMERALD, COLOR_CRIMSON, COLOR_AMBER, COLOR_CYAN, get_eastern_time
+)
 from utils.logger import log_action
 from config import SUCCESS_COLOR, INFO_COLOR, WARNING_COLOR, logger
 
-class IdentityVerificationView(discord.ui.View):
-    def __init__(self, guild_id: int, roles_map: Dict[str, int]):
-        super().__init__(timeout=None)
-        self.guild_id = guild_id
-        self.roles_map = roles_map
+VERIFY_CONFIGS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "face_verify_config.json")
 
-        # Dynamically build buttons from roles_map
-        for label, role_id in roles_map.items():
-            btn = discord.ui.Button(
-                label=label,
-                style=discord.ButtonStyle.secondary,
-                custom_id=f"id_role:{guild_id}:{role_id}"
-            )
-            btn.callback = self._create_callback(role_id, label)
-            self.add_item(btn)
+def load_face_configs() -> Dict[str, Any]:
+    if not os.path.exists(VERIFY_CONFIGS_FILE):
+        return {}
+    try:
+        with open(VERIFY_CONFIGS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
 
-        # Add manual verification button
-        req_btn = discord.ui.Button(
-            label="Request Mod Verification",
-            style=discord.ButtonStyle.primary,
-            emoji="🛡️",
-            custom_id=f"id_manual_req:{guild_id}"
-        )
-        req_btn.callback = self._manual_request_callback
-        self.add_item(req_btn)
+def save_face_configs(data: Dict[str, Any]):
+    os.makedirs(os.path.dirname(VERIFY_CONFIGS_FILE), exist_ok=True)
+    with open(VERIFY_CONFIGS_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
 
-    def _create_callback(self, role_id: int, label: str):
-        async def callback(interaction: discord.Interaction):
-            member = interaction.user
-            if not isinstance(member, discord.Member):
-                return
 
-            role = interaction.guild.get_role(role_id)
-            if not role:
-                return await interaction.response.send_message("❌ This role no longer exists.", ephemeral=True)
+class FaceVerifySubmitModal(discord.ui.Modal, title="Face / Video Verification"):
+    """Modal for submitting video proof showing user and server vanity."""
+    def __init__(self, vanity_phrase: str):
+        super().__init__()
+        self.vanity_phrase = vanity_phrase
 
-            if role in member.roles:
-                await member.remove_roles(role, reason="Identity self-selection toggle")
-                await interaction.response.send_message(f"🗑️ Removed role **{role.name}**.", ephemeral=True)
-            else:
-                await member.add_roles(role, reason="Identity self-selection toggle")
-                await interaction.response.send_message(f"✅ Added role **{role.name}**!", ephemeral=True)
+    video_url = discord.ui.TextInput(
+        label="Video Proof Link (Required)",
+        placeholder="https://streamable.com/... or Imgur / Discord CDN / YouTube / TikTok",
+        required=True,
+        max_length=512
+    )
+    social_handle = discord.ui.TextInput(
+        label="Social Profile / Handle (Optional)",
+        placeholder="Instagram / TikTok / Twitter handle...",
+        required=False,
+        max_length=100
+    )
+    notes = discord.ui.TextInput(
+        label="Notes / Confirmation",
+        placeholder="Confirmed video shows face & server vanity...",
+        style=discord.TextStyle.paragraph,
+        required=False,
+        max_length=500
+    )
 
-        return callback
-
-    async def _manual_request_callback(self, interaction: discord.Interaction):
-        member = interaction.user
-        if not isinstance(member, discord.Member):
+    async def on_submit(self, interaction: discord.Interaction):
+        user = interaction.user
+        guild = interaction.guild
+        if not guild:
             return
 
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(IdentityVerifyConfig).where(IdentityVerifyConfig.guild_id == interaction.guild_id))
-            cfg = res.scalar_one_or_none()
-
-            if not cfg or not cfg.review_channel_id:
-                return await interaction.response.send_message("❌ Manual mod review channel is not configured on this server.", ephemeral=True)
-
-            # Account Age Calculation
-            created_at = member.created_at
-            now = datetime.now(timezone.utc)
-            account_age_days = (now - created_at).days
-
-            review_channel = interaction.guild.get_channel(cfg.review_channel_id)
-            if not review_channel or not isinstance(review_channel, discord.TextChannel):
-                return await interaction.response.send_message("❌ Review channel unavailable.", ephemeral=True)
-
-            age_status = f"✅ `{account_age_days}` days old" if account_age_days >= cfg.min_account_age_days else f"⚠️ Account is only `{account_age_days}` days old (Min: `{cfg.min_account_age_days}` days)"
-
-            embed = ego_embed(
-                title="🛡️ Manual Identity Verification Request",
-                description=(
-                    f"**User:** {member.mention} (`{member.id}`)\n"
-                    f"**Account Age:** {age_status}\n"
-                    f"**Joined Server:** <t:{int(member.joined_at.timestamp())}:R>\n\n"
-                    f"*Staff may grant verified access or interview the user if needed.*"
-                ),
-                color=WARNING_COLOR if account_age_days < cfg.min_account_age_days else INFO_COLOR
+        cfg = load_face_configs().get(str(guild.id), {})
+        review_ch_id = cfg.get("review_channel_id")
+        if not review_ch_id:
+            return await interaction.response.send_message(
+                embed=error_embed("Review Channel Unset", "Staff review channel is not configured on this server."),
+                ephemeral=True
             )
-            embed.set_thumbnail(url=member.display_avatar.url)
 
-            await review_channel.send(embed=embed)
-            await interaction.response.send_message("✅ Your verification request has been dispatched to staff.", ephemeral=True)
+        review_ch = guild.get_channel(review_ch_id)
+        if not review_ch or not isinstance(review_ch, discord.TextChannel):
+            return await interaction.response.send_message(
+                embed=error_embed("Review Channel Error", "Staff review channel is unavailable or deleted."),
+                ephemeral=True
+            )
+
+        # Calculate account age
+        account_age_days = (datetime.now(timezone.utc) - user.created_at).days
+        min_age = cfg.get("min_account_age_days", 7)
+        age_status = f"✅ `{account_age_days}` days old" if account_age_days >= min_age else f"⚠️ Account is `{account_age_days}` days old (Min: `{min_age}` days)"
+
+        video_link_clean = self.video_url.value.strip()
+
+        review_embed = ego_embed(
+            title=f"📹 Face/Video Verification • {user.display_name}",
+            description=(
+                f"> **Applicant:** {user.mention} (`{user.id}`)\n"
+                f"> **Account Age:** {age_status}\n"
+                f"> **Joined Server:** <t:{int(user.joined_at.timestamp())}:R>\n"
+                f"> **Required Vanity:** `{self.vanity_phrase}`\n\n"
+                f"**✦ Submitted Proof:**\n"
+                f"• **Video Link:** [Watch Submitted Video]({video_link_clean})\n"
+                f"• **Raw URL:** `{video_link_clean}`\n"
+                + (f"• **Social Profile:** `{self.social_handle.value.strip()}`\n" if self.social_handle.value else "")
+                + (f"• **Applicant Notes:** *{self.notes.value.strip()}*\n" if self.notes.value else "")
+                + f"\n*Staff: Review the video to ensure user shows face and matches the vanity requirement.*"
+            ),
+            color=COLOR_VIOLET
+        )
+        review_embed.set_thumbnail(url=user.display_avatar.url)
+        review_embed.set_footer(text=f"Verification Ticket • {get_eastern_time()}")
+
+        verified_role_id = cfg.get("verified_role_id")
+        view = FaceVerifyReviewView(applicant_id=user.id, verified_role_id=verified_role_id)
+        await review_ch.send(embed=review_embed, view=view)
+
+        await interaction.response.send_message(
+            embed=success_embed(
+                "Verification Submitted",
+                f"✅ Your video verification has been dispatched to staff for review in {review_ch.mention}!\n"
+                f"You will receive a direct notification once reviewed."
+            ),
+            ephemeral=True
+        )
+
+
+class FaceVerifyDenyModal(discord.ui.Modal, title="Deny Verification"):
+    def __init__(self, applicant_id: int, message: discord.Message):
+        super().__init__()
+        self.applicant_id = applicant_id
+        self.msg = message
+
+    reason = discord.ui.TextInput(
+        label="Reason for Denial",
+        placeholder="e.g. Video did not show server vanity, poor lighting, or unreadable note...",
+        style=discord.TextStyle.paragraph,
+        required=True,
+        max_length=500
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        applicant = guild.get_member(self.applicant_id) or await interaction.client.fetch_user(self.applicant_id)
+
+        # Disable buttons on review card
+        for item in self.msg.components:
+            for child in item.children:
+                child.disabled = True
+        try:
+            await self.msg.edit(view=None)
+        except Exception:
+            pass
+
+        # Alert applicant
+        if applicant:
+            try:
+                dm_embed = ego_embed(
+                    title=f"Verification Update • {guild.name}",
+                    description=(
+                        f"❌ Your Face / Video verification request on **{guild.name}** was **Declined**.\n\n"
+                        f"**Reason:** *{self.reason.value.strip()}*\n\n"
+                        f"You may re-record your video with the correct vanity and re-submit in the verification channel."
+                    ),
+                    color=COLOR_CRIMSON
+                )
+                await applicant.send(embed=dm_embed)
+            except Exception:
+                pass
+
+        await interaction.response.send_message(
+            embed=error_embed("Verification Denied", f"Denied verification for <@{self.applicant_id}>.\nReason: *{self.reason.value.strip()}*")
+        )
+
+
+class FaceVerifyReviewView(discord.ui.View):
+    """Staff review interactive buttons for Face/Video verification."""
+    def __init__(self, applicant_id: int = 0, verified_role_id: Optional[int] = None):
+        super().__init__(timeout=None)
+        self.applicant_id = applicant_id
+        self.verified_role_id = verified_role_id
+        self.approve_btn.custom_id = f"face_approve:{applicant_id}"
+        self.deny_btn.custom_id = f"face_deny:{applicant_id}"
+
+    @discord.ui.button(label="Approve & Grant Role", style=discord.ButtonStyle.success, emoji="✅", custom_id="face_verify_approve")
+    async def approve_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        guild = interaction.guild
+        if not interaction.user.guild_permissions.manage_roles and not interaction.user.guild_permissions.administrator:
+            return await interaction.response.send_message("❌ Staff permissions required.", ephemeral=True)
+
+        applicant_id = self.applicant_id
+        if not applicant_id and interaction.data and "custom_id" in interaction.data:
+            cid = interaction.data["custom_id"]
+            if ":" in cid:
+                applicant_id = int(cid.split(":")[1])
+
+        applicant = guild.get_member(applicant_id)
+        cfg = load_face_configs().get(str(guild.id), {})
+        role_id = self.verified_role_id or cfg.get("verified_role_id")
+        role_granted_str = ""
+
+        if applicant and role_id:
+            role = guild.get_role(role_id)
+            if role:
+                try:
+                    await applicant.add_roles(role, reason=f"Face/Video Verification approved by {interaction.user.name}")
+                    role_granted_str = f" and assigned {role.mention}"
+                except Exception as e:
+                    logger.error(f"Failed to assign verified role: {e}")
+
+        # Disable buttons
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=self)
+
+        await interaction.response.send_message(
+            embed=success_embed(
+                "Verification Approved",
+                f"✅ <@{applicant_id}> was **Approved** by {interaction.user.mention}{role_granted_str}."
+            )
+        )
+
+        if applicant:
+            try:
+                dm_embed = ego_embed(
+                    title=f"🎉 Verification Approved • {guild.name}",
+                    description=f"Congratulations! Your Face/Video verification on **{guild.name}** has been **Approved**!{role_granted_str}",
+                    color=COLOR_EMERALD
+                )
+                await applicant.send(embed=dm_embed)
+            except Exception:
+                pass
+
+    @discord.ui.button(label="Deny Verification", style=discord.ButtonStyle.danger, emoji="❌", custom_id="face_verify_deny")
+    async def deny_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.user.guild_permissions.manage_roles and not interaction.user.guild_permissions.administrator:
+            return await interaction.response.send_message("❌ Staff permissions required.", ephemeral=True)
+
+        applicant_id = self.applicant_id
+        if not applicant_id and interaction.data and "custom_id" in interaction.data:
+            cid = interaction.data["custom_id"]
+            if ":" in cid:
+                applicant_id = int(cid.split(":")[1])
+
+        modal = FaceVerifyDenyModal(applicant_id=applicant_id, message=interaction.message)
+        await interaction.response.send_modal(modal)
+
+
+class FaceVerificationLaunchView(discord.ui.View):
+    """Persistent panel button deployed in #verify for members to start video verification."""
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(
+        label="Start Face / Video Verification",
+        style=discord.ButtonStyle.primary,
+        emoji="📹",
+        custom_id="face_verify_launch_btn"
+    )
+    async def launch_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        guild = interaction.guild
+        if not guild:
+            return
+
+        cfg = load_face_configs().get(str(guild.id), {})
+        vanity_phrase = cfg.get("vanity_phrase") or getattr(guild, "vanity_url_code", None) or f"discord.gg/{guild.name.lower().replace(' ', '')}"
+
+        modal = FaceVerifySubmitModal(vanity_phrase=vanity_phrase)
+        await interaction.response.send_modal(modal)
+
 
 class IdentityVerifyCog(commands.Cog, name="IdentityVerify"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    async def restore_verification_views(self):
-        """Restore persistent buttons for verification panels."""
-        try:
-            async with AsyncSessionLocal() as session:
-                res = await session.execute(select(IdentityVerifyConfig).where(IdentityVerifyConfig.enabled == True))
-                configs = res.scalars().all()
+    # =========================================================================
+    # PUBLIC VERIFICATION COMMAND (/verify)
+    # =========================================================================
+    verify_public_group = app_commands.Group(name="verify", description="Member verification and identity authentication")
 
-                for cfg in configs:
-                    if cfg.message_id and cfg.roles_map:
-                        view = IdentityVerificationView(cfg.guild_id, cfg.roles_map)
-                        self.bot.add_view(view, message_id=cfg.message_id)
-        except Exception as e:
-            logger.warning(f"Could not restore identity verification views: {e}")
+    @verify_public_group.command(name="face", description="Submit Face / Video verification proof with server vanity")
+    async def verify_face_cmd(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        if not guild:
+            return await interaction.response.send_message("❌ Must be in a server.", ephemeral=True)
 
-    verify_group = app_commands.Group(
-        name="verify_panel",
-        description="Identity & Gender role verification panel",
+        cfg = load_face_configs().get(str(guild.id), {})
+        vanity_phrase = cfg.get("vanity_phrase") or getattr(guild, "vanity_url_code", None) or f"discord.gg/{guild.name.lower().replace(' ', '')}"
+
+        modal = FaceVerifySubmitModal(vanity_phrase=vanity_phrase)
+        await interaction.response.send_modal(modal)
+
+    # =========================================================================
+    # STAFF / ADMIN VERIFICATION GROUP (/verify_admin)
+    # =========================================================================
+    verify_admin_group = app_commands.Group(
+        name="verify_admin",
+        description="Staff administration controls for Face/Video Verification",
         default_permissions=discord.Permissions(administrator=True)
     )
 
-    @verify_group.command(name="setup", description="Deploy the identity & gender verification panel")
+    @verify_admin_group.command(name="setup", description="Configure Face/Video verification settings, role, and review channel")
     @app_commands.describe(
-        channel="Channel to post verification panel in",
-        review_channel="Channel where manual verification alerts get sent",
-        min_age_days="Minimum account age in days before flagging",
-        role1="Role option 1 (e.g. He/Him)",
-        role2="Role option 2 (e.g. She/Her)",
-        role3="Role option 3 (e.g. They/Them)",
-        role4="Role option 4 (e.g. Verified Member)"
+        verified_role="Role automatically granted upon approval",
+        review_channel="Channel where submitted video proof is sent for staff review",
+        vanity_phrase="Required vanity text (e.g. .gg/ego or server vanity)",
+        min_account_age="Minimum account age in days (default: 7)"
     )
     @is_admin_or_has_role()
-    async def verify_setup(
+    async def verify_admin_setup(
         self,
         interaction: discord.Interaction,
-        channel: discord.TextChannel,
-        review_channel: Optional[discord.TextChannel] = None,
-        min_age_days: int = 7,
-        role1: Optional[discord.Role] = None,
-        role2: Optional[discord.Role] = None,
-        role3: Optional[discord.Role] = None,
-        role4: Optional[discord.Role] = None
+        verified_role: discord.Role,
+        review_channel: discord.TextChannel,
+        vanity_phrase: Optional[str] = None,
+        min_account_age: Optional[int] = 7
     ):
-        roles_map = {}
-        for r in [role1, role2, role3, role4]:
-            if r:
-                roles_map[r.name] = r.id
+        guild = interaction.guild
+        configs = load_face_configs()
+        g_id = str(guild.id)
 
-        if not roles_map:
-            return await interaction.response.send_message(
-                embed=error_embed("No Roles Specified", "Please provide at least 1 role option."),
-                ephemeral=True
-            )
+        phrase = vanity_phrase.strip() if vanity_phrase else getattr(guild, "vanity_url_code", None) or f"discord.gg/{guild.name.lower().replace(' ', '')}"
+
+        configs[g_id] = {
+            "verified_role_id": verified_role.id,
+            "review_channel_id": review_channel.id,
+            "vanity_phrase": phrase,
+            "min_account_age_days": min_account_age or 7,
+            "enabled": True
+        }
+        save_face_configs(configs)
+
+        await interaction.response.send_message(
+            embed=success_embed(
+                "Face Verification Configured",
+                f"✅ **Configuration Live:**\n"
+                f"• **Verified Role:** {verified_role.mention}\n"
+                f"• **Review Channel:** {review_channel.mention}\n"
+                f"• **Required Vanity Phrase:** `{phrase}`\n"
+                f"• **Min Account Age:** `{min_account_age or 7}` days\n\n"
+                f"Run `/verify_admin post_panel` to drop the verification panel in your welcome/verify channel!"
+            ),
+            ephemeral=True
+        )
+
+    @verify_admin_group.command(name="post_panel", description="Deploy the aesthetic permanent Face Verification Panel to a channel")
+    @app_commands.describe(channel="Channel to post verification panel in (defaults to current)")
+    @is_admin_or_has_role()
+    async def verify_admin_post_panel(self, interaction: discord.Interaction, channel: Optional[discord.TextChannel] = None):
+        target_ch = channel or interaction.channel
+        guild = interaction.guild
+        if not guild or not target_ch:
+            return await interaction.response.send_message("❌ Channel not found.", ephemeral=True)
+
+        cfg = load_face_configs().get(str(guild.id), {})
+        vanity_phrase = cfg.get("vanity_phrase") or getattr(guild, "vanity_url_code", None) or f"discord.gg/{guild.name.lower().replace(' ', '')}"
+        role_id = cfg.get("verified_role_id")
+        role_mention = f"<@&{role_id}>" if role_id else "@Verified"
 
         embed = ego_embed(
-            title="✨ Identity & Role Verification",
+            title=f"📹 Face & Video Verification • {guild.name}",
             description=(
-                "Select your identity, pronoun, or access roles below to customize your profile.\n\n"
-                "🛡️ **Anti-Troll & Security:**\n"
-                "If you need manual staff verification or access, click **Request Mod Verification**."
+                f"> **Get Authenticated & Verified in {guild.name}**\n\n"
+                f"✦ **Verification Requirements:**\n"
+                f"1. Record a short video/selfie of yourself.\n"
+                f"2. Hold a paper showing the server vanity: **`{vanity_phrase}`** along with your Discord username & today's date.\n"
+                f"3. Upload to Streamable, Imgur, Discord, Drive, YouTube, or TikTok and submit your link below.\n\n"
+                f"✦ **Reward:** Unlocks the **{role_mention}** role and access to all private server channels!\n\n"
+                f"Click **Start Face / Video Verification** below to begin."
             ),
-            color=INFO_COLOR
+            color=COLOR_VIOLET
         )
+        if guild.banner:
+            embed.set_image(url=guild.banner.url)
+        elif guild.splash:
+            embed.set_image(url=guild.splash.url)
 
-        view = IdentityVerificationView(interaction.guild_id, roles_map)
-        msg = await channel.send(embed=embed, view=view)
+        embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
+        embed.set_footer(text=f"Official Verification Gate • {guild.name}")
 
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(IdentityVerifyConfig).where(IdentityVerifyConfig.guild_id == interaction.guild_id))
-            cfg = res.scalar_one_or_none()
+        view = FaceVerificationLaunchView()
+        await target_ch.send(embed=embed, view=view)
 
-            if not cfg:
-                cfg = IdentityVerifyConfig(guild_id=interaction.guild_id)
-                session.add(cfg)
-
-            cfg.enabled = True
-            cfg.channel_id = channel.id
-            cfg.message_id = msg.id
-            cfg.review_channel_id = review_channel.id if review_channel else None
-            cfg.min_account_age_days = min_age_days
-            cfg.roles_map = roles_map
-            await session.commit()
-
-        self.bot.add_view(view, message_id=msg.id)
         await interaction.response.send_message(
-            embed=success_embed("Verification Panel Deployed", f"Active in {channel.mention} with `{len(roles_map)}` role buttons.")
+            embed=success_embed("Panel Deployed", f"Verification panel is active in {target_ch.mention}."),
+            ephemeral=True
         )
+
 
 async def setup(bot: commands.Bot):
-    cog = IdentityVerifyCog(bot)
-    await bot.add_cog(cog)
-    await cog.restore_verification_views()
+    await bot.add_cog(IdentityVerifyCog(bot))
