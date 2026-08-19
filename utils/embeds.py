@@ -39,9 +39,10 @@ def ego_embed(
     if image_url:
         embed.set_image(url=image_url)
 
-    footer = footer_text or "ego • sovereign community engine"
+    footer = footer_text or "Ego"
     embed.set_footer(text=footer)
     return embed
+
 
 def success_embed(title: str, description: str, **kwargs) -> discord.Embed:
     """Aesthetic emerald success notification."""
