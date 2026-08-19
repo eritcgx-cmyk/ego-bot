@@ -174,6 +174,7 @@ class ApplicationsCog(commands.Cog, name="Applications"):
         question3="Third question (optional)",
         question4="Fourth question (optional)"
     )
+    @app_commands.default_permissions(manage_roles=True)
     @is_admin_or_has_role()
     async def app_setup(
         self,
@@ -271,6 +272,7 @@ class ApplicationsCog(commands.Cog, name="Applications"):
         await interaction.response.send_modal(modal)
 
     @apps_group.command(name="list", description="List all pending applications")
+    @app_commands.default_permissions(manage_roles=True)
     @is_mod_or_has_role()
     async def app_list(self, interaction: discord.Interaction):
         async with AsyncSessionLocal() as session:
@@ -300,8 +302,10 @@ class ApplicationsCog(commands.Cog, name="Applications"):
 
     @apps_group.command(name="close", description="Close an application form from accepting new submissions")
     @app_commands.describe(form_id="ID of the form to close")
+    @app_commands.default_permissions(manage_roles=True)
     @is_admin_or_has_role()
     async def app_close(self, interaction: discord.Interaction, form_id: int):
+
         async with AsyncSessionLocal() as session:
             res = await session.execute(
                 select(ApplicationForm).where(ApplicationForm.id == form_id, ApplicationForm.guild_id == interaction.guild_id)
