@@ -87,20 +87,21 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
         return await interaction.response.send_message(
             embed=error_embed("Missing Permissions", "You do not have the required Discord permissions to run this command."),
             ephemeral=True
-        )
-    elif isinstance(error, app_commands.CheckFailure):
-        msg = str(error) or "You do not meet the permission requirements for this command."
-        if interaction.response.is_done():
-            return await interaction.followup.send(embed=error_embed("Permission Denied", msg), ephemeral=True)
-        else:
-            return await interaction.response.send_message(embed=error_embed("Permission Denied", msg), ephemeral=True)
-
     logger.error(f"Unhandled AppCommand error in /{interaction.command.name if interaction.command else 'unknown'}: {error}")
-    err_text = f"An unexpected error occurred: `{error}`"
-    if interaction.response.is_done():
-        await interaction.followup.send(embed=error_embed("Error", err_text), ephemeral=True)
-    else:
-        await interaction.response.send_message(embed=error_embed("Error", err_text), ephemeral=True)
+    err_text = "An unexpected error occurred while executing this command."
+    if isinstance(error, app_commands.MissingPermissions):
+        err_text = "You do not have permission to use this command."
+    elif isinstance(error, app_commands.CheckFailure):
+        err_text = "You are not authorized to run this command."
+
+    try:
+        if interaction.response.is_done():
+            await interaction.followup.send(embed=error_embed("Error", err_text), ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=error_embed("Error", err_text), ephemeral=True)
+    except Exception:
+        pass
+
 
 # Central Guild Configuration Slash Command Group
 config_group = app_commands.Group(name="config", description="Configure core Ego Bot settings for this server")
