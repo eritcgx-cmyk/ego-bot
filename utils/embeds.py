@@ -1,9 +1,10 @@
 """
 Clean & Minimal Aesthetic Embed Builder for Ego Bot.
-Features sleek typography, curated dark-mode colors, and simple layouts.
+Features timezone-aware timestamps (EST / US Eastern Time) and sleek branding.
 """
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
+import zoneinfo
 import discord
 
 # Curated Palette
@@ -16,6 +17,13 @@ COLOR_CYAN     = 0x06B6D4   # Neon Cyan
 COLOR_ROSE     = 0xFB7185   # Soft Pink
 COLOR_INDIGO   = 0x6366F1   # Indigo Blue
 
+def get_eastern_time() -> datetime:
+    """Returns the current Eastern Time (EST/EDT)."""
+    try:
+        return datetime.now(zoneinfo.ZoneInfo("America/New_York"))
+    except Exception:
+        return datetime.now(timezone.utc)
+
 def ego_embed(
     title: Optional[str] = None,
     description: Optional[str] = None,
@@ -25,21 +33,29 @@ def ego_embed(
     footer_text: Optional[str] = None,
     timestamp: bool = True
 ) -> discord.Embed:
-    """Builds a clean Discord embed with minimal branding."""
+    """Builds a clean Discord embed with minimal branding and Eastern Time."""
     embed = discord.Embed(
         title=title,
         description=description,
         color=color
     )
     if timestamp:
-        embed.timestamp = datetime.utcnow()
+        # Timezone-aware UTC timestamp allows Discord to natively localize to user device (EST)
+        embed.timestamp = datetime.now(timezone.utc)
     
     if thumbnail_url:
         embed.set_thumbnail(url=thumbnail_url)
     if image_url:
         embed.set_image(url=image_url)
 
-    footer = footer_text or "Ego"
+    est_now = get_eastern_time()
+    est_str = est_now.strftime("%I:%M %p EST")
+    
+    if footer_text:
+        footer = f"{footer_text} • {est_str}"
+    else:
+        footer = f"Ego • {est_str}"
+
     embed.set_footer(text=footer)
     return embed
 
