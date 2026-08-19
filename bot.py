@@ -91,13 +91,7 @@ class EgoBot(commands.Bot):
         except Exception as e:
             logger.debug(f"Could not register Friend Group views: {e}")
 
-        # 4. Sync Slash Commands
-        logger.info("Syncing application slash command tree with Discord...")
-        try:
-            synced = await self.tree.sync()
-            logger.info(f"Synced {len(synced)} global slash commands.")
-        except Exception as e:
-            logger.error(f"Failed to sync slash commands: {e}")
+        # 4. Global sync disabled to prevent 1-hour Discord global client caching; guild sync runs on_ready
 
 
 
