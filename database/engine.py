@@ -31,9 +31,37 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 async def init_db() -> None:
-    """Initialize tables in the database."""
+    """Initialize tables in the database and auto-migrate missing columns."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+        # Auto-migrate welcome_configs missing columns
+        try:
+            from sqlalchemy import text
+            await conn.execute(text("ALTER TABLE welcome_configs ADD COLUMN leave_enabled BOOLEAN DEFAULT 0"))
+        except Exception:
+            pass
+        try:
+            from sqlalchemy import text
+            await conn.execute(text("ALTER TABLE welcome_configs ADD COLUMN leave_channel_id BIGINT"))
+        except Exception:
+            pass
+        try:
+            from sqlalchemy import text
+            await conn.execute(text("ALTER TABLE welcome_configs ADD COLUMN leave_title VARCHAR(255)"))
+        except Exception:
+            pass
+        try:
+            from sqlalchemy import text
+            await conn.execute(text("ALTER TABLE welcome_configs ADD COLUMN leave_message TEXT"))
+        except Exception:
+            pass
+        try:
+            from sqlalchemy import text
+            await conn.execute(text("ALTER TABLE welcome_configs ADD COLUMN leave_color INTEGER DEFAULT 15680324"))
+        except Exception:
+            pass
+
     logger.info("Database schema verified and tables created.")
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
