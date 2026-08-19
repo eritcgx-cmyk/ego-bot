@@ -1,0 +1,9602 @@
+[
+  {
+    "id": 1,
+    "category": "Content Creator",
+    "name": "Streamer Elite",
+    "color": "#FF0050",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 2,
+    "category": "Content Creator",
+    "name": "Streamer Pro",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 3,
+    "category": "Content Creator",
+    "name": "Streamer Prime",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 4,
+    "category": "Content Creator",
+    "name": "Streamer Ultra",
+    "color": "#9146FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 5,
+    "category": "Content Creator",
+    "name": "Streamer Gold",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 6,
+    "category": "Content Creator",
+    "name": "Streamer Diamond",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 7,
+    "category": "Content Creator",
+    "name": "Streamer Partner",
+    "color": "#FFA500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 8,
+    "category": "Content Creator",
+    "name": "Streamer Affiliate",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 9,
+    "category": "Content Creator",
+    "name": "Streamer Rising",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 10,
+    "category": "Content Creator",
+    "name": "Streamer Verified",
+    "color": "#1DB954",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 11,
+    "category": "Content Creator",
+    "name": "Streamer Legend",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 12,
+    "category": "Content Creator",
+    "name": "Streamer Master",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 13,
+    "category": "Content Creator",
+    "name": "Streamer Star",
+    "color": "#FF0050",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 14,
+    "category": "Content Creator",
+    "name": "Streamer Icon",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 15,
+    "category": "Content Creator",
+    "name": "Streamer VIP",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 16,
+    "category": "Content Creator",
+    "name": "Streamer Ambassador",
+    "color": "#9146FF",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 17,
+    "category": "Content Creator",
+    "name": "Streamer Official",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 18,
+    "category": "Content Creator",
+    "name": "Streamer Pioneer",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 19,
+    "category": "Content Creator",
+    "name": "Streamer Creator",
+    "color": "#FFA500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 20,
+    "category": "Content Creator",
+    "name": "Streamer Talent",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 21,
+    "category": "Content Creator",
+    "name": "YouTuber Pro",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 22,
+    "category": "Content Creator",
+    "name": "YouTuber Prime",
+    "color": "#FF0000",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 23,
+    "category": "Content Creator",
+    "name": "YouTuber Ultra",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 24,
+    "category": "Content Creator",
+    "name": "YouTuber Gold",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 25,
+    "category": "Content Creator",
+    "name": "YouTuber Diamond",
+    "color": "#E1306C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 26,
+    "category": "Content Creator",
+    "name": "YouTuber Partner",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 27,
+    "category": "Content Creator",
+    "name": "YouTuber Affiliate",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 28,
+    "category": "Content Creator",
+    "name": "YouTuber Rising",
+    "color": "#00FF7F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 29,
+    "category": "Content Creator",
+    "name": "YouTuber Verified",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 30,
+    "category": "Content Creator",
+    "name": "YouTuber Legend",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 31,
+    "category": "Content Creator",
+    "name": "YouTuber Master",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 32,
+    "category": "Content Creator",
+    "name": "YouTuber Star",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 33,
+    "category": "Content Creator",
+    "name": "YouTuber Icon",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 34,
+    "category": "Content Creator",
+    "name": "YouTuber VIP",
+    "color": "#FF0000",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 35,
+    "category": "Content Creator",
+    "name": "YouTuber Ambassador",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 36,
+    "category": "Content Creator",
+    "name": "YouTuber Official",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 37,
+    "category": "Content Creator",
+    "name": "YouTuber Pioneer",
+    "color": "#E1306C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 38,
+    "category": "Content Creator",
+    "name": "YouTuber Creator",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 39,
+    "category": "Content Creator",
+    "name": "YouTuber Talent",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 40,
+    "category": "Content Creator",
+    "name": "YouTuber Elite",
+    "color": "#00FF7F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 41,
+    "category": "Content Creator",
+    "name": "Tiktoker Prime",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 42,
+    "category": "Content Creator",
+    "name": "Tiktoker Ultra",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 43,
+    "category": "Content Creator",
+    "name": "Tiktoker Gold",
+    "color": "#1DA1F2",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 44,
+    "category": "Content Creator",
+    "name": "Tiktoker Diamond",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 45,
+    "category": "Content Creator",
+    "name": "Tiktoker Partner",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 46,
+    "category": "Content Creator",
+    "name": "Tiktoker Affiliate",
+    "color": "#FF4500",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 47,
+    "category": "Content Creator",
+    "name": "Tiktoker Rising",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 48,
+    "category": "Content Creator",
+    "name": "Tiktoker Verified",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 49,
+    "category": "Content Creator",
+    "name": "Tiktoker Legend",
+    "color": "#FF69B4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 50,
+    "category": "Content Creator",
+    "name": "Tiktoker Master",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 51,
+    "category": "Content Creator",
+    "name": "Tiktoker Star",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 52,
+    "category": "Content Creator",
+    "name": "Tiktoker Icon",
+    "color": "#00F2FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 53,
+    "category": "Content Creator",
+    "name": "Tiktoker VIP",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 54,
+    "category": "Content Creator",
+    "name": "Tiktoker Ambassador",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 55,
+    "category": "Content Creator",
+    "name": "Tiktoker Official",
+    "color": "#1DA1F2",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 56,
+    "category": "Content Creator",
+    "name": "Tiktoker Pioneer",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 57,
+    "category": "Content Creator",
+    "name": "Tiktoker Creator",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 58,
+    "category": "Content Creator",
+    "name": "Tiktoker Talent",
+    "color": "#FF4500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 59,
+    "category": "Content Creator",
+    "name": "Tiktoker Elite",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 60,
+    "category": "Content Creator",
+    "name": "Tiktoker Pro",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 61,
+    "category": "Content Creator",
+    "name": "Vlogger Ultra",
+    "color": "#9146FF",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 62,
+    "category": "Content Creator",
+    "name": "Vlogger Gold",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 63,
+    "category": "Content Creator",
+    "name": "Vlogger Diamond",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 64,
+    "category": "Content Creator",
+    "name": "Vlogger Partner",
+    "color": "#FFA500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 65,
+    "category": "Content Creator",
+    "name": "Vlogger Affiliate",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 66,
+    "category": "Content Creator",
+    "name": "Vlogger Rising",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 67,
+    "category": "Content Creator",
+    "name": "Vlogger Verified",
+    "color": "#1DB954",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 68,
+    "category": "Content Creator",
+    "name": "Vlogger Legend",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 69,
+    "category": "Content Creator",
+    "name": "Vlogger Master",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 70,
+    "category": "Content Creator",
+    "name": "Vlogger Star",
+    "color": "#FF0050",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 71,
+    "category": "Content Creator",
+    "name": "Vlogger Icon",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 72,
+    "category": "Content Creator",
+    "name": "Vlogger VIP",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 73,
+    "category": "Content Creator",
+    "name": "Vlogger Ambassador",
+    "color": "#9146FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 74,
+    "category": "Content Creator",
+    "name": "Vlogger Official",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 75,
+    "category": "Content Creator",
+    "name": "Vlogger Pioneer",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 76,
+    "category": "Content Creator",
+    "name": "Vlogger Creator",
+    "color": "#FFA500",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 77,
+    "category": "Content Creator",
+    "name": "Vlogger Talent",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 78,
+    "category": "Content Creator",
+    "name": "Vlogger Elite",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 79,
+    "category": "Content Creator",
+    "name": "Vlogger Pro",
+    "color": "#1DB954",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 80,
+    "category": "Content Creator",
+    "name": "Vlogger Prime",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 81,
+    "category": "Content Creator",
+    "name": "Podcaster Gold",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 82,
+    "category": "Content Creator",
+    "name": "Podcaster Diamond",
+    "color": "#E1306C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 83,
+    "category": "Content Creator",
+    "name": "Podcaster Partner",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 84,
+    "category": "Content Creator",
+    "name": "Podcaster Affiliate",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 85,
+    "category": "Content Creator",
+    "name": "Podcaster Rising",
+    "color": "#00FF7F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 86,
+    "category": "Content Creator",
+    "name": "Podcaster Verified",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 87,
+    "category": "Content Creator",
+    "name": "Podcaster Legend",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 88,
+    "category": "Content Creator",
+    "name": "Podcaster Master",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 89,
+    "category": "Content Creator",
+    "name": "Podcaster Star",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 90,
+    "category": "Content Creator",
+    "name": "Podcaster Icon",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 91,
+    "category": "Content Creator",
+    "name": "Podcaster VIP",
+    "color": "#FF0000",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 92,
+    "category": "Content Creator",
+    "name": "Podcaster Ambassador",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 93,
+    "category": "Content Creator",
+    "name": "Podcaster Official",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 94,
+    "category": "Content Creator",
+    "name": "Podcaster Pioneer",
+    "color": "#E1306C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 95,
+    "category": "Content Creator",
+    "name": "Podcaster Creator",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 96,
+    "category": "Content Creator",
+    "name": "Podcaster Talent",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 97,
+    "category": "Content Creator",
+    "name": "Podcaster Elite",
+    "color": "#00FF7F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 98,
+    "category": "Content Creator",
+    "name": "Podcaster Pro",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 99,
+    "category": "Content Creator",
+    "name": "Podcaster Prime",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 100,
+    "category": "Content Creator",
+    "name": "Podcaster Ultra",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 101,
+    "category": "Content Creator",
+    "name": "Caster Diamond",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 102,
+    "category": "Content Creator",
+    "name": "Caster Partner",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 103,
+    "category": "Content Creator",
+    "name": "Caster Affiliate",
+    "color": "#FF4500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 104,
+    "category": "Content Creator",
+    "name": "Caster Rising",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 105,
+    "category": "Content Creator",
+    "name": "Caster Verified",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 106,
+    "category": "Content Creator",
+    "name": "Caster Legend",
+    "color": "#FF69B4",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 107,
+    "category": "Content Creator",
+    "name": "Caster Master",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 108,
+    "category": "Content Creator",
+    "name": "Caster Star",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 109,
+    "category": "Content Creator",
+    "name": "Caster Icon",
+    "color": "#00F2FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 110,
+    "category": "Content Creator",
+    "name": "Caster VIP",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 111,
+    "category": "Content Creator",
+    "name": "Caster Ambassador",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 112,
+    "category": "Content Creator",
+    "name": "Caster Official",
+    "color": "#1DA1F2",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 113,
+    "category": "Content Creator",
+    "name": "Caster Pioneer",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 114,
+    "category": "Content Creator",
+    "name": "Caster Creator",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 115,
+    "category": "Content Creator",
+    "name": "Caster Talent",
+    "color": "#FF4500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 116,
+    "category": "Content Creator",
+    "name": "Caster Elite",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 117,
+    "category": "Content Creator",
+    "name": "Caster Pro",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 118,
+    "category": "Content Creator",
+    "name": "Caster Prime",
+    "color": "#FF69B4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 119,
+    "category": "Content Creator",
+    "name": "Caster Ultra",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 120,
+    "category": "Content Creator",
+    "name": "Caster Gold",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 121,
+    "category": "Content Creator",
+    "name": "Broadcaster Partner",
+    "color": "#FFA500",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 122,
+    "category": "Content Creator",
+    "name": "Broadcaster Affiliate",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 123,
+    "category": "Content Creator",
+    "name": "Broadcaster Rising",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 124,
+    "category": "Content Creator",
+    "name": "Broadcaster Verified",
+    "color": "#1DB954",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 125,
+    "category": "Content Creator",
+    "name": "Broadcaster Legend",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 126,
+    "category": "Content Creator",
+    "name": "Broadcaster Master",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 127,
+    "category": "Content Creator",
+    "name": "Broadcaster Star",
+    "color": "#FF0050",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 128,
+    "category": "Content Creator",
+    "name": "Broadcaster Icon",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 129,
+    "category": "Content Creator",
+    "name": "Broadcaster VIP",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 130,
+    "category": "Content Creator",
+    "name": "Broadcaster Ambassador",
+    "color": "#9146FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 131,
+    "category": "Content Creator",
+    "name": "Broadcaster Official",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 132,
+    "category": "Content Creator",
+    "name": "Broadcaster Pioneer",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 133,
+    "category": "Content Creator",
+    "name": "Broadcaster Creator",
+    "color": "#FFA500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 134,
+    "category": "Content Creator",
+    "name": "Broadcaster Talent",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 135,
+    "category": "Content Creator",
+    "name": "Broadcaster Elite",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 136,
+    "category": "Content Creator",
+    "name": "Broadcaster Pro",
+    "color": "#1DB954",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 137,
+    "category": "Content Creator",
+    "name": "Broadcaster Prime",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 138,
+    "category": "Content Creator",
+    "name": "Broadcaster Ultra",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 139,
+    "category": "Content Creator",
+    "name": "Broadcaster Gold",
+    "color": "#FF0050",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 140,
+    "category": "Content Creator",
+    "name": "Broadcaster Diamond",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 141,
+    "category": "Content Creator",
+    "name": "Animator Affiliate",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 142,
+    "category": "Content Creator",
+    "name": "Animator Rising",
+    "color": "#00FF7F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 143,
+    "category": "Content Creator",
+    "name": "Animator Verified",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 144,
+    "category": "Content Creator",
+    "name": "Animator Legend",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 145,
+    "category": "Content Creator",
+    "name": "Animator Master",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 146,
+    "category": "Content Creator",
+    "name": "Animator Star",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 147,
+    "category": "Content Creator",
+    "name": "Animator Icon",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 148,
+    "category": "Content Creator",
+    "name": "Animator VIP",
+    "color": "#FF0000",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 149,
+    "category": "Content Creator",
+    "name": "Animator Ambassador",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 150,
+    "category": "Content Creator",
+    "name": "Animator Official",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 151,
+    "category": "Content Creator",
+    "name": "Animator Pioneer",
+    "color": "#E1306C",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 152,
+    "category": "Content Creator",
+    "name": "Animator Creator",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 153,
+    "category": "Content Creator",
+    "name": "Animator Talent",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 154,
+    "category": "Content Creator",
+    "name": "Animator Elite",
+    "color": "#00FF7F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 155,
+    "category": "Content Creator",
+    "name": "Animator Pro",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 156,
+    "category": "Content Creator",
+    "name": "Animator Prime",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 157,
+    "category": "Content Creator",
+    "name": "Animator Ultra",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 158,
+    "category": "Content Creator",
+    "name": "Animator Gold",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 159,
+    "category": "Content Creator",
+    "name": "Animator Diamond",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 160,
+    "category": "Content Creator",
+    "name": "Animator Partner",
+    "color": "#FF0000",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 161,
+    "category": "Content Creator",
+    "name": "Producer Rising",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 162,
+    "category": "Content Creator",
+    "name": "Producer Verified",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 163,
+    "category": "Content Creator",
+    "name": "Producer Legend",
+    "color": "#FF69B4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 164,
+    "category": "Content Creator",
+    "name": "Producer Master",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 165,
+    "category": "Content Creator",
+    "name": "Producer Star",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 166,
+    "category": "Content Creator",
+    "name": "Producer Icon",
+    "color": "#00F2FE",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 167,
+    "category": "Content Creator",
+    "name": "Producer VIP",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 168,
+    "category": "Content Creator",
+    "name": "Producer Ambassador",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 169,
+    "category": "Content Creator",
+    "name": "Producer Official",
+    "color": "#1DA1F2",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 170,
+    "category": "Content Creator",
+    "name": "Producer Pioneer",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 171,
+    "category": "Content Creator",
+    "name": "Producer Creator",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 172,
+    "category": "Content Creator",
+    "name": "Producer Talent",
+    "color": "#FF4500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 173,
+    "category": "Content Creator",
+    "name": "Producer Elite",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 174,
+    "category": "Content Creator",
+    "name": "Producer Pro",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 175,
+    "category": "Content Creator",
+    "name": "Producer Prime",
+    "color": "#FF69B4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 176,
+    "category": "Content Creator",
+    "name": "Producer Ultra",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 177,
+    "category": "Content Creator",
+    "name": "Producer Gold",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 178,
+    "category": "Content Creator",
+    "name": "Producer Diamond",
+    "color": "#00F2FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 179,
+    "category": "Content Creator",
+    "name": "Producer Partner",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 180,
+    "category": "Content Creator",
+    "name": "Producer Affiliate",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 181,
+    "category": "Content Creator",
+    "name": "Editor Verified",
+    "color": "#1DB954",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 182,
+    "category": "Content Creator",
+    "name": "Editor Legend",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 183,
+    "category": "Content Creator",
+    "name": "Editor Master",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 184,
+    "category": "Content Creator",
+    "name": "Editor Star",
+    "color": "#FF0050",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 185,
+    "category": "Content Creator",
+    "name": "Editor Icon",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 186,
+    "category": "Content Creator",
+    "name": "Editor VIP",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 187,
+    "category": "Content Creator",
+    "name": "Editor Ambassador",
+    "color": "#9146FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 188,
+    "category": "Content Creator",
+    "name": "Editor Official",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 189,
+    "category": "Content Creator",
+    "name": "Editor Pioneer",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 190,
+    "category": "Content Creator",
+    "name": "Editor Creator",
+    "color": "#FFA500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 191,
+    "category": "Content Creator",
+    "name": "Editor Talent",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 192,
+    "category": "Content Creator",
+    "name": "Editor Elite",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 193,
+    "category": "Content Creator",
+    "name": "Editor Pro",
+    "color": "#1DB954",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 194,
+    "category": "Content Creator",
+    "name": "Editor Prime",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 195,
+    "category": "Content Creator",
+    "name": "Editor Ultra",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 196,
+    "category": "Content Creator",
+    "name": "Editor Gold",
+    "color": "#FF0050",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 197,
+    "category": "Content Creator",
+    "name": "Editor Diamond",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 198,
+    "category": "Content Creator",
+    "name": "Editor Partner",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 199,
+    "category": "Content Creator",
+    "name": "Editor Affiliate",
+    "color": "#9146FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 200,
+    "category": "Content Creator",
+    "name": "Editor Rising",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 201,
+    "category": "Content Creator",
+    "name": "Clip Master Legend",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 202,
+    "category": "Content Creator",
+    "name": "Clip Master Master",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 203,
+    "category": "Content Creator",
+    "name": "Clip Master Star",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 204,
+    "category": "Content Creator",
+    "name": "Clip Master Icon",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 205,
+    "category": "Content Creator",
+    "name": "Clip Master VIP",
+    "color": "#FF0000",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 206,
+    "category": "Content Creator",
+    "name": "Clip Master Ambassador",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 207,
+    "category": "Content Creator",
+    "name": "Clip Master Official",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 208,
+    "category": "Content Creator",
+    "name": "Clip Master Pioneer",
+    "color": "#E1306C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 209,
+    "category": "Content Creator",
+    "name": "Clip Master Creator",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 210,
+    "category": "Content Creator",
+    "name": "Clip Master Talent",
+    "color": "#FF4500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 211,
+    "category": "Content Creator",
+    "name": "Clip Master Elite",
+    "color": "#00FF7F",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 212,
+    "category": "Content Creator",
+    "name": "Clip Master Pro",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 213,
+    "category": "Content Creator",
+    "name": "Clip Master Prime",
+    "color": "#FF69B4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 214,
+    "category": "Content Creator",
+    "name": "Clip Master Ultra",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 215,
+    "category": "Content Creator",
+    "name": "Clip Master Gold",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 216,
+    "category": "Content Creator",
+    "name": "Clip Master Diamond",
+    "color": "#00F2FE",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 217,
+    "category": "Content Creator",
+    "name": "Clip Master Partner",
+    "color": "#FF0000",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 218,
+    "category": "Content Creator",
+    "name": "Clip Master Affiliate",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 219,
+    "category": "Content Creator",
+    "name": "Clip Master Rising",
+    "color": "#1DA1F2",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 220,
+    "category": "Content Creator",
+    "name": "Clip Master Verified",
+    "color": "#E1306C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 221,
+    "category": "Content Creator",
+    "name": "Gamer Master",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 222,
+    "category": "Content Creator",
+    "name": "Gamer Star",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 223,
+    "category": "Content Creator",
+    "name": "Gamer Icon",
+    "color": "#00F2FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 224,
+    "category": "Content Creator",
+    "name": "Gamer VIP",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 225,
+    "category": "Content Creator",
+    "name": "Gamer Ambassador",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 226,
+    "category": "Content Creator",
+    "name": "Gamer Official",
+    "color": "#1DA1F2",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 227,
+    "category": "Content Creator",
+    "name": "Gamer Pioneer",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 228,
+    "category": "Content Creator",
+    "name": "Gamer Creator",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 229,
+    "category": "Content Creator",
+    "name": "Gamer Talent",
+    "color": "#FF4500",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 230,
+    "category": "Content Creator",
+    "name": "Gamer Elite",
+    "color": "#00FF7F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 231,
+    "category": "Content Creator",
+    "name": "Gamer Pro",
+    "color": "#1DB954",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 232,
+    "category": "Content Creator",
+    "name": "Gamer Prime",
+    "color": "#FF69B4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 233,
+    "category": "Content Creator",
+    "name": "Gamer Ultra",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 234,
+    "category": "Content Creator",
+    "name": "Gamer Gold",
+    "color": "#FF0050",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 235,
+    "category": "Content Creator",
+    "name": "Gamer Diamond",
+    "color": "#00F2FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 236,
+    "category": "Content Creator",
+    "name": "Gamer Partner",
+    "color": "#FF0000",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 237,
+    "category": "Content Creator",
+    "name": "Gamer Affiliate",
+    "color": "#9146FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 238,
+    "category": "Content Creator",
+    "name": "Gamer Rising",
+    "color": "#1DA1F2",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 239,
+    "category": "Content Creator",
+    "name": "Gamer Verified",
+    "color": "#E1306C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 240,
+    "category": "Content Creator",
+    "name": "Gamer Legend",
+    "color": "#FFA500",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 241,
+    "category": "Verified",
+    "name": "Verified Member",
+    "color": "#3498DB",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 242,
+    "category": "Verified",
+    "name": "Verified Citizen",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 243,
+    "category": "Verified",
+    "name": "Verified Resident",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 244,
+    "category": "Verified",
+    "name": "Verified Resident VIP",
+    "color": "#16A085",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 245,
+    "category": "Verified",
+    "name": "Verified Badge",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 246,
+    "category": "Verified",
+    "name": "Verified Pass",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 247,
+    "category": "Verified",
+    "name": "Verified Clearance",
+    "color": "#00BCD4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 248,
+    "category": "Verified",
+    "name": "Verified Level A",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 249,
+    "category": "Verified",
+    "name": "Verified Level B",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 250,
+    "category": "Verified",
+    "name": "Verified Level S",
+    "color": "#8BC34A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 251,
+    "category": "Verified",
+    "name": "Verified Status",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 252,
+    "category": "Verified",
+    "name": "Verified Grade I",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 253,
+    "category": "Verified",
+    "name": "Verified Grade II",
+    "color": "#3498DB",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 254,
+    "category": "Verified",
+    "name": "Verified Access",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 255,
+    "category": "Verified",
+    "name": "Verified Holder",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 256,
+    "category": "Verified",
+    "name": "Verified Native",
+    "color": "#16A085",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 257,
+    "category": "Verified",
+    "name": "Verified Peer",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 258,
+    "category": "Verified",
+    "name": "Verified Persona",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 259,
+    "category": "Verified",
+    "name": "Verified Profile",
+    "color": "#00BCD4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 260,
+    "category": "Verified",
+    "name": "Verified Identity",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 261,
+    "category": "Verified",
+    "name": "Authenticated Citizen",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 262,
+    "category": "Verified",
+    "name": "Authenticated Resident",
+    "color": "#1ABC9C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 263,
+    "category": "Verified",
+    "name": "Authenticated Resident VIP",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 264,
+    "category": "Verified",
+    "name": "Authenticated Badge",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 265,
+    "category": "Verified",
+    "name": "Authenticated Pass",
+    "color": "#2980B9",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 266,
+    "category": "Verified",
+    "name": "Authenticated Clearance",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 267,
+    "category": "Verified",
+    "name": "Authenticated Level A",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 268,
+    "category": "Verified",
+    "name": "Authenticated Level B",
+    "color": "#4CAF50",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 269,
+    "category": "Verified",
+    "name": "Authenticated Level S",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 270,
+    "category": "Verified",
+    "name": "Authenticated Status",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 271,
+    "category": "Verified",
+    "name": "Authenticated Grade I",
+    "color": "#2196F3",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 272,
+    "category": "Verified",
+    "name": "Authenticated Grade II",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 273,
+    "category": "Verified",
+    "name": "Authenticated Access",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 274,
+    "category": "Verified",
+    "name": "Authenticated Holder",
+    "color": "#1ABC9C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 275,
+    "category": "Verified",
+    "name": "Authenticated Native",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 276,
+    "category": "Verified",
+    "name": "Authenticated Peer",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 277,
+    "category": "Verified",
+    "name": "Authenticated Persona",
+    "color": "#2980B9",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 278,
+    "category": "Verified",
+    "name": "Authenticated Profile",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 279,
+    "category": "Verified",
+    "name": "Authenticated Identity",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 280,
+    "category": "Verified",
+    "name": "Authenticated Member",
+    "color": "#4CAF50",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 281,
+    "category": "Verified",
+    "name": "Identity Confirmed Resident",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 282,
+    "category": "Verified",
+    "name": "Identity Confirmed Resident VIP",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 283,
+    "category": "Verified",
+    "name": "Identity Confirmed Badge",
+    "color": "#27AE60",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 284,
+    "category": "Verified",
+    "name": "Identity Confirmed Pass",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 285,
+    "category": "Verified",
+    "name": "Identity Confirmed Clearance",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 286,
+    "category": "Verified",
+    "name": "Identity Confirmed Level A",
+    "color": "#009688",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 287,
+    "category": "Verified",
+    "name": "Identity Confirmed Level B",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 288,
+    "category": "Verified",
+    "name": "Identity Confirmed Level S",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 289,
+    "category": "Verified",
+    "name": "Identity Confirmed Status",
+    "color": "#03A9F4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 290,
+    "category": "Verified",
+    "name": "Identity Confirmed Grade I",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 291,
+    "category": "Verified",
+    "name": "Identity Confirmed Grade II",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 292,
+    "category": "Verified",
+    "name": "Identity Confirmed Access",
+    "color": "#2ECC71",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 293,
+    "category": "Verified",
+    "name": "Identity Confirmed Holder",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 294,
+    "category": "Verified",
+    "name": "Identity Confirmed Native",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 295,
+    "category": "Verified",
+    "name": "Identity Confirmed Peer",
+    "color": "#27AE60",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 296,
+    "category": "Verified",
+    "name": "Identity Confirmed Persona",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 297,
+    "category": "Verified",
+    "name": "Identity Confirmed Profile",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 298,
+    "category": "Verified",
+    "name": "Identity Confirmed Identity",
+    "color": "#009688",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 299,
+    "category": "Verified",
+    "name": "Identity Confirmed Member",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 300,
+    "category": "Verified",
+    "name": "Identity Confirmed Citizen",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 301,
+    "category": "Verified",
+    "name": "Real Resident VIP",
+    "color": "#16A085",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 302,
+    "category": "Verified",
+    "name": "Real Badge",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 303,
+    "category": "Verified",
+    "name": "Real Pass",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 304,
+    "category": "Verified",
+    "name": "Real Clearance",
+    "color": "#00BCD4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 305,
+    "category": "Verified",
+    "name": "Real Level A",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 306,
+    "category": "Verified",
+    "name": "Real Level B",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 307,
+    "category": "Verified",
+    "name": "Real Level S",
+    "color": "#8BC34A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 308,
+    "category": "Verified",
+    "name": "Real Status",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 309,
+    "category": "Verified",
+    "name": "Real Grade I",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 310,
+    "category": "Verified",
+    "name": "Real Grade II",
+    "color": "#3498DB",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 311,
+    "category": "Verified",
+    "name": "Real Access",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 312,
+    "category": "Verified",
+    "name": "Real Holder",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 313,
+    "category": "Verified",
+    "name": "Real Native",
+    "color": "#16A085",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 314,
+    "category": "Verified",
+    "name": "Real Peer",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 315,
+    "category": "Verified",
+    "name": "Real Persona",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 316,
+    "category": "Verified",
+    "name": "Real Profile",
+    "color": "#00BCD4",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 317,
+    "category": "Verified",
+    "name": "Real Identity",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 318,
+    "category": "Verified",
+    "name": "Real Member",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 319,
+    "category": "Verified",
+    "name": "Real Citizen",
+    "color": "#8BC34A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 320,
+    "category": "Verified",
+    "name": "Real Resident",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 321,
+    "category": "Verified",
+    "name": "Official Badge",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 322,
+    "category": "Verified",
+    "name": "Official Pass",
+    "color": "#2980B9",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 323,
+    "category": "Verified",
+    "name": "Official Clearance",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 324,
+    "category": "Verified",
+    "name": "Official Level A",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 325,
+    "category": "Verified",
+    "name": "Official Level B",
+    "color": "#4CAF50",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 326,
+    "category": "Verified",
+    "name": "Official Level S",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 327,
+    "category": "Verified",
+    "name": "Official Status",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 328,
+    "category": "Verified",
+    "name": "Official Grade I",
+    "color": "#2196F3",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 329,
+    "category": "Verified",
+    "name": "Official Grade II",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 330,
+    "category": "Verified",
+    "name": "Official Access",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 331,
+    "category": "Verified",
+    "name": "Official Holder",
+    "color": "#1ABC9C",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 332,
+    "category": "Verified",
+    "name": "Official Native",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 333,
+    "category": "Verified",
+    "name": "Official Peer",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 334,
+    "category": "Verified",
+    "name": "Official Persona",
+    "color": "#2980B9",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 335,
+    "category": "Verified",
+    "name": "Official Profile",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 336,
+    "category": "Verified",
+    "name": "Official Identity",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 337,
+    "category": "Verified",
+    "name": "Official Member",
+    "color": "#4CAF50",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 338,
+    "category": "Verified",
+    "name": "Official Citizen",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 339,
+    "category": "Verified",
+    "name": "Official Resident",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 340,
+    "category": "Verified",
+    "name": "Official Resident VIP",
+    "color": "#2196F3",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 341,
+    "category": "Verified",
+    "name": "Tier 1 Verified Pass",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 342,
+    "category": "Verified",
+    "name": "Tier 1 Verified Clearance",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 343,
+    "category": "Verified",
+    "name": "Tier 1 Verified Level A",
+    "color": "#009688",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 344,
+    "category": "Verified",
+    "name": "Tier 1 Verified Level B",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 345,
+    "category": "Verified",
+    "name": "Tier 1 Verified Level S",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 346,
+    "category": "Verified",
+    "name": "Tier 1 Verified Status",
+    "color": "#03A9F4",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 347,
+    "category": "Verified",
+    "name": "Tier 1 Verified Grade I",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 348,
+    "category": "Verified",
+    "name": "Tier 1 Verified Grade II",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 349,
+    "category": "Verified",
+    "name": "Tier 1 Verified Access",
+    "color": "#2ECC71",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 350,
+    "category": "Verified",
+    "name": "Tier 1 Verified Holder",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 351,
+    "category": "Verified",
+    "name": "Tier 1 Verified Native",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 352,
+    "category": "Verified",
+    "name": "Tier 1 Verified Peer",
+    "color": "#27AE60",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 353,
+    "category": "Verified",
+    "name": "Tier 1 Verified Persona",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 354,
+    "category": "Verified",
+    "name": "Tier 1 Verified Profile",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 355,
+    "category": "Verified",
+    "name": "Tier 1 Verified Identity",
+    "color": "#009688",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 356,
+    "category": "Verified",
+    "name": "Tier 1 Verified Member",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 357,
+    "category": "Verified",
+    "name": "Tier 1 Verified Citizen",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 358,
+    "category": "Verified",
+    "name": "Tier 1 Verified Resident",
+    "color": "#03A9F4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 359,
+    "category": "Verified",
+    "name": "Tier 1 Verified Resident VIP",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 360,
+    "category": "Verified",
+    "name": "Tier 1 Verified Badge",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 361,
+    "category": "Verified",
+    "name": "Tier 2 Verified Clearance",
+    "color": "#00BCD4",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 362,
+    "category": "Verified",
+    "name": "Tier 2 Verified Level A",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 363,
+    "category": "Verified",
+    "name": "Tier 2 Verified Level B",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 364,
+    "category": "Verified",
+    "name": "Tier 2 Verified Level S",
+    "color": "#8BC34A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 365,
+    "category": "Verified",
+    "name": "Tier 2 Verified Status",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 366,
+    "category": "Verified",
+    "name": "Tier 2 Verified Grade I",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 367,
+    "category": "Verified",
+    "name": "Tier 2 Verified Grade II",
+    "color": "#3498DB",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 368,
+    "category": "Verified",
+    "name": "Tier 2 Verified Access",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 369,
+    "category": "Verified",
+    "name": "Tier 2 Verified Holder",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 370,
+    "category": "Verified",
+    "name": "Tier 2 Verified Native",
+    "color": "#16A085",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 371,
+    "category": "Verified",
+    "name": "Tier 2 Verified Peer",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 372,
+    "category": "Verified",
+    "name": "Tier 2 Verified Persona",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 373,
+    "category": "Verified",
+    "name": "Tier 2 Verified Profile",
+    "color": "#00BCD4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 374,
+    "category": "Verified",
+    "name": "Tier 2 Verified Identity",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 375,
+    "category": "Verified",
+    "name": "Tier 2 Verified Member",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 376,
+    "category": "Verified",
+    "name": "Tier 2 Verified Citizen",
+    "color": "#8BC34A",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 377,
+    "category": "Verified",
+    "name": "Tier 2 Verified Resident",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 378,
+    "category": "Verified",
+    "name": "Tier 2 Verified Resident VIP",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 379,
+    "category": "Verified",
+    "name": "Tier 2 Verified Badge",
+    "color": "#3498DB",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 380,
+    "category": "Verified",
+    "name": "Tier 2 Verified Pass",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 381,
+    "category": "Verified",
+    "name": "Tier 3 Verified Level A",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 382,
+    "category": "Verified",
+    "name": "Tier 3 Verified Level B",
+    "color": "#4CAF50",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 383,
+    "category": "Verified",
+    "name": "Tier 3 Verified Level S",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 384,
+    "category": "Verified",
+    "name": "Tier 3 Verified Status",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 385,
+    "category": "Verified",
+    "name": "Tier 3 Verified Grade I",
+    "color": "#2196F3",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 386,
+    "category": "Verified",
+    "name": "Tier 3 Verified Grade II",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 387,
+    "category": "Verified",
+    "name": "Tier 3 Verified Access",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 388,
+    "category": "Verified",
+    "name": "Tier 3 Verified Holder",
+    "color": "#1ABC9C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 389,
+    "category": "Verified",
+    "name": "Tier 3 Verified Native",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 390,
+    "category": "Verified",
+    "name": "Tier 3 Verified Peer",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 391,
+    "category": "Verified",
+    "name": "Tier 3 Verified Persona",
+    "color": "#2980B9",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 392,
+    "category": "Verified",
+    "name": "Tier 3 Verified Profile",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 393,
+    "category": "Verified",
+    "name": "Tier 3 Verified Identity",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 394,
+    "category": "Verified",
+    "name": "Tier 3 Verified Member",
+    "color": "#4CAF50",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 395,
+    "category": "Verified",
+    "name": "Tier 3 Verified Citizen",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 396,
+    "category": "Verified",
+    "name": "Tier 3 Verified Resident",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 397,
+    "category": "Verified",
+    "name": "Tier 3 Verified Resident VIP",
+    "color": "#2196F3",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 398,
+    "category": "Verified",
+    "name": "Tier 3 Verified Badge",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 399,
+    "category": "Verified",
+    "name": "Tier 3 Verified Pass",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 400,
+    "category": "Verified",
+    "name": "Tier 3 Verified Clearance",
+    "color": "#1ABC9C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 401,
+    "category": "Verified",
+    "name": "Certified Level B",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 402,
+    "category": "Verified",
+    "name": "Certified Level S",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 403,
+    "category": "Verified",
+    "name": "Certified Status",
+    "color": "#03A9F4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 404,
+    "category": "Verified",
+    "name": "Certified Grade I",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 405,
+    "category": "Verified",
+    "name": "Certified Grade II",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 406,
+    "category": "Verified",
+    "name": "Certified Access",
+    "color": "#2ECC71",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 407,
+    "category": "Verified",
+    "name": "Certified Holder",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 408,
+    "category": "Verified",
+    "name": "Certified Native",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 409,
+    "category": "Verified",
+    "name": "Certified Peer",
+    "color": "#27AE60",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 410,
+    "category": "Verified",
+    "name": "Certified Persona",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 411,
+    "category": "Verified",
+    "name": "Certified Profile",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 412,
+    "category": "Verified",
+    "name": "Certified Identity",
+    "color": "#009688",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 413,
+    "category": "Verified",
+    "name": "Certified Member",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 414,
+    "category": "Verified",
+    "name": "Certified Citizen",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 415,
+    "category": "Verified",
+    "name": "Certified Resident",
+    "color": "#03A9F4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 416,
+    "category": "Verified",
+    "name": "Certified Resident VIP",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 417,
+    "category": "Verified",
+    "name": "Certified Badge",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 418,
+    "category": "Verified",
+    "name": "Certified Pass",
+    "color": "#2ECC71",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 419,
+    "category": "Verified",
+    "name": "Certified Clearance",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 420,
+    "category": "Verified",
+    "name": "Certified Level A",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 421,
+    "category": "Verified",
+    "name": "Recognized Level S",
+    "color": "#8BC34A",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 422,
+    "category": "Verified",
+    "name": "Recognized Status",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 423,
+    "category": "Verified",
+    "name": "Recognized Grade I",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 424,
+    "category": "Verified",
+    "name": "Recognized Grade II",
+    "color": "#3498DB",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 425,
+    "category": "Verified",
+    "name": "Recognized Access",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 426,
+    "category": "Verified",
+    "name": "Recognized Holder",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 427,
+    "category": "Verified",
+    "name": "Recognized Native",
+    "color": "#16A085",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 428,
+    "category": "Verified",
+    "name": "Recognized Peer",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 429,
+    "category": "Verified",
+    "name": "Recognized Persona",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 430,
+    "category": "Verified",
+    "name": "Recognized Profile",
+    "color": "#00BCD4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 431,
+    "category": "Verified",
+    "name": "Recognized Identity",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 432,
+    "category": "Verified",
+    "name": "Recognized Member",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 433,
+    "category": "Verified",
+    "name": "Recognized Citizen",
+    "color": "#8BC34A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 434,
+    "category": "Verified",
+    "name": "Recognized Resident",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 435,
+    "category": "Verified",
+    "name": "Recognized Resident VIP",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 436,
+    "category": "Verified",
+    "name": "Recognized Badge",
+    "color": "#3498DB",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 437,
+    "category": "Verified",
+    "name": "Recognized Pass",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 438,
+    "category": "Verified",
+    "name": "Recognized Clearance",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 439,
+    "category": "Verified",
+    "name": "Recognized Level A",
+    "color": "#16A085",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 440,
+    "category": "Verified",
+    "name": "Recognized Level B",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 441,
+    "category": "Verified",
+    "name": "Validated Status",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 442,
+    "category": "Verified",
+    "name": "Validated Grade I",
+    "color": "#2196F3",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 443,
+    "category": "Verified",
+    "name": "Validated Grade II",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 444,
+    "category": "Verified",
+    "name": "Validated Access",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 445,
+    "category": "Verified",
+    "name": "Validated Holder",
+    "color": "#1ABC9C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 446,
+    "category": "Verified",
+    "name": "Validated Native",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 447,
+    "category": "Verified",
+    "name": "Validated Peer",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 448,
+    "category": "Verified",
+    "name": "Validated Persona",
+    "color": "#2980B9",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 449,
+    "category": "Verified",
+    "name": "Validated Profile",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 450,
+    "category": "Verified",
+    "name": "Validated Identity",
+    "color": "#009688",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 451,
+    "category": "Verified",
+    "name": "Validated Member",
+    "color": "#4CAF50",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 452,
+    "category": "Verified",
+    "name": "Validated Citizen",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 453,
+    "category": "Verified",
+    "name": "Validated Resident",
+    "color": "#03A9F4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 454,
+    "category": "Verified",
+    "name": "Validated Resident VIP",
+    "color": "#2196F3",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 455,
+    "category": "Verified",
+    "name": "Validated Badge",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 456,
+    "category": "Verified",
+    "name": "Validated Pass",
+    "color": "#2ECC71",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 457,
+    "category": "Verified",
+    "name": "Validated Clearance",
+    "color": "#1ABC9C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 458,
+    "category": "Verified",
+    "name": "Validated Level A",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 459,
+    "category": "Verified",
+    "name": "Validated Level B",
+    "color": "#27AE60",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 460,
+    "category": "Verified",
+    "name": "Validated Level S",
+    "color": "#2980B9",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 461,
+    "category": "Verified",
+    "name": "Endorsed Grade I",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 462,
+    "category": "Verified",
+    "name": "Endorsed Grade II",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 463,
+    "category": "Verified",
+    "name": "Endorsed Access",
+    "color": "#2ECC71",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 464,
+    "category": "Verified",
+    "name": "Endorsed Holder",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 465,
+    "category": "Verified",
+    "name": "Endorsed Native",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 466,
+    "category": "Verified",
+    "name": "Endorsed Peer",
+    "color": "#27AE60",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 467,
+    "category": "Verified",
+    "name": "Endorsed Persona",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 468,
+    "category": "Verified",
+    "name": "Endorsed Profile",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 469,
+    "category": "Verified",
+    "name": "Endorsed Identity",
+    "color": "#009688",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 470,
+    "category": "Verified",
+    "name": "Endorsed Member",
+    "color": "#4CAF50",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 471,
+    "category": "Verified",
+    "name": "Endorsed Citizen",
+    "color": "#8BC34A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 472,
+    "category": "Verified",
+    "name": "Endorsed Resident",
+    "color": "#03A9F4",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 473,
+    "category": "Verified",
+    "name": "Endorsed Resident VIP",
+    "color": "#2196F3",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 474,
+    "category": "Verified",
+    "name": "Endorsed Badge",
+    "color": "#3498DB",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 475,
+    "category": "Verified",
+    "name": "Endorsed Pass",
+    "color": "#2ECC71",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 476,
+    "category": "Verified",
+    "name": "Endorsed Clearance",
+    "color": "#1ABC9C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 477,
+    "category": "Verified",
+    "name": "Endorsed Level A",
+    "color": "#16A085",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 478,
+    "category": "Verified",
+    "name": "Endorsed Level B",
+    "color": "#27AE60",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 479,
+    "category": "Verified",
+    "name": "Endorsed Level S",
+    "color": "#2980B9",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 480,
+    "category": "Verified",
+    "name": "Endorsed Status",
+    "color": "#00BCD4",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 481,
+    "category": "Mod",
+    "name": "Trial Mod Team",
+    "color": "#E74C3C",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 482,
+    "category": "Mod",
+    "name": "Trial Mod Staff",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 483,
+    "category": "Mod",
+    "name": "Trial Mod Division",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 484,
+    "category": "Mod",
+    "name": "Trial Mod Corps",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 485,
+    "category": "Mod",
+    "name": "Trial Mod Command",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 486,
+    "category": "Mod",
+    "name": "Trial Mod Security",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 487,
+    "category": "Mod",
+    "name": "Trial Mod Operations",
+    "color": "#B71540",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 488,
+    "category": "Mod",
+    "name": "Trial Mod Squad",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 489,
+    "category": "Mod",
+    "name": "Trial Mod Bureau",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 490,
+    "category": "Mod",
+    "name": "Trial Mod Council",
+    "color": "#E55039",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 491,
+    "category": "Mod",
+    "name": "Trial Mod Executive",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 492,
+    "category": "Mod",
+    "name": "Trial Mod Unit",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 493,
+    "category": "Mod",
+    "name": "Trial Mod Watch",
+    "color": "#E74C3C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 494,
+    "category": "Mod",
+    "name": "Trial Mod Shield",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 495,
+    "category": "Mod",
+    "name": "Trial Mod Core",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 496,
+    "category": "Mod",
+    "name": "Trial Mod Desk",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 497,
+    "category": "Mod",
+    "name": "Trial Mod Force",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 498,
+    "category": "Mod",
+    "name": "Trial Mod Branch",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 499,
+    "category": "Mod",
+    "name": "Trial Mod Authority",
+    "color": "#B71540",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 500,
+    "category": "Mod",
+    "name": "Trial Mod Order",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 501,
+    "category": "Mod",
+    "name": "Junior Mod Staff",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 502,
+    "category": "Mod",
+    "name": "Junior Mod Division",
+    "color": "#D35400",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 503,
+    "category": "Mod",
+    "name": "Junior Mod Corps",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 504,
+    "category": "Mod",
+    "name": "Junior Mod Command",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 505,
+    "category": "Mod",
+    "name": "Junior Mod Security",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 506,
+    "category": "Mod",
+    "name": "Junior Mod Operations",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 507,
+    "category": "Mod",
+    "name": "Junior Mod Squad",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 508,
+    "category": "Mod",
+    "name": "Junior Mod Bureau",
+    "color": "#FA983A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 509,
+    "category": "Mod",
+    "name": "Junior Mod Council",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 510,
+    "category": "Mod",
+    "name": "Junior Mod Executive",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 511,
+    "category": "Mod",
+    "name": "Junior Mod Unit",
+    "color": "#CD6155",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 512,
+    "category": "Mod",
+    "name": "Junior Mod Watch",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 513,
+    "category": "Mod",
+    "name": "Junior Mod Shield",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 514,
+    "category": "Mod",
+    "name": "Junior Mod Core",
+    "color": "#D35400",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 515,
+    "category": "Mod",
+    "name": "Junior Mod Desk",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 516,
+    "category": "Mod",
+    "name": "Junior Mod Force",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 517,
+    "category": "Mod",
+    "name": "Junior Mod Branch",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 518,
+    "category": "Mod",
+    "name": "Junior Mod Authority",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 519,
+    "category": "Mod",
+    "name": "Junior Mod Order",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 520,
+    "category": "Mod",
+    "name": "Junior Mod Team",
+    "color": "#FA983A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 521,
+    "category": "Mod",
+    "name": "Moderator Division",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 522,
+    "category": "Mod",
+    "name": "Moderator Corps",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 523,
+    "category": "Mod",
+    "name": "Moderator Command",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 524,
+    "category": "Mod",
+    "name": "Moderator Security",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 525,
+    "category": "Mod",
+    "name": "Moderator Operations",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 526,
+    "category": "Mod",
+    "name": "Moderator Squad",
+    "color": "#EB2F06",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 527,
+    "category": "Mod",
+    "name": "Moderator Bureau",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 528,
+    "category": "Mod",
+    "name": "Moderator Council",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 529,
+    "category": "Mod",
+    "name": "Moderator Executive",
+    "color": "#B33939",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 530,
+    "category": "Mod",
+    "name": "Moderator Unit",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 531,
+    "category": "Mod",
+    "name": "Moderator Watch",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 532,
+    "category": "Mod",
+    "name": "Moderator Shield",
+    "color": "#C0392B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 533,
+    "category": "Mod",
+    "name": "Moderator Core",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 534,
+    "category": "Mod",
+    "name": "Moderator Desk",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 535,
+    "category": "Mod",
+    "name": "Moderator Force",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 536,
+    "category": "Mod",
+    "name": "Moderator Branch",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 537,
+    "category": "Mod",
+    "name": "Moderator Authority",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 538,
+    "category": "Mod",
+    "name": "Moderator Order",
+    "color": "#EB2F06",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 539,
+    "category": "Mod",
+    "name": "Moderator Team",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 540,
+    "category": "Mod",
+    "name": "Moderator Staff",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 541,
+    "category": "Mod",
+    "name": "Senior Mod Corps",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 542,
+    "category": "Mod",
+    "name": "Senior Mod Command",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 543,
+    "category": "Mod",
+    "name": "Senior Mod Security",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 544,
+    "category": "Mod",
+    "name": "Senior Mod Operations",
+    "color": "#B71540",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 545,
+    "category": "Mod",
+    "name": "Senior Mod Squad",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 546,
+    "category": "Mod",
+    "name": "Senior Mod Bureau",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 547,
+    "category": "Mod",
+    "name": "Senior Mod Council",
+    "color": "#E55039",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 548,
+    "category": "Mod",
+    "name": "Senior Mod Executive",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 549,
+    "category": "Mod",
+    "name": "Senior Mod Unit",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 550,
+    "category": "Mod",
+    "name": "Senior Mod Watch",
+    "color": "#E74C3C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 551,
+    "category": "Mod",
+    "name": "Senior Mod Shield",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 552,
+    "category": "Mod",
+    "name": "Senior Mod Core",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 553,
+    "category": "Mod",
+    "name": "Senior Mod Desk",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 554,
+    "category": "Mod",
+    "name": "Senior Mod Force",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 555,
+    "category": "Mod",
+    "name": "Senior Mod Branch",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 556,
+    "category": "Mod",
+    "name": "Senior Mod Authority",
+    "color": "#B71540",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 557,
+    "category": "Mod",
+    "name": "Senior Mod Order",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 558,
+    "category": "Mod",
+    "name": "Senior Mod Team",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 559,
+    "category": "Mod",
+    "name": "Senior Mod Staff",
+    "color": "#E55039",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 560,
+    "category": "Mod",
+    "name": "Senior Mod Division",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 561,
+    "category": "Mod",
+    "name": "Lead Mod Command",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 562,
+    "category": "Mod",
+    "name": "Lead Mod Security",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 563,
+    "category": "Mod",
+    "name": "Lead Mod Operations",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 564,
+    "category": "Mod",
+    "name": "Lead Mod Squad",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 565,
+    "category": "Mod",
+    "name": "Lead Mod Bureau",
+    "color": "#FA983A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 566,
+    "category": "Mod",
+    "name": "Lead Mod Council",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 567,
+    "category": "Mod",
+    "name": "Lead Mod Executive",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 568,
+    "category": "Mod",
+    "name": "Lead Mod Unit",
+    "color": "#CD6155",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 569,
+    "category": "Mod",
+    "name": "Lead Mod Watch",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 570,
+    "category": "Mod",
+    "name": "Lead Mod Shield",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 571,
+    "category": "Mod",
+    "name": "Lead Mod Core",
+    "color": "#D35400",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 572,
+    "category": "Mod",
+    "name": "Lead Mod Desk",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 573,
+    "category": "Mod",
+    "name": "Lead Mod Force",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 574,
+    "category": "Mod",
+    "name": "Lead Mod Branch",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 575,
+    "category": "Mod",
+    "name": "Lead Mod Authority",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 576,
+    "category": "Mod",
+    "name": "Lead Mod Order",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 577,
+    "category": "Mod",
+    "name": "Lead Mod Team",
+    "color": "#FA983A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 578,
+    "category": "Mod",
+    "name": "Lead Mod Staff",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 579,
+    "category": "Mod",
+    "name": "Lead Mod Division",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 580,
+    "category": "Mod",
+    "name": "Lead Mod Corps",
+    "color": "#CD6155",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 581,
+    "category": "Mod",
+    "name": "Staff Security",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 582,
+    "category": "Mod",
+    "name": "Staff Operations",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 583,
+    "category": "Mod",
+    "name": "Staff Squad",
+    "color": "#EB2F06",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 584,
+    "category": "Mod",
+    "name": "Staff Bureau",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 585,
+    "category": "Mod",
+    "name": "Staff Council",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 586,
+    "category": "Mod",
+    "name": "Staff Executive",
+    "color": "#B33939",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 587,
+    "category": "Mod",
+    "name": "Staff Unit",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 588,
+    "category": "Mod",
+    "name": "Staff Watch",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 589,
+    "category": "Mod",
+    "name": "Staff Shield",
+    "color": "#C0392B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 590,
+    "category": "Mod",
+    "name": "Staff Core",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 591,
+    "category": "Mod",
+    "name": "Staff Desk",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 592,
+    "category": "Mod",
+    "name": "Staff Force",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 593,
+    "category": "Mod",
+    "name": "Staff Branch",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 594,
+    "category": "Mod",
+    "name": "Staff Authority",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 595,
+    "category": "Mod",
+    "name": "Staff Order",
+    "color": "#EB2F06",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 596,
+    "category": "Mod",
+    "name": "Staff Team",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 597,
+    "category": "Mod",
+    "name": "Staff Staff",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 598,
+    "category": "Mod",
+    "name": "Staff Division",
+    "color": "#B33939",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 599,
+    "category": "Mod",
+    "name": "Staff Corps",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 600,
+    "category": "Mod",
+    "name": "Staff Command",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 601,
+    "category": "Mod",
+    "name": "Head Staff Operations",
+    "color": "#B71540",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 602,
+    "category": "Mod",
+    "name": "Head Staff Squad",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 603,
+    "category": "Mod",
+    "name": "Head Staff Bureau",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 604,
+    "category": "Mod",
+    "name": "Head Staff Council",
+    "color": "#E55039",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 605,
+    "category": "Mod",
+    "name": "Head Staff Executive",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 606,
+    "category": "Mod",
+    "name": "Head Staff Unit",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 607,
+    "category": "Mod",
+    "name": "Head Staff Watch",
+    "color": "#E74C3C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 608,
+    "category": "Mod",
+    "name": "Head Staff Shield",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 609,
+    "category": "Mod",
+    "name": "Head Staff Core",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 610,
+    "category": "Mod",
+    "name": "Head Staff Desk",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 611,
+    "category": "Mod",
+    "name": "Head Staff Force",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 612,
+    "category": "Mod",
+    "name": "Head Staff Branch",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 613,
+    "category": "Mod",
+    "name": "Head Staff Authority",
+    "color": "#B71540",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 614,
+    "category": "Mod",
+    "name": "Head Staff Order",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 615,
+    "category": "Mod",
+    "name": "Head Staff Team",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 616,
+    "category": "Mod",
+    "name": "Head Staff Staff",
+    "color": "#E55039",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 617,
+    "category": "Mod",
+    "name": "Head Staff Division",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 618,
+    "category": "Mod",
+    "name": "Head Staff Corps",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 619,
+    "category": "Mod",
+    "name": "Head Staff Command",
+    "color": "#E74C3C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 620,
+    "category": "Mod",
+    "name": "Head Staff Security",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 621,
+    "category": "Mod",
+    "name": "Administrator Squad",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 622,
+    "category": "Mod",
+    "name": "Administrator Bureau",
+    "color": "#FA983A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 623,
+    "category": "Mod",
+    "name": "Administrator Council",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 624,
+    "category": "Mod",
+    "name": "Administrator Executive",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 625,
+    "category": "Mod",
+    "name": "Administrator Unit",
+    "color": "#CD6155",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 626,
+    "category": "Mod",
+    "name": "Administrator Watch",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 627,
+    "category": "Mod",
+    "name": "Administrator Shield",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 628,
+    "category": "Mod",
+    "name": "Administrator Core",
+    "color": "#D35400",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 629,
+    "category": "Mod",
+    "name": "Administrator Desk",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 630,
+    "category": "Mod",
+    "name": "Administrator Force",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 631,
+    "category": "Mod",
+    "name": "Administrator Branch",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 632,
+    "category": "Mod",
+    "name": "Administrator Authority",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 633,
+    "category": "Mod",
+    "name": "Administrator Order",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 634,
+    "category": "Mod",
+    "name": "Administrator Team",
+    "color": "#FA983A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 635,
+    "category": "Mod",
+    "name": "Administrator Staff",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 636,
+    "category": "Mod",
+    "name": "Administrator Division",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 637,
+    "category": "Mod",
+    "name": "Administrator Corps",
+    "color": "#CD6155",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 638,
+    "category": "Mod",
+    "name": "Administrator Command",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 639,
+    "category": "Mod",
+    "name": "Administrator Security",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 640,
+    "category": "Mod",
+    "name": "Administrator Operations",
+    "color": "#D35400",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 641,
+    "category": "Mod",
+    "name": "Server Warden Bureau",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 642,
+    "category": "Mod",
+    "name": "Server Warden Council",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 643,
+    "category": "Mod",
+    "name": "Server Warden Executive",
+    "color": "#B33939",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 644,
+    "category": "Mod",
+    "name": "Server Warden Unit",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 645,
+    "category": "Mod",
+    "name": "Server Warden Watch",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 646,
+    "category": "Mod",
+    "name": "Server Warden Shield",
+    "color": "#C0392B",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 647,
+    "category": "Mod",
+    "name": "Server Warden Core",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 648,
+    "category": "Mod",
+    "name": "Server Warden Desk",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 649,
+    "category": "Mod",
+    "name": "Server Warden Force",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 650,
+    "category": "Mod",
+    "name": "Server Warden Branch",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 651,
+    "category": "Mod",
+    "name": "Server Warden Authority",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 652,
+    "category": "Mod",
+    "name": "Server Warden Order",
+    "color": "#EB2F06",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 653,
+    "category": "Mod",
+    "name": "Server Warden Team",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 654,
+    "category": "Mod",
+    "name": "Server Warden Staff",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 655,
+    "category": "Mod",
+    "name": "Server Warden Division",
+    "color": "#B33939",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 656,
+    "category": "Mod",
+    "name": "Server Warden Corps",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 657,
+    "category": "Mod",
+    "name": "Server Warden Command",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 658,
+    "category": "Mod",
+    "name": "Server Warden Security",
+    "color": "#C0392B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 659,
+    "category": "Mod",
+    "name": "Server Warden Operations",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 660,
+    "category": "Mod",
+    "name": "Server Warden Squad",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 661,
+    "category": "Mod",
+    "name": "Overseer Council",
+    "color": "#E55039",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 662,
+    "category": "Mod",
+    "name": "Overseer Executive",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 663,
+    "category": "Mod",
+    "name": "Overseer Unit",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 664,
+    "category": "Mod",
+    "name": "Overseer Watch",
+    "color": "#E74C3C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 665,
+    "category": "Mod",
+    "name": "Overseer Shield",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 666,
+    "category": "Mod",
+    "name": "Overseer Core",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 667,
+    "category": "Mod",
+    "name": "Overseer Desk",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 668,
+    "category": "Mod",
+    "name": "Overseer Force",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 669,
+    "category": "Mod",
+    "name": "Overseer Branch",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 670,
+    "category": "Mod",
+    "name": "Overseer Authority",
+    "color": "#B71540",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 671,
+    "category": "Mod",
+    "name": "Overseer Order",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 672,
+    "category": "Mod",
+    "name": "Overseer Team",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 673,
+    "category": "Mod",
+    "name": "Overseer Staff",
+    "color": "#E55039",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 674,
+    "category": "Mod",
+    "name": "Overseer Division",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 675,
+    "category": "Mod",
+    "name": "Overseer Corps",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 676,
+    "category": "Mod",
+    "name": "Overseer Command",
+    "color": "#E74C3C",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 677,
+    "category": "Mod",
+    "name": "Overseer Security",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 678,
+    "category": "Mod",
+    "name": "Overseer Operations",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 679,
+    "category": "Mod",
+    "name": "Overseer Squad",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 680,
+    "category": "Mod",
+    "name": "Overseer Bureau",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 681,
+    "category": "Mod",
+    "name": "Sentinel Executive",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 682,
+    "category": "Mod",
+    "name": "Sentinel Unit",
+    "color": "#CD6155",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 683,
+    "category": "Mod",
+    "name": "Sentinel Watch",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 684,
+    "category": "Mod",
+    "name": "Sentinel Shield",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 685,
+    "category": "Mod",
+    "name": "Sentinel Core",
+    "color": "#D35400",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 686,
+    "category": "Mod",
+    "name": "Sentinel Desk",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 687,
+    "category": "Mod",
+    "name": "Sentinel Force",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 688,
+    "category": "Mod",
+    "name": "Sentinel Branch",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 689,
+    "category": "Mod",
+    "name": "Sentinel Authority",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 690,
+    "category": "Mod",
+    "name": "Sentinel Order",
+    "color": "#EB2F06",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 691,
+    "category": "Mod",
+    "name": "Sentinel Team",
+    "color": "#FA983A",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 692,
+    "category": "Mod",
+    "name": "Sentinel Staff",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 693,
+    "category": "Mod",
+    "name": "Sentinel Division",
+    "color": "#B33939",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 694,
+    "category": "Mod",
+    "name": "Sentinel Corps",
+    "color": "#CD6155",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 695,
+    "category": "Mod",
+    "name": "Sentinel Command",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 696,
+    "category": "Mod",
+    "name": "Sentinel Security",
+    "color": "#C0392B",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 697,
+    "category": "Mod",
+    "name": "Sentinel Operations",
+    "color": "#D35400",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 698,
+    "category": "Mod",
+    "name": "Sentinel Squad",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 699,
+    "category": "Mod",
+    "name": "Sentinel Bureau",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 700,
+    "category": "Mod",
+    "name": "Sentinel Council",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 701,
+    "category": "Mod",
+    "name": "Guardian Unit",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 702,
+    "category": "Mod",
+    "name": "Guardian Watch",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 703,
+    "category": "Mod",
+    "name": "Guardian Shield",
+    "color": "#C0392B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 704,
+    "category": "Mod",
+    "name": "Guardian Core",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 705,
+    "category": "Mod",
+    "name": "Guardian Desk",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 706,
+    "category": "Mod",
+    "name": "Guardian Force",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 707,
+    "category": "Mod",
+    "name": "Guardian Branch",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 708,
+    "category": "Mod",
+    "name": "Guardian Authority",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 709,
+    "category": "Mod",
+    "name": "Guardian Order",
+    "color": "#EB2F06",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 710,
+    "category": "Mod",
+    "name": "Guardian Team",
+    "color": "#FA983A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 711,
+    "category": "Mod",
+    "name": "Guardian Staff",
+    "color": "#E55039",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 712,
+    "category": "Mod",
+    "name": "Guardian Division",
+    "color": "#B33939",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 713,
+    "category": "Mod",
+    "name": "Guardian Corps",
+    "color": "#CD6155",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 714,
+    "category": "Mod",
+    "name": "Guardian Command",
+    "color": "#E74C3C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 715,
+    "category": "Mod",
+    "name": "Guardian Security",
+    "color": "#C0392B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 716,
+    "category": "Mod",
+    "name": "Guardian Operations",
+    "color": "#D35400",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 717,
+    "category": "Mod",
+    "name": "Guardian Squad",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 718,
+    "category": "Mod",
+    "name": "Guardian Bureau",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 719,
+    "category": "Mod",
+    "name": "Guardian Council",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 720,
+    "category": "Mod",
+    "name": "Guardian Executive",
+    "color": "#B71540",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 721,
+    "category": "Rich/Status",
+    "name": "Whale Tier",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 722,
+    "category": "Rich/Status",
+    "name": "Whale Club",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 723,
+    "category": "Rich/Status",
+    "name": "Whale Royalty",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 724,
+    "category": "Rich/Status",
+    "name": "Whale Society",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 725,
+    "category": "Rich/Status",
+    "name": "Whale Lounge",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 726,
+    "category": "Rich/Status",
+    "name": "Whale Circle",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 727,
+    "category": "Rich/Status",
+    "name": "Whale Syndicate",
+    "color": "#B7950B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 728,
+    "category": "Rich/Status",
+    "name": "Whale Dynasty",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 729,
+    "category": "Rich/Status",
+    "name": "Whale Empire",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 730,
+    "category": "Rich/Status",
+    "name": "Whale Privilege",
+    "color": "#AF7AC5",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 731,
+    "category": "Rich/Status",
+    "name": "Whale Elite",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 732,
+    "category": "Rich/Status",
+    "name": "Whale Lux",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 733,
+    "category": "Rich/Status",
+    "name": "Whale Prestige",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 734,
+    "category": "Rich/Status",
+    "name": "Whale Imperial",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 735,
+    "category": "Rich/Status",
+    "name": "Whale Grand",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 736,
+    "category": "Rich/Status",
+    "name": "Whale Opulence",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 737,
+    "category": "Rich/Status",
+    "name": "Whale Vault",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 738,
+    "category": "Rich/Status",
+    "name": "Whale Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 739,
+    "category": "Rich/Status",
+    "name": "Whale Nobility",
+    "color": "#B7950B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 740,
+    "category": "Rich/Status",
+    "name": "Whale Crown",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 741,
+    "category": "Rich/Status",
+    "name": "Millionaire Club",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 742,
+    "category": "Rich/Status",
+    "name": "Millionaire Royalty",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 743,
+    "category": "Rich/Status",
+    "name": "Millionaire Society",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 744,
+    "category": "Rich/Status",
+    "name": "Millionaire Lounge",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 745,
+    "category": "Rich/Status",
+    "name": "Millionaire Circle",
+    "color": "#D4AC0D",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 746,
+    "category": "Rich/Status",
+    "name": "Millionaire Syndicate",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 747,
+    "category": "Rich/Status",
+    "name": "Millionaire Dynasty",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 748,
+    "category": "Rich/Status",
+    "name": "Millionaire Empire",
+    "color": "#6C3483",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 749,
+    "category": "Rich/Status",
+    "name": "Millionaire Privilege",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 750,
+    "category": "Rich/Status",
+    "name": "Millionaire Elite",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 751,
+    "category": "Rich/Status",
+    "name": "Millionaire Lux",
+    "color": "#FAD02C",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 752,
+    "category": "Rich/Status",
+    "name": "Millionaire Prestige",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 753,
+    "category": "Rich/Status",
+    "name": "Millionaire Imperial",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 754,
+    "category": "Rich/Status",
+    "name": "Millionaire Grand",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 755,
+    "category": "Rich/Status",
+    "name": "Millionaire Opulence",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 756,
+    "category": "Rich/Status",
+    "name": "Millionaire Vault",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 757,
+    "category": "Rich/Status",
+    "name": "Millionaire Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 758,
+    "category": "Rich/Status",
+    "name": "Millionaire Nobility",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 759,
+    "category": "Rich/Status",
+    "name": "Millionaire Crown",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 760,
+    "category": "Rich/Status",
+    "name": "Millionaire Tier",
+    "color": "#6C3483",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 761,
+    "category": "Rich/Status",
+    "name": "Billionaire Royalty",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 762,
+    "category": "Rich/Status",
+    "name": "Billionaire Society",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 763,
+    "category": "Rich/Status",
+    "name": "Billionaire Lounge",
+    "color": "#8E44AD",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 764,
+    "category": "Rich/Status",
+    "name": "Billionaire Circle",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 765,
+    "category": "Rich/Status",
+    "name": "Billionaire Syndicate",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 766,
+    "category": "Rich/Status",
+    "name": "Billionaire Dynasty",
+    "color": "#7D3C98",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 767,
+    "category": "Rich/Status",
+    "name": "Billionaire Empire",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 768,
+    "category": "Rich/Status",
+    "name": "Billionaire Privilege",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 769,
+    "category": "Rich/Status",
+    "name": "Billionaire Elite",
+    "color": "#F7DC6F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 770,
+    "category": "Rich/Status",
+    "name": "Billionaire Lux",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 771,
+    "category": "Rich/Status",
+    "name": "Billionaire Prestige",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 772,
+    "category": "Rich/Status",
+    "name": "Billionaire Imperial",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 773,
+    "category": "Rich/Status",
+    "name": "Billionaire Grand",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 774,
+    "category": "Rich/Status",
+    "name": "Billionaire Opulence",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 775,
+    "category": "Rich/Status",
+    "name": "Billionaire Vault",
+    "color": "#8E44AD",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 776,
+    "category": "Rich/Status",
+    "name": "Billionaire Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 777,
+    "category": "Rich/Status",
+    "name": "Billionaire Nobility",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 778,
+    "category": "Rich/Status",
+    "name": "Billionaire Crown",
+    "color": "#7D3C98",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 779,
+    "category": "Rich/Status",
+    "name": "Billionaire Tier",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 780,
+    "category": "Rich/Status",
+    "name": "Billionaire Club",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 781,
+    "category": "Rich/Status",
+    "name": "Booster Elite Society",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 782,
+    "category": "Rich/Status",
+    "name": "Booster Elite Lounge",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 783,
+    "category": "Rich/Status",
+    "name": "Booster Elite Circle",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 784,
+    "category": "Rich/Status",
+    "name": "Booster Elite Syndicate",
+    "color": "#B7950B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 785,
+    "category": "Rich/Status",
+    "name": "Booster Elite Dynasty",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 786,
+    "category": "Rich/Status",
+    "name": "Booster Elite Empire",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 787,
+    "category": "Rich/Status",
+    "name": "Booster Elite Privilege",
+    "color": "#AF7AC5",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 788,
+    "category": "Rich/Status",
+    "name": "Booster Elite Elite",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 789,
+    "category": "Rich/Status",
+    "name": "Booster Elite Lux",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 790,
+    "category": "Rich/Status",
+    "name": "Booster Elite Prestige",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 791,
+    "category": "Rich/Status",
+    "name": "Booster Elite Imperial",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 792,
+    "category": "Rich/Status",
+    "name": "Booster Elite Grand",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 793,
+    "category": "Rich/Status",
+    "name": "Booster Elite Opulence",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 794,
+    "category": "Rich/Status",
+    "name": "Booster Elite Vault",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 795,
+    "category": "Rich/Status",
+    "name": "Booster Elite Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 796,
+    "category": "Rich/Status",
+    "name": "Booster Elite Nobility",
+    "color": "#B7950B",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 797,
+    "category": "Rich/Status",
+    "name": "Booster Elite Crown",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 798,
+    "category": "Rich/Status",
+    "name": "Booster Elite Tier",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 799,
+    "category": "Rich/Status",
+    "name": "Booster Elite Club",
+    "color": "#AF7AC5",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 800,
+    "category": "Rich/Status",
+    "name": "Booster Elite Royalty",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 801,
+    "category": "Rich/Status",
+    "name": "Booster King Lounge",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 802,
+    "category": "Rich/Status",
+    "name": "Booster King Circle",
+    "color": "#D4AC0D",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 803,
+    "category": "Rich/Status",
+    "name": "Booster King Syndicate",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 804,
+    "category": "Rich/Status",
+    "name": "Booster King Dynasty",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 805,
+    "category": "Rich/Status",
+    "name": "Booster King Empire",
+    "color": "#6C3483",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 806,
+    "category": "Rich/Status",
+    "name": "Booster King Privilege",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 807,
+    "category": "Rich/Status",
+    "name": "Booster King Elite",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 808,
+    "category": "Rich/Status",
+    "name": "Booster King Lux",
+    "color": "#FAD02C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 809,
+    "category": "Rich/Status",
+    "name": "Booster King Prestige",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 810,
+    "category": "Rich/Status",
+    "name": "Booster King Imperial",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 811,
+    "category": "Rich/Status",
+    "name": "Booster King Grand",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 812,
+    "category": "Rich/Status",
+    "name": "Booster King Opulence",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 813,
+    "category": "Rich/Status",
+    "name": "Booster King Vault",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 814,
+    "category": "Rich/Status",
+    "name": "Booster King Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 815,
+    "category": "Rich/Status",
+    "name": "Booster King Nobility",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 816,
+    "category": "Rich/Status",
+    "name": "Booster King Crown",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 817,
+    "category": "Rich/Status",
+    "name": "Booster King Tier",
+    "color": "#6C3483",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 818,
+    "category": "Rich/Status",
+    "name": "Booster King Club",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 819,
+    "category": "Rich/Status",
+    "name": "Booster King Royalty",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 820,
+    "category": "Rich/Status",
+    "name": "Booster King Society",
+    "color": "#FAD02C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 821,
+    "category": "Rich/Status",
+    "name": "Booster Queen Circle",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 822,
+    "category": "Rich/Status",
+    "name": "Booster Queen Syndicate",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 823,
+    "category": "Rich/Status",
+    "name": "Booster Queen Dynasty",
+    "color": "#7D3C98",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 824,
+    "category": "Rich/Status",
+    "name": "Booster Queen Empire",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 825,
+    "category": "Rich/Status",
+    "name": "Booster Queen Privilege",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 826,
+    "category": "Rich/Status",
+    "name": "Booster Queen Elite",
+    "color": "#F7DC6F",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 827,
+    "category": "Rich/Status",
+    "name": "Booster Queen Lux",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 828,
+    "category": "Rich/Status",
+    "name": "Booster Queen Prestige",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 829,
+    "category": "Rich/Status",
+    "name": "Booster Queen Imperial",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 830,
+    "category": "Rich/Status",
+    "name": "Booster Queen Grand",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 831,
+    "category": "Rich/Status",
+    "name": "Booster Queen Opulence",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 832,
+    "category": "Rich/Status",
+    "name": "Booster Queen Vault",
+    "color": "#8E44AD",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 833,
+    "category": "Rich/Status",
+    "name": "Booster Queen Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 834,
+    "category": "Rich/Status",
+    "name": "Booster Queen Nobility",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 835,
+    "category": "Rich/Status",
+    "name": "Booster Queen Crown",
+    "color": "#7D3C98",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 836,
+    "category": "Rich/Status",
+    "name": "Booster Queen Tier",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 837,
+    "category": "Rich/Status",
+    "name": "Booster Queen Club",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 838,
+    "category": "Rich/Status",
+    "name": "Booster Queen Royalty",
+    "color": "#F7DC6F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 839,
+    "category": "Rich/Status",
+    "name": "Booster Queen Society",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 840,
+    "category": "Rich/Status",
+    "name": "Booster Queen Lounge",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 841,
+    "category": "Rich/Status",
+    "name": "Diamond Club Syndicate",
+    "color": "#B7950B",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 842,
+    "category": "Rich/Status",
+    "name": "Diamond Club Dynasty",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 843,
+    "category": "Rich/Status",
+    "name": "Diamond Club Empire",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 844,
+    "category": "Rich/Status",
+    "name": "Diamond Club Privilege",
+    "color": "#AF7AC5",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 845,
+    "category": "Rich/Status",
+    "name": "Diamond Club Elite",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 846,
+    "category": "Rich/Status",
+    "name": "Diamond Club Lux",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 847,
+    "category": "Rich/Status",
+    "name": "Diamond Club Prestige",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 848,
+    "category": "Rich/Status",
+    "name": "Diamond Club Imperial",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 849,
+    "category": "Rich/Status",
+    "name": "Diamond Club Grand",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 850,
+    "category": "Rich/Status",
+    "name": "Diamond Club Opulence",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 851,
+    "category": "Rich/Status",
+    "name": "Diamond Club Vault",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 852,
+    "category": "Rich/Status",
+    "name": "Diamond Club Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 853,
+    "category": "Rich/Status",
+    "name": "Diamond Club Nobility",
+    "color": "#B7950B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 854,
+    "category": "Rich/Status",
+    "name": "Diamond Club Crown",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 855,
+    "category": "Rich/Status",
+    "name": "Diamond Club Tier",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 856,
+    "category": "Rich/Status",
+    "name": "Diamond Club Club",
+    "color": "#AF7AC5",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 857,
+    "category": "Rich/Status",
+    "name": "Diamond Club Royalty",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 858,
+    "category": "Rich/Status",
+    "name": "Diamond Club Society",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 859,
+    "category": "Rich/Status",
+    "name": "Diamond Club Lounge",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 860,
+    "category": "Rich/Status",
+    "name": "Diamond Club Circle",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 861,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Dynasty",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 862,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Empire",
+    "color": "#6C3483",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 863,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Privilege",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 864,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Elite",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 865,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Lux",
+    "color": "#FAD02C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 866,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Prestige",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 867,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Imperial",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 868,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Grand",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 869,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Opulence",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 870,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Vault",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 871,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 872,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Nobility",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 873,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Crown",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 874,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Tier",
+    "color": "#6C3483",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 875,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Club",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 876,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Royalty",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 877,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Society",
+    "color": "#FAD02C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 878,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Lounge",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 879,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Circle",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 880,
+    "category": "Rich/Status",
+    "name": "Obsidian Member Syndicate",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 881,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Empire",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 882,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Privilege",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 883,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Elite",
+    "color": "#F7DC6F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 884,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Lux",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 885,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Prestige",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 886,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Imperial",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 887,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Grand",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 888,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Opulence",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 889,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Vault",
+    "color": "#8E44AD",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 890,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 891,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Nobility",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 892,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Crown",
+    "color": "#7D3C98",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 893,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Tier",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 894,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Club",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 895,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Royalty",
+    "color": "#F7DC6F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 896,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Society",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 897,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Lounge",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 898,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Circle",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 899,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Syndicate",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 900,
+    "category": "Rich/Status",
+    "name": "Emerald VIP Dynasty",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 901,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Privilege",
+    "color": "#AF7AC5",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 902,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Elite",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 903,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Lux",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 904,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Prestige",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 905,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Imperial",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 906,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Grand",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 907,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Opulence",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 908,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Vault",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 909,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 910,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Nobility",
+    "color": "#B7950B",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 911,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Crown",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 912,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Tier",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 913,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Club",
+    "color": "#AF7AC5",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 914,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Royalty",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 915,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Society",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 916,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Lounge",
+    "color": "#F1C40F",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 917,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Circle",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 918,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Syndicate",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 919,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Dynasty",
+    "color": "#9B59B6",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 920,
+    "category": "Rich/Status",
+    "name": "Ruby Royalty Empire",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 921,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Elite",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 922,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Lux",
+    "color": "#FAD02C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 923,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Prestige",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 924,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Imperial",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 925,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Grand",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 926,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Opulence",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 927,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Vault",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 928,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 929,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Nobility",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 930,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Crown",
+    "color": "#7D3C98",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 931,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Tier",
+    "color": "#6C3483",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 932,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Club",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 933,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Royalty",
+    "color": "#F7DC6F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 934,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Society",
+    "color": "#FAD02C",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 935,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Lounge",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 936,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Circle",
+    "color": "#F39C12",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 937,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Syndicate",
+    "color": "#E67E22",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 938,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Dynasty",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 939,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Empire",
+    "color": "#8E44AD",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 940,
+    "category": "Rich/Status",
+    "name": "Platinum Aristocrat Privilege",
+    "color": "#D4AC0D",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 941,
+    "category": "Rich/Status",
+    "name": "Gold Standard Lux",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 942,
+    "category": "Rich/Status",
+    "name": "Gold Standard Prestige",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 943,
+    "category": "Rich/Status",
+    "name": "Gold Standard Imperial",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 944,
+    "category": "Rich/Status",
+    "name": "Gold Standard Grand",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 945,
+    "category": "Rich/Status",
+    "name": "Gold Standard Opulence",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 946,
+    "category": "Rich/Status",
+    "name": "Gold Standard Vault",
+    "color": "#8E44AD",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 947,
+    "category": "Rich/Status",
+    "name": "Gold Standard Sovereignty",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 948,
+    "category": "Rich/Status",
+    "name": "Gold Standard Nobility",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 949,
+    "category": "Rich/Status",
+    "name": "Gold Standard Crown",
+    "color": "#7D3C98",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 950,
+    "category": "Rich/Status",
+    "name": "Gold Standard Tier",
+    "color": "#6C3483",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 951,
+    "category": "Rich/Status",
+    "name": "Gold Standard Club",
+    "color": "#AF7AC5",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 952,
+    "category": "Rich/Status",
+    "name": "Gold Standard Royalty",
+    "color": "#F7DC6F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 953,
+    "category": "Rich/Status",
+    "name": "Gold Standard Society",
+    "color": "#FAD02C",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 954,
+    "category": "Rich/Status",
+    "name": "Gold Standard Lounge",
+    "color": "#F1C40F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 955,
+    "category": "Rich/Status",
+    "name": "Gold Standard Circle",
+    "color": "#F39C12",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 956,
+    "category": "Rich/Status",
+    "name": "Gold Standard Syndicate",
+    "color": "#E67E22",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 957,
+    "category": "Rich/Status",
+    "name": "Gold Standard Dynasty",
+    "color": "#9B59B6",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 958,
+    "category": "Rich/Status",
+    "name": "Gold Standard Empire",
+    "color": "#8E44AD",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 959,
+    "category": "Rich/Status",
+    "name": "Gold Standard Privilege",
+    "color": "#D4AC0D",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 960,
+    "category": "Rich/Status",
+    "name": "Gold Standard Elite",
+    "color": "#B7950B",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 961,
+    "category": "Custom",
+    "name": "Neon Vibe",
+    "color": "#FF007F",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 962,
+    "category": "Custom",
+    "name": "Neon Aura",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 963,
+    "category": "Custom",
+    "name": "Neon Pulse",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 964,
+    "category": "Custom",
+    "name": "Neon Wave",
+    "color": "#FFCC00",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 965,
+    "category": "Custom",
+    "name": "Neon Glow",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 966,
+    "category": "Custom",
+    "name": "Neon Echo",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 967,
+    "category": "Custom",
+    "name": "Neon Shade",
+    "color": "#39FF14",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 968,
+    "category": "Custom",
+    "name": "Neon Drift",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 969,
+    "category": "Custom",
+    "name": "Neon Flux",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 970,
+    "category": "Custom",
+    "name": "Neon Spark",
+    "color": "#BC13FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 971,
+    "category": "Custom",
+    "name": "Neon Phase",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 972,
+    "category": "Custom",
+    "name": "Neon Frequency",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 973,
+    "category": "Custom",
+    "name": "Neon Haze",
+    "color": "#FF007F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 974,
+    "category": "Custom",
+    "name": "Neon Prism",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 975,
+    "category": "Custom",
+    "name": "Neon Mirage",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 976,
+    "category": "Custom",
+    "name": "Neon Horizon",
+    "color": "#FFCC00",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 977,
+    "category": "Custom",
+    "name": "Neon Nebula",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 978,
+    "category": "Custom",
+    "name": "Neon Specter",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 979,
+    "category": "Custom",
+    "name": "Neon Matrix",
+    "color": "#39FF14",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 980,
+    "category": "Custom",
+    "name": "Neon Chroma",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 981,
+    "category": "Custom",
+    "name": "Cyberpunk Aura",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 982,
+    "category": "Custom",
+    "name": "Cyberpunk Pulse",
+    "color": "#00FFCC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 983,
+    "category": "Custom",
+    "name": "Cyberpunk Wave",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 984,
+    "category": "Custom",
+    "name": "Cyberpunk Glow",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 985,
+    "category": "Custom",
+    "name": "Cyberpunk Echo",
+    "color": "#00FFFF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 986,
+    "category": "Custom",
+    "name": "Cyberpunk Shade",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 987,
+    "category": "Custom",
+    "name": "Cyberpunk Drift",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 988,
+    "category": "Custom",
+    "name": "Cyberpunk Flux",
+    "color": "#FE019A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 989,
+    "category": "Custom",
+    "name": "Cyberpunk Spark",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 990,
+    "category": "Custom",
+    "name": "Cyberpunk Phase",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 991,
+    "category": "Custom",
+    "name": "Cyberpunk Frequency",
+    "color": "#FF355E",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 992,
+    "category": "Custom",
+    "name": "Cyberpunk Haze",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 993,
+    "category": "Custom",
+    "name": "Cyberpunk Prism",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 994,
+    "category": "Custom",
+    "name": "Cyberpunk Mirage",
+    "color": "#00FFCC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 995,
+    "category": "Custom",
+    "name": "Cyberpunk Horizon",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 996,
+    "category": "Custom",
+    "name": "Cyberpunk Nebula",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 997,
+    "category": "Custom",
+    "name": "Cyberpunk Specter",
+    "color": "#00FFFF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 998,
+    "category": "Custom",
+    "name": "Cyberpunk Matrix",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 999,
+    "category": "Custom",
+    "name": "Cyberpunk Chroma",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1000,
+    "category": "Custom",
+    "name": "Cyberpunk Vibe",
+    "color": "#FE019A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1001,
+    "category": "Custom",
+    "name": "Monochrome Pulse",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1002,
+    "category": "Custom",
+    "name": "Monochrome Wave",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1003,
+    "category": "Custom",
+    "name": "Monochrome Glow",
+    "color": "#FF1493",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1004,
+    "category": "Custom",
+    "name": "Monochrome Echo",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1005,
+    "category": "Custom",
+    "name": "Monochrome Shade",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1006,
+    "category": "Custom",
+    "name": "Monochrome Drift",
+    "color": "#FF073A",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1007,
+    "category": "Custom",
+    "name": "Monochrome Flux",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1008,
+    "category": "Custom",
+    "name": "Monochrome Spark",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1009,
+    "category": "Custom",
+    "name": "Monochrome Phase",
+    "color": "#0FF0FC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1010,
+    "category": "Custom",
+    "name": "Monochrome Frequency",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1011,
+    "category": "Custom",
+    "name": "Monochrome Haze",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1012,
+    "category": "Custom",
+    "name": "Monochrome Prism",
+    "color": "#7F00FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1013,
+    "category": "Custom",
+    "name": "Monochrome Mirage",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1014,
+    "category": "Custom",
+    "name": "Monochrome Horizon",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1015,
+    "category": "Custom",
+    "name": "Monochrome Nebula",
+    "color": "#FF1493",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1016,
+    "category": "Custom",
+    "name": "Monochrome Specter",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1017,
+    "category": "Custom",
+    "name": "Monochrome Matrix",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1018,
+    "category": "Custom",
+    "name": "Monochrome Chroma",
+    "color": "#FF073A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1019,
+    "category": "Custom",
+    "name": "Monochrome Vibe",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1020,
+    "category": "Custom",
+    "name": "Monochrome Aura",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1021,
+    "category": "Custom",
+    "name": "Pastel Wave",
+    "color": "#FFCC00",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1022,
+    "category": "Custom",
+    "name": "Pastel Glow",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1023,
+    "category": "Custom",
+    "name": "Pastel Echo",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1024,
+    "category": "Custom",
+    "name": "Pastel Shade",
+    "color": "#39FF14",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1025,
+    "category": "Custom",
+    "name": "Pastel Drift",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1026,
+    "category": "Custom",
+    "name": "Pastel Flux",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1027,
+    "category": "Custom",
+    "name": "Pastel Spark",
+    "color": "#BC13FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1028,
+    "category": "Custom",
+    "name": "Pastel Phase",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1029,
+    "category": "Custom",
+    "name": "Pastel Frequency",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1030,
+    "category": "Custom",
+    "name": "Pastel Haze",
+    "color": "#FF007F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1031,
+    "category": "Custom",
+    "name": "Pastel Prism",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1032,
+    "category": "Custom",
+    "name": "Pastel Mirage",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1033,
+    "category": "Custom",
+    "name": "Pastel Horizon",
+    "color": "#FFCC00",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1034,
+    "category": "Custom",
+    "name": "Pastel Nebula",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1035,
+    "category": "Custom",
+    "name": "Pastel Specter",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1036,
+    "category": "Custom",
+    "name": "Pastel Matrix",
+    "color": "#39FF14",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1037,
+    "category": "Custom",
+    "name": "Pastel Chroma",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1038,
+    "category": "Custom",
+    "name": "Pastel Vibe",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1039,
+    "category": "Custom",
+    "name": "Pastel Aura",
+    "color": "#BC13FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1040,
+    "category": "Custom",
+    "name": "Pastel Pulse",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1041,
+    "category": "Custom",
+    "name": "Glitch Glow",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1042,
+    "category": "Custom",
+    "name": "Glitch Echo",
+    "color": "#00FFFF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1043,
+    "category": "Custom",
+    "name": "Glitch Shade",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1044,
+    "category": "Custom",
+    "name": "Glitch Drift",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1045,
+    "category": "Custom",
+    "name": "Glitch Flux",
+    "color": "#FE019A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1046,
+    "category": "Custom",
+    "name": "Glitch Spark",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1047,
+    "category": "Custom",
+    "name": "Glitch Phase",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1048,
+    "category": "Custom",
+    "name": "Glitch Frequency",
+    "color": "#FF355E",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1049,
+    "category": "Custom",
+    "name": "Glitch Haze",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1050,
+    "category": "Custom",
+    "name": "Glitch Prism",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1051,
+    "category": "Custom",
+    "name": "Glitch Mirage",
+    "color": "#00FFCC",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1052,
+    "category": "Custom",
+    "name": "Glitch Horizon",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1053,
+    "category": "Custom",
+    "name": "Glitch Nebula",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1054,
+    "category": "Custom",
+    "name": "Glitch Specter",
+    "color": "#00FFFF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1055,
+    "category": "Custom",
+    "name": "Glitch Matrix",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1056,
+    "category": "Custom",
+    "name": "Glitch Chroma",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1057,
+    "category": "Custom",
+    "name": "Glitch Vibe",
+    "color": "#FE019A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1058,
+    "category": "Custom",
+    "name": "Glitch Aura",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1059,
+    "category": "Custom",
+    "name": "Glitch Pulse",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1060,
+    "category": "Custom",
+    "name": "Glitch Wave",
+    "color": "#FF355E",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1061,
+    "category": "Custom",
+    "name": "Retro Echo",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1062,
+    "category": "Custom",
+    "name": "Retro Shade",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1063,
+    "category": "Custom",
+    "name": "Retro Drift",
+    "color": "#FF073A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1064,
+    "category": "Custom",
+    "name": "Retro Flux",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1065,
+    "category": "Custom",
+    "name": "Retro Spark",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1066,
+    "category": "Custom",
+    "name": "Retro Phase",
+    "color": "#0FF0FC",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1067,
+    "category": "Custom",
+    "name": "Retro Frequency",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1068,
+    "category": "Custom",
+    "name": "Retro Haze",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1069,
+    "category": "Custom",
+    "name": "Retro Prism",
+    "color": "#7F00FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1070,
+    "category": "Custom",
+    "name": "Retro Mirage",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1071,
+    "category": "Custom",
+    "name": "Retro Horizon",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1072,
+    "category": "Custom",
+    "name": "Retro Nebula",
+    "color": "#FF1493",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1073,
+    "category": "Custom",
+    "name": "Retro Specter",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1074,
+    "category": "Custom",
+    "name": "Retro Matrix",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1075,
+    "category": "Custom",
+    "name": "Retro Chroma",
+    "color": "#FF073A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1076,
+    "category": "Custom",
+    "name": "Retro Vibe",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1077,
+    "category": "Custom",
+    "name": "Retro Aura",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1078,
+    "category": "Custom",
+    "name": "Retro Pulse",
+    "color": "#0FF0FC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1079,
+    "category": "Custom",
+    "name": "Retro Wave",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1080,
+    "category": "Custom",
+    "name": "Retro Glow",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1081,
+    "category": "Custom",
+    "name": "Synthwave Shade",
+    "color": "#39FF14",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1082,
+    "category": "Custom",
+    "name": "Synthwave Drift",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1083,
+    "category": "Custom",
+    "name": "Synthwave Flux",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1084,
+    "category": "Custom",
+    "name": "Synthwave Spark",
+    "color": "#BC13FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1085,
+    "category": "Custom",
+    "name": "Synthwave Phase",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1086,
+    "category": "Custom",
+    "name": "Synthwave Frequency",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1087,
+    "category": "Custom",
+    "name": "Synthwave Haze",
+    "color": "#FF007F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1088,
+    "category": "Custom",
+    "name": "Synthwave Prism",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1089,
+    "category": "Custom",
+    "name": "Synthwave Mirage",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1090,
+    "category": "Custom",
+    "name": "Synthwave Horizon",
+    "color": "#FFCC00",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1091,
+    "category": "Custom",
+    "name": "Synthwave Nebula",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1092,
+    "category": "Custom",
+    "name": "Synthwave Specter",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1093,
+    "category": "Custom",
+    "name": "Synthwave Matrix",
+    "color": "#39FF14",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1094,
+    "category": "Custom",
+    "name": "Synthwave Chroma",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1095,
+    "category": "Custom",
+    "name": "Synthwave Vibe",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1096,
+    "category": "Custom",
+    "name": "Synthwave Aura",
+    "color": "#BC13FE",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1097,
+    "category": "Custom",
+    "name": "Synthwave Pulse",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1098,
+    "category": "Custom",
+    "name": "Synthwave Wave",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1099,
+    "category": "Custom",
+    "name": "Synthwave Glow",
+    "color": "#FF007F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1100,
+    "category": "Custom",
+    "name": "Synthwave Echo",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1101,
+    "category": "Custom",
+    "name": "Vaporwave Drift",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1102,
+    "category": "Custom",
+    "name": "Vaporwave Flux",
+    "color": "#FE019A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1103,
+    "category": "Custom",
+    "name": "Vaporwave Spark",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1104,
+    "category": "Custom",
+    "name": "Vaporwave Phase",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1105,
+    "category": "Custom",
+    "name": "Vaporwave Frequency",
+    "color": "#FF355E",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1106,
+    "category": "Custom",
+    "name": "Vaporwave Haze",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1107,
+    "category": "Custom",
+    "name": "Vaporwave Prism",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1108,
+    "category": "Custom",
+    "name": "Vaporwave Mirage",
+    "color": "#00FFCC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1109,
+    "category": "Custom",
+    "name": "Vaporwave Horizon",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1110,
+    "category": "Custom",
+    "name": "Vaporwave Nebula",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1111,
+    "category": "Custom",
+    "name": "Vaporwave Specter",
+    "color": "#00FFFF",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1112,
+    "category": "Custom",
+    "name": "Vaporwave Matrix",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1113,
+    "category": "Custom",
+    "name": "Vaporwave Chroma",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1114,
+    "category": "Custom",
+    "name": "Vaporwave Vibe",
+    "color": "#FE019A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1115,
+    "category": "Custom",
+    "name": "Vaporwave Aura",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1116,
+    "category": "Custom",
+    "name": "Vaporwave Pulse",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1117,
+    "category": "Custom",
+    "name": "Vaporwave Wave",
+    "color": "#FF355E",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1118,
+    "category": "Custom",
+    "name": "Vaporwave Glow",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1119,
+    "category": "Custom",
+    "name": "Vaporwave Echo",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1120,
+    "category": "Custom",
+    "name": "Vaporwave Shade",
+    "color": "#00FFCC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1121,
+    "category": "Custom",
+    "name": "Midnight Flux",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1122,
+    "category": "Custom",
+    "name": "Midnight Spark",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1123,
+    "category": "Custom",
+    "name": "Midnight Phase",
+    "color": "#0FF0FC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1124,
+    "category": "Custom",
+    "name": "Midnight Frequency",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1125,
+    "category": "Custom",
+    "name": "Midnight Haze",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1126,
+    "category": "Custom",
+    "name": "Midnight Prism",
+    "color": "#7F00FF",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1127,
+    "category": "Custom",
+    "name": "Midnight Mirage",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1128,
+    "category": "Custom",
+    "name": "Midnight Horizon",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1129,
+    "category": "Custom",
+    "name": "Midnight Nebula",
+    "color": "#FF1493",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1130,
+    "category": "Custom",
+    "name": "Midnight Specter",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1131,
+    "category": "Custom",
+    "name": "Midnight Matrix",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1132,
+    "category": "Custom",
+    "name": "Midnight Chroma",
+    "color": "#FF073A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1133,
+    "category": "Custom",
+    "name": "Midnight Vibe",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1134,
+    "category": "Custom",
+    "name": "Midnight Aura",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1135,
+    "category": "Custom",
+    "name": "Midnight Pulse",
+    "color": "#0FF0FC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1136,
+    "category": "Custom",
+    "name": "Midnight Wave",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1137,
+    "category": "Custom",
+    "name": "Midnight Glow",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1138,
+    "category": "Custom",
+    "name": "Midnight Echo",
+    "color": "#7F00FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1139,
+    "category": "Custom",
+    "name": "Midnight Shade",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1140,
+    "category": "Custom",
+    "name": "Midnight Drift",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1141,
+    "category": "Custom",
+    "name": "Solar Spark",
+    "color": "#BC13FE",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1142,
+    "category": "Custom",
+    "name": "Solar Phase",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1143,
+    "category": "Custom",
+    "name": "Solar Frequency",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1144,
+    "category": "Custom",
+    "name": "Solar Haze",
+    "color": "#FF007F",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1145,
+    "category": "Custom",
+    "name": "Solar Prism",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1146,
+    "category": "Custom",
+    "name": "Solar Mirage",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1147,
+    "category": "Custom",
+    "name": "Solar Horizon",
+    "color": "#FFCC00",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1148,
+    "category": "Custom",
+    "name": "Solar Nebula",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1149,
+    "category": "Custom",
+    "name": "Solar Specter",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1150,
+    "category": "Custom",
+    "name": "Solar Matrix",
+    "color": "#39FF14",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1151,
+    "category": "Custom",
+    "name": "Solar Chroma",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1152,
+    "category": "Custom",
+    "name": "Solar Vibe",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1153,
+    "category": "Custom",
+    "name": "Solar Aura",
+    "color": "#BC13FE",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1154,
+    "category": "Custom",
+    "name": "Solar Pulse",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1155,
+    "category": "Custom",
+    "name": "Solar Wave",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1156,
+    "category": "Custom",
+    "name": "Solar Glow",
+    "color": "#FF007F",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1157,
+    "category": "Custom",
+    "name": "Solar Echo",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1158,
+    "category": "Custom",
+    "name": "Solar Shade",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1159,
+    "category": "Custom",
+    "name": "Solar Drift",
+    "color": "#FFCC00",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1160,
+    "category": "Custom",
+    "name": "Solar Flux",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1161,
+    "category": "Custom",
+    "name": "Lunar Phase",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1162,
+    "category": "Custom",
+    "name": "Lunar Frequency",
+    "color": "#FF355E",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1163,
+    "category": "Custom",
+    "name": "Lunar Haze",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1164,
+    "category": "Custom",
+    "name": "Lunar Prism",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1165,
+    "category": "Custom",
+    "name": "Lunar Mirage",
+    "color": "#00FFCC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1166,
+    "category": "Custom",
+    "name": "Lunar Horizon",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1167,
+    "category": "Custom",
+    "name": "Lunar Nebula",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1168,
+    "category": "Custom",
+    "name": "Lunar Specter",
+    "color": "#00FFFF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1169,
+    "category": "Custom",
+    "name": "Lunar Matrix",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1170,
+    "category": "Custom",
+    "name": "Lunar Chroma",
+    "color": "#FF073A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1171,
+    "category": "Custom",
+    "name": "Lunar Vibe",
+    "color": "#FE019A",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1172,
+    "category": "Custom",
+    "name": "Lunar Aura",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1173,
+    "category": "Custom",
+    "name": "Lunar Pulse",
+    "color": "#0FF0FC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1174,
+    "category": "Custom",
+    "name": "Lunar Wave",
+    "color": "#FF355E",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1175,
+    "category": "Custom",
+    "name": "Lunar Glow",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1176,
+    "category": "Custom",
+    "name": "Lunar Echo",
+    "color": "#7F00FF",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1177,
+    "category": "Custom",
+    "name": "Lunar Shade",
+    "color": "#00FFCC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1178,
+    "category": "Custom",
+    "name": "Lunar Drift",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1179,
+    "category": "Custom",
+    "name": "Lunar Flux",
+    "color": "#FF1493",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1180,
+    "category": "Custom",
+    "name": "Lunar Spark",
+    "color": "#00FFFF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1181,
+    "category": "Custom",
+    "name": "Cosmic Frequency",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1182,
+    "category": "Custom",
+    "name": "Cosmic Haze",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1183,
+    "category": "Custom",
+    "name": "Cosmic Prism",
+    "color": "#7F00FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1184,
+    "category": "Custom",
+    "name": "Cosmic Mirage",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1185,
+    "category": "Custom",
+    "name": "Cosmic Horizon",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1186,
+    "category": "Custom",
+    "name": "Cosmic Nebula",
+    "color": "#FF1493",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
+    "id": 1187,
+    "category": "Custom",
+    "name": "Cosmic Specter",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1188,
+    "category": "Custom",
+    "name": "Cosmic Matrix",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1189,
+    "category": "Custom",
+    "name": "Cosmic Chroma",
+    "color": "#FF073A",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1190,
+    "category": "Custom",
+    "name": "Cosmic Vibe",
+    "color": "#FE019A",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1191,
+    "category": "Custom",
+    "name": "Cosmic Aura",
+    "color": "#BC13FE",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1192,
+    "category": "Custom",
+    "name": "Cosmic Pulse",
+    "color": "#0FF0FC",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1193,
+    "category": "Custom",
+    "name": "Cosmic Wave",
+    "color": "#FF355E",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1194,
+    "category": "Custom",
+    "name": "Cosmic Glow",
+    "color": "#FF007F",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1195,
+    "category": "Custom",
+    "name": "Cosmic Echo",
+    "color": "#7F00FF",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1196,
+    "category": "Custom",
+    "name": "Cosmic Shade",
+    "color": "#00FFCC",
+    "hoist": false,
+    "mentionable": true
+  },
+  {
+    "id": 1197,
+    "category": "Custom",
+    "name": "Cosmic Drift",
+    "color": "#FFCC00",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1198,
+    "category": "Custom",
+    "name": "Cosmic Flux",
+    "color": "#FF1493",
+    "hoist": true,
+    "mentionable": false
+  },
+  {
+    "id": 1199,
+    "category": "Custom",
+    "name": "Cosmic Spark",
+    "color": "#00FFFF",
+    "hoist": false,
+    "mentionable": false
+  },
+  {
+    "id": 1200,
+    "category": "Custom",
+    "name": "Cosmic Phase",
+    "color": "#39FF14",
+    "hoist": false,
+    "mentionable": false
+  }
+]
