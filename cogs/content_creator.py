@@ -71,8 +71,17 @@ def save_tier_requirements(data: Dict[str, Any]):
     with open(CC_REQ_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
+import re
+
 class CCTicketReviewView(discord.ui.View):
-    def __init__(self, applicant_id: int, platform: str, profile_url: str, video_url: str, requested_tier: str):
+    def __init__(
+        self,
+        applicant_id: Optional[int] = None,
+        platform: Optional[str] = None,
+        profile_url: Optional[str] = None,
+        video_url: Optional[str] = None,
+        requested_tier: Optional[str] = None
+    ):
         super().__init__(timeout=None)
         self.applicant_id = applicant_id
         self.platform = platform
@@ -80,17 +89,52 @@ class CCTicketReviewView(discord.ui.View):
         self.video_url = video_url
         self.requested_tier = requested_tier
 
+    def _extract_info_from_message(self, message: discord.Message):
+        """Extracts applicant ID, tier, and platform directly from the embed message on bot reboots."""
+        if not message or not message.embeds:
+            return
+        embed = message.embeds[0]
+        desc = embed.description or ""
+
+        # Extract Applicant User ID
+        id_match = re.search(r"`(\d{15,22})`", desc)
+        if id_match:
+            self.applicant_id = int(id_match.group(1))
+
+        # Extract Platform
+        plat_match = re.search(r"Platform:\*\* `([^`]+)`", desc, re.IGNORECASE)
+        if plat_match:
+            self.platform = plat_match.group(1)
+        elif not self.platform:
+            self.platform = "Creator"
+
+        # Extract Tier
+        tier_match = re.search(r"Requested Tier:\*\* `([^`]+)`", desc, re.IGNORECASE)
+        if tier_match:
+            self.requested_tier = tier_match.group(1)
+        elif embed.title and " - " in embed.title:
+            self.requested_tier = embed.title.split(" - ")[-1].strip()
+        elif not self.requested_tier:
+            self.requested_tier = "CC"
+
     @discord.ui.button(label="Accept & Assign Role", style=discord.ButtonStyle.success, custom_id="cc_accept_btn")
     async def accept_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not self.applicant_id:
+            self._extract_info_from_message(interaction.message)
+
+        if not self.applicant_id:
+            return await interaction.response.send_message("Could not resolve applicant ID from this ticket.", ephemeral=True)
+
         guild = interaction.guild
         member = guild.get_member(self.applicant_id)
+        requested_tier = self.requested_tier or "CC"
 
-        target_role = discord.utils.get(guild.roles, name=self.requested_tier)
+        target_role = discord.utils.get(guild.roles, name=requested_tier)
         if not target_role:
             try:
-                target_role = await guild.create_role(name=self.requested_tier, color=discord.Color(0x8B5CF6), reason="Ego CC Tier")
+                target_role = await guild.create_role(name=requested_tier, color=discord.Color(0x8B5CF6), reason="Ego CC Tier")
             except Exception as e:
-                return await interaction.response.send_message(f"Failed to find or create role `{self.requested_tier}`: {e}", ephemeral=True)
+                return await interaction.response.send_message(f"Failed to find or create role `{requested_tier}`: {e}", ephemeral=True)
 
         if member:
             try:
@@ -98,7 +142,7 @@ class CCTicketReviewView(discord.ui.View):
                 try:
                     dm_embed = success_embed(
                         "Creator Verification Approved",
-                        f"Your **{self.platform.title()}** Creator Application for **{guild.name}** has been approved.\n"
+                        f"Your **{(self.platform or 'Creator').title()}** Creator Application for **{guild.name}** has been approved.\n"
                         f"› **Assigned Role:** `{target_role.name}`"
                     )
                     await member.send(embed=dm_embed)
@@ -110,24 +154,28 @@ class CCTicketReviewView(discord.ui.View):
         for item in self.children:
             item.disabled = True
 
-        embed = interaction.message.embeds[0]
-        embed.color = COLOR_EMERALD
-        embed.title = f"Creator Verification Approved - {self.requested_tier}"
-        embed.add_field(name="› Reviewed By", value=interaction.user.mention, inline=True)
+        if interaction.message.embeds:
+            embed = interaction.message.embeds[0]
+            embed.color = COLOR_EMERALD
+            embed.title = f"Creator Verification Approved - {requested_tier}"
+            embed.add_field(name="› Reviewed By", value=interaction.user.mention, inline=True)
+            await interaction.message.edit(embed=embed, view=self)
 
-        await interaction.message.edit(embed=embed, view=self)
-        await interaction.response.send_message(f"Approved {member.mention if member else f'<@{self.applicant_id}>'} as **{self.requested_tier}**.", ephemeral=True)
+        await interaction.response.send_message(f"Approved {member.mention if member else f'<@{self.applicant_id}>'} as **{requested_tier}**.", ephemeral=True)
 
     @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger, custom_id="cc_decline_btn")
     async def decline_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not self.applicant_id:
+            self._extract_info_from_message(interaction.message)
+
         guild = interaction.guild
-        member = guild.get_member(self.applicant_id)
+        member = guild.get_member(self.applicant_id) if self.applicant_id else None
 
         if member:
             try:
                 dm_embed = error_embed(
                     "Creator Application Declined",
-                    f"Your **{self.platform.title()}** verification request for **{guild.name}** was reviewed and declined at this time.",
+                    f"Your **{(self.platform or 'Creator').title()}** verification request for **{guild.name}** was reviewed and declined at this time.",
                     tip="Make sure your profile and video links are public and active."
                 )
                 await member.send(embed=dm_embed)
@@ -137,13 +185,15 @@ class CCTicketReviewView(discord.ui.View):
         for item in self.children:
             item.disabled = True
 
-        embed = interaction.message.embeds[0]
-        embed.color = COLOR_CRIMSON
-        embed.title = "Creator Verification Declined"
-        embed.add_field(name="› Reviewed By", value=interaction.user.mention, inline=True)
+        if interaction.message.embeds:
+            embed = interaction.message.embeds[0]
+            embed.color = COLOR_CRIMSON
+            embed.title = "Creator Verification Declined"
+            embed.add_field(name="› Reviewed By", value=interaction.user.mention, inline=True)
+            await interaction.message.edit(embed=embed, view=self)
 
-        await interaction.message.edit(embed=embed, view=self)
         await interaction.response.send_message(f"Declined application for <@{self.applicant_id}>.", ephemeral=True)
+
 
 class CCVerificationModal(discord.ui.Modal, title="Content Creator Verification"):
     def __init__(self, platform: str, tier: str):
