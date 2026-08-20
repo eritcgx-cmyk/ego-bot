@@ -353,7 +353,12 @@ class FaceVerificationLaunchView(discord.ui.View):
         vanity_phrase = cfg.get("vanity_phrase") or getattr(guild, "vanity_url_code", None) or f"discord.gg/{guild.name.lower().replace(' ', '')}"
 
         modal = FaceVerifySubmitModal(vanity_phrase=vanity_phrase)
-        await interaction.response.send_modal(modal)
+        try:
+            await interaction.response.send_modal(modal)
+        except (discord.NotFound, discord.InteractionResponded):
+            pass
+        except Exception as e:
+            logger.debug(f"Modal dispatch error: {e}")
 
 
 class IdentityVerifyCog(commands.Cog, name="IdentityVerify"):
