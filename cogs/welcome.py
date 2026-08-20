@@ -336,6 +336,25 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             cfg.dm_message = dm_message
             await session.commit()
 
+        try:
+            from utils.state_manager import update_guild_state_section
+            update_guild_state_section(interaction.guild_id, "welcome", {
+                "enabled": True,
+                "channel_id": channel.id,
+                "title": title,
+                "message": message,
+                "embed_color": embed_color,
+                "dm_enabled": dm_enabled or False,
+                "dm_message": dm_message,
+                "leave_enabled": getattr(cfg, "leave_enabled", True),
+                "leave_channel_id": getattr(cfg, "leave_channel_id", channel.id),
+                "leave_title": getattr(cfg, "leave_title", None),
+                "leave_message": getattr(cfg, "leave_message", None),
+                "leave_color": getattr(cfg, "leave_color", None)
+            })
+        except Exception:
+            pass
+
         sample_embed = self._build_welcome_embed(
             interaction.user,
             title or WELCOME_PRESETS["standard"]["title"],
@@ -346,7 +365,7 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         )
 
         await interaction.response.send_message(
-            content="✅ **Welcome System Configured!** Live preview with Server Banner:",
+            content="✅ **Welcome System Configured & Saved!** Live preview with Server Banner:",
             embed=sample_embed
         )
 
@@ -387,6 +406,23 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             cfg.leave_message = message or LEAVE_PRESETS["standard"]["message"]
             cfg.leave_color = embed_color
             await session.commit()
+
+        try:
+            from utils.state_manager import update_guild_state_section
+            update_guild_state_section(interaction.guild_id, "welcome", {
+                "enabled": getattr(cfg, "enabled", True),
+                "channel_id": getattr(cfg, "channel_id", channel.id),
+                "title": getattr(cfg, "title", None),
+                "message": getattr(cfg, "message", None),
+                "embed_color": getattr(cfg, "embed_color", 0x8B5CF6),
+                "leave_enabled": enabled if enabled is not None else True,
+                "leave_channel_id": channel.id,
+                "leave_title": title or LEAVE_PRESETS["standard"]["title"],
+                "leave_message": message or LEAVE_PRESETS["standard"]["message"],
+                "leave_color": embed_color
+            })
+        except Exception:
+            pass
 
         sample_embed = self._build_leave_embed(
             interaction.user,
