@@ -211,6 +211,44 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         )
         return embed
 
+    def _get_target_welcome_channel(self, guild: discord.Guild, configured_id: Optional[int]) -> Optional[discord.TextChannel]:
+        """Resolves the best welcome text channel with automatic name fallback."""
+        if configured_id and configured_id != guild.id:
+            ch = guild.get_channel(configured_id)
+            if ch and isinstance(ch, discord.TextChannel):
+                return ch
+
+        for name in ["welc", "welcome", "joins", "arrivals", "gen", "general"]:
+            found = discord.utils.find(lambda c: c.name.lower() == name and isinstance(c, discord.TextChannel), guild.channels)
+            if found:
+                return found
+
+        if guild.system_channel:
+            return guild.system_channel
+        for ch in guild.text_channels:
+            if ch.permissions_for(guild.me).send_messages:
+                return ch
+        return None
+
+    def _get_target_leave_channel(self, guild: discord.Guild, configured_id: Optional[int]) -> Optional[discord.TextChannel]:
+        """Resolves the best leave/goodbye text channel with automatic name fallback."""
+        if configured_id and configured_id != guild.id:
+            ch = guild.get_channel(configured_id)
+            if ch and isinstance(ch, discord.TextChannel):
+                return ch
+
+        for name in ["welc", "welcome", "leave", "goodbye", "gen", "general"]:
+            found = discord.utils.find(lambda c: c.name.lower() == name and isinstance(c, discord.TextChannel), guild.channels)
+            if found:
+                return found
+
+        if guild.system_channel:
+            return guild.system_channel
+        for ch in guild.text_channels:
+            if ch.permissions_for(guild.me).send_messages:
+                return ch
+        return None
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         if member.bot:
@@ -235,18 +273,17 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             inviter, invites_count = await self._resolve_inviter_info(member)
 
             # Guild Channel Welcome Message
-            if cfg.channel_id:
-                channel = member.guild.get_channel(cfg.channel_id)
-                if channel and isinstance(channel, discord.TextChannel):
-                    try:
-                        title_tmpl = cfg.title or WELCOME_PRESETS["standard"]["title"]
-                        msg_tmpl = cfg.message or WELCOME_PRESETS["standard"]["message"]
-                        color_val = cfg.embed_color or WELCOME_PRESETS["standard"]["color"]
+            target_ch = self._get_target_welcome_channel(member.guild, cfg.channel_id)
+            if target_ch:
+                try:
+                    title_tmpl = cfg.title or WELCOME_PRESETS["standard"]["title"]
+                    msg_tmpl = cfg.message or WELCOME_PRESETS["standard"]["message"]
+                    color_val = cfg.embed_color or WELCOME_PRESETS["standard"]["color"]
 
-                        embed = self._build_welcome_embed(member, title_tmpl, msg_tmpl, color_val, inviter, invites_count)
-                        await channel.send(content=member.mention, embed=embed)
-                    except Exception as e:
-                        logger.error(f"Failed to send welcome message in guild {member.guild.id}: {e}")
+                    embed = self._build_welcome_embed(member, title_tmpl, msg_tmpl, color_val, inviter, invites_count)
+                    await target_ch.send(content=member.mention, embed=embed)
+                except Exception as e:
+                    logger.error(f"Failed to send welcome message in guild {member.guild.id}: {e}")
 
             # Optional Welcome Direct Message
             if cfg.dm_enabled and cfg.dm_message:
@@ -277,11 +314,8 @@ class WelcomeCog(commands.Cog, name="Welcome"):
                 return
 
             leave_ch_id = getattr(cfg, "leave_channel_id", None) or cfg.channel_id
-            if not leave_ch_id:
-                return
-
-            channel = member.guild.get_channel(leave_ch_id)
-            if not channel or not isinstance(channel, discord.TextChannel):
+            target_ch = self._get_target_leave_channel(member.guild, leave_ch_id)
+            if not target_ch:
                 return
 
             inviter, invites_count = await self._resolve_inviter_info(member)
@@ -291,7 +325,7 @@ class WelcomeCog(commands.Cog, name="Welcome"):
 
             try:
                 embed = self._build_leave_embed(member, title_tmpl, msg_tmpl, color_val, inviter, invites_count)
-                await channel.send(embed=embed)
+                await target_ch.send(embed=embed)
             except Exception as e:
                 logger.error(f"Failed to send leave message in guild {member.guild.id}: {e}")
 
