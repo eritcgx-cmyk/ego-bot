@@ -1,0 +1,13 @@
+{
+  "1539142640891732051": {
+    "review_channel_id": 1539749771990933565,
+    "verified_boy_role_id": 1539155975791976548,
+    "verified_girl_role_id": 1539155943110213733,
+    "verified_role_id": 1539155722946879508,
+    "male_role_id": 1539161161822638150,
+    "female_role_id": 1539161171976917082,
+    "vanity_phrase": "/egoing",
+    "min_account_age_days": 10,
+    "enabled": true
+  }
+}
