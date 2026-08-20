@@ -13,17 +13,22 @@
     },
     "welcome": {
       "enabled": true,
-      "channel_id": 1539142640891732051,
+      "channel_id": 1539746562727608510,
       "title": "✦ Welcome to {server}!",
       "message": "> Hey {mention}, welcome to **{server}**!\n> You were invited by **{inviter}**, who now has **`{invites_count}`** invites.\n> Server Member Count: **`#{membercount}`**",
       "embed_color": 9133302,
       "dm_enabled": false,
       "dm_message": "Welcome to {server}! Make sure to read the rules and verify.",
       "leave_enabled": true,
-      "leave_channel_id": 1539142640891732051,
+      "leave_channel_id": 1539746562727608510,
       "leave_title": "✦ Member Left • {server}",
       "leave_message": "> **{user}** (`{mention}`) has left the server.\n> They were invited by **{inviter}** (now has **`{invites_count}`** invites).\n> Remaining Members: **`#{membercount}`**",
       "leave_color": 15680324
+    },
+    "rules": {
+      "channel_id": 1539143043364429854,
+      "agree_role_id": 1539155722946879508,
+      "enabled": true
     },
     "config": {
       "mod_log_channel_id": 1539749771990933565,
