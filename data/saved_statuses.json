@@ -1,21 +1,5 @@
 [
   {
-    "id": 1,
-    "type": "playing",
-    "text": "Roblox",
-    "details": "Grinding with friends",
-    "url": null,
-    "author": "Default"
-  },
-  {
-    "id": 2,
-    "type": "playing",
-    "text": "Grand Theft Auto VI",
-    "details": "Exploring Vice City",
-    "url": null,
-    "author": "Default"
-  },
-  {
     "id": 3,
     "type": "watching",
     "text": "you keep /egoing me",
@@ -38,5 +22,13 @@
     "details": null,
     "url": "https://twitch.tv/discord",
     "author": "Default"
+  },
+  {
+    "id": 6,
+    "type": "listening",
+    "text": "drake",
+    "details": "stop /egoing me",
+    "url": null,
+    "author": "Local CLI"
   }
 ]
