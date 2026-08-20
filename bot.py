@@ -122,6 +122,10 @@ class EgoBot(commands.Bot):
             except Exception as e:
                 logger.debug(f"Guild sync error: {e}")
 
+        if not continuous_autosave_task.is_running():
+            continuous_autosave_task.start()
+            logger.info("Continuous 60s master state auto-save loop running.")
+
 
 bot = EgoBot()
 
@@ -171,6 +175,12 @@ async def config_modlog(interaction: discord.Interaction, channel: discord.TextC
 
         await session.commit()
 
+    try:
+        from utils.state_manager import update_guild_state_section
+        update_guild_state_section(interaction.guild_id, "config", {"mod_log_channel_id": channel.id})
+    except Exception:
+        pass
+
     await interaction.response.send_message(
         embed=success_embed("Mod-Log Configured", f"Audit logs will be dispatched to {channel.mention}.")
     )
@@ -201,6 +211,15 @@ async def config_roles(
 
         await session.commit()
 
+    try:
+        from utils.state_manager import update_guild_state_section
+        update_guild_state_section(interaction.guild_id, "config", {
+            "admin_role_id": cfg.admin_role_id,
+            "mod_role_id": cfg.mod_role_id
+        })
+    except Exception:
+        pass
+
     await interaction.response.send_message(
         embed=success_embed(
             "Management Roles Updated",
@@ -228,6 +247,33 @@ async def config_status(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 bot.tree.add_command(config_group)
+
+# 100x Continuous Master Auto-Save Background Task (Runs every 60s)
+from discord.ext import tasks
+
+@tasks.loop(seconds=60)
+async def continuous_autosave_task():
+    try:
+        from utils.state_manager import dump_entire_database_to_master_state
+        await dump_entire_database_to_master_state()
+    except Exception as e:
+        logger.debug(f"Continuous autosave notice: {e}")
+
+@bot.tree.command(name="save_all", description="Trigger an instant atomic auto-save of all bot configurations and databases")
+@is_admin_or_has_role()
+async def save_all_cmd(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+    try:
+        from utils.state_manager import dump_entire_database_to_master_state
+        await dump_entire_database_to_master_state()
+        await interaction.followup.send(
+            embed=success_embed(
+                "Auto-Save Snapshot Complete",
+                "✅ All database tables, server configurations, roles, and verification states have been **atomically saved** to the persistent master state engine."
+            )
+        )
+    except Exception as e:
+        await interaction.followup.send(embed=error_embed("Save Error", str(e)))
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
