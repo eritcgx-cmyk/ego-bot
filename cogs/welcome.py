@@ -1,13 +1,16 @@
 """
-Comprehensive Welcome & Leave (Goodbye) System Cog for Ego Bot with Server Banner & Presets.
+100x Redesigned Ultra-Aesthetic Welcome & Leave (Goodbye) Engine for Ego Bot.
 Features:
-- Dedicated preset templates for Welcome & Goodbye cards
-- Embedded Server Banner (Defaults to official server banner)
-- Dynamic inviter & invite count resolution ({inviter}, {invites_count})
-- Preset selector & live test commands
+- Dynamic Inviter & Invite Count tracking on Join and Leave ({inviter}, {invites_count})
+- Official Server Banner auto-embedding with fallback
+- Auto-Role on join support (@Unverified / @Member)
+- Built-in Curated Presets: Standard Ego, Framed Box Aesthetic, and Compact Minimal
+- Live Testing commands (/welcome test join | leave) and Instant Previews (/welcome preview)
+- Instant Master State Auto-Persistence & SQLite sync
 """
 import os
 import json
+from datetime import datetime, timezone
 from typing import Optional, Tuple, Dict, Any
 import discord
 from discord import app_commands
@@ -30,27 +33,27 @@ WELCOME_PRESETS: Dict[str, Dict[str, Any]] = {
     "standard": {
         "title": "✦ Welcome to {server}!",
         "message": (
-            "> Hey {mention}, welcome to **{server}**!\n"
+            "> Welcome {mention} to **{server}**!\n"
             "> You were invited by **{inviter}**, who now has **`{invites_count}`** invites.\n"
             "> Server Member Count: **`#{membercount}`**"
         ),
         "color": 0x8B5CF6
     },
+    "aesthetic": {
+        "title": "👑 New Member Arrival • {server}",
+        "message": (
+            "╭✦ **Welcome to the Server**\n"
+            "┊ › **User:** {mention} (`{user}`)\n"
+            "┊ › **Invited By:** {inviter} (`{invites_count}` total)\n"
+            "┊ › **Member Count:** `#{membercount}`\n"
+            "╰✦ Make sure to complete verification in <#1539142640891732051>!"
+        ),
+        "color": 0xEC4899
+    },
     "compact": {
         "title": "👋 Welcome {user}!",
         "message": "Welcome {mention} to **{server}**! Invited by **{inviter}** (`{invites_count}` invites). Member **#{membercount}**.",
         "color": 0x3B82F6
-    },
-    "aesthetic": {
-        "title": "👑 Welcome to {server} • {user}",
-        "message": (
-            "╭✦ **New Member Arrival**\n"
-            "┊ › **User:** {mention} (`{user}`)\n"
-            "┊ › **Invited By:** {inviter} (`{invites_count}` total)\n"
-            "┊ › **Server Roster:** `#{membercount}`\n"
-            "╰✦ Make sure to verify in <#1539142640891732051>!"
-        ),
-        "color": 0xEC4899
     }
 }
 
@@ -64,20 +67,20 @@ LEAVE_PRESETS: Dict[str, Dict[str, Any]] = {
         ),
         "color": 0xEF4444
     },
+    "aesthetic": {
+        "title": "🥀 Member Departure • {server}",
+        "message": (
+            "╭✦ **Departure Notice**\n"
+            "┊ › **Member:** `{user}`\n"
+            "┊ › **Original Inviter:** {inviter} (`{invites_count}` invites remaining)\n"
+            "╰✦ **Remaining Roster:** `{membercount}` members"
+        ),
+        "color": 0x991B1B
+    },
     "compact": {
         "title": "👋 Goodbye {user}",
         "message": "**{user}** left **{server}**. Invited by **{inviter}** (now `{invites_count}`). `{membercount}` members remaining.",
         "color": 0xF97316
-    },
-    "aesthetic": {
-        "title": "🥀 Member Departure • {server}",
-        "message": (
-            "╭✦ **Departure Log**\n"
-            "┊ › **User:** `{user}`\n"
-            "┊ › **Original Inviter:** {inviter} (`{invites_count}` left)\n"
-            "╰✦ **Remaining Roster:** `{membercount}` members"
-        ),
-        "color": 0x991B1B
     }
 }
 
@@ -167,7 +170,7 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         )
         embed.set_thumbnail(url=member.display_avatar.url)
 
-        # Set Server Banner (Guild banner, splash, or fallback official banner)
+        # Set Server Banner (Guild banner, splash, or official preset banner)
         guild = member.guild
         banner_url = (guild.banner.url if guild.banner else None) or (guild.splash.url if guild.splash else None) or DEFAULT_BANNER_URL
         embed.set_image(url=banner_url)
@@ -220,6 +223,15 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             if not cfg or not cfg.enabled:
                 return
 
+            # Auto-Role Assignment
+            if cfg.auto_role_id:
+                auto_r = member.guild.get_role(cfg.auto_role_id)
+                if auto_r:
+                    try:
+                        await member.add_roles(auto_r, reason="Ego Welcome Auto-Role")
+                    except Exception as e:
+                        logger.debug(f"Could not assign auto-role: {e}")
+
             inviter, invites_count = await self._resolve_inviter_info(member)
 
             # Guild Channel Welcome Message
@@ -249,10 +261,8 @@ class WelcomeCog(commands.Cog, name="Welcome"):
                         dm_embed.set_thumbnail(url=member.guild.icon.url)
                     dm_embed.set_image(url=DEFAULT_BANNER_URL)
                     await member.send(embed=dm_embed)
-                except discord.Forbidden:
+                except Exception:
                     pass
-                except Exception as e:
-                    logger.debug(f"Could not send welcome DM to user {member.id}: {e}")
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
@@ -294,12 +304,13 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         default_permissions=discord.Permissions(administrator=True)
     )
 
-    @welcome_group.command(name="setup", description="Configure welcome channel and message template")
+    @welcome_group.command(name="setup", description="Configure welcome channel, message template, and auto-role")
     @app_commands.describe(
         channel="Channel to send welcome embeds in",
         title="Embed title ({user}, {server}, {membercount}, {inviter}, {invites_count})",
         message="Embed message body ({mention}, {server}, {membercount}, {inviter}, {invites_count})",
         color="Hex color (e.g. #8B5CF6)",
+        auto_role="Optional role automatically given to new members",
         dm_enabled="Send a welcome direct message to joining users",
         dm_message="Message content for direct message"
     )
@@ -311,6 +322,7 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         title: Optional[str] = WELCOME_PRESETS["standard"]["title"],
         message: Optional[str] = WELCOME_PRESETS["standard"]["message"],
         color: Optional[str] = "#8B5CF6",
+        auto_role: Optional[discord.Role] = None,
         dm_enabled: Optional[bool] = False,
         dm_message: Optional[str] = "Welcome to {server}! Be sure to review our rules and verify."
     ):
@@ -332,6 +344,7 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             cfg.title = title
             cfg.message = message
             cfg.embed_color = embed_color
+            cfg.auto_role_id = auto_role.id if auto_role else None
             cfg.dm_enabled = dm_enabled or False
             cfg.dm_message = dm_message
             await session.commit()
@@ -344,13 +357,14 @@ class WelcomeCog(commands.Cog, name="Welcome"):
                 "title": title,
                 "message": message,
                 "embed_color": embed_color,
+                "auto_role_id": auto_role.id if auto_role else None,
                 "dm_enabled": dm_enabled or False,
                 "dm_message": dm_message,
                 "leave_enabled": getattr(cfg, "leave_enabled", True),
                 "leave_channel_id": getattr(cfg, "leave_channel_id", channel.id),
                 "leave_title": getattr(cfg, "leave_title", None),
                 "leave_message": getattr(cfg, "leave_message", None),
-                "leave_color": getattr(cfg, "leave_color", None)
+                "leave_color": getattr(cfg, "leave_color", 0xEF4444)
             })
         except Exception:
             pass
@@ -434,16 +448,16 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         )
 
         await interaction.response.send_message(
-            content="✅ **Leave / Goodbye System Configured!** Live preview with Server Banner:",
+            content="✅ **Leave / Goodbye System Configured & Saved!** Live preview with Server Banner:",
             embed=sample_embed
         )
 
     @welcome_group.command(name="apply_preset", description="Apply an aesthetic built-in preset to Welcome and Leave cards")
-    @app_commands.describe(preset="Preset style to apply (standard, compact, aesthetic)")
+    @app_commands.describe(preset="Preset style to apply (standard, aesthetic, compact)")
     @app_commands.choices(preset=[
-        app_commands.Choice(name="Standard (Ego Invite Tracker + Banner)", value="standard"),
-        app_commands.Choice(name="Compact (2-Line Minimal)", value="compact"),
-        app_commands.Choice(name="Aesthetic (Framed Box Style)", value="aesthetic")
+        app_commands.Choice(name="Standard (Ego Dynamic Inviter + Banner)", value="standard"),
+        app_commands.Choice(name="Aesthetic (Framed Box Style)", value="aesthetic"),
+        app_commands.Choice(name="Compact (2-Line Minimal)", value="compact")
     ])
     @is_admin_or_has_role()
     async def welcome_apply_preset(self, interaction: discord.Interaction, preset: app_commands.Choice[str]):
@@ -467,12 +481,88 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             cfg.leave_color = l_preset["color"]
             await session.commit()
 
-        w_embed = self._build_welcome_embed(interaction.user, w_preset["title"], w_preset["message"], w_preset["color"], inviter=interaction.user, invites_count=5)
+        try:
+            from utils.state_manager import update_guild_state_section
+            update_guild_state_section(interaction.guild_id, "welcome", {
+                "title": w_preset["title"],
+                "message": w_preset["message"],
+                "embed_color": w_preset["color"],
+                "leave_title": l_preset["title"],
+                "leave_message": l_preset["message"],
+                "leave_color": l_preset["color"]
+            })
+        except Exception:
+            pass
+
+        w_embed = self._build_welcome_embed(
+            interaction.user,
+            w_preset["title"],
+            w_preset["message"],
+            w_preset["color"],
+            inviter=interaction.user,
+            invites_count=5
+        )
 
         await interaction.response.send_message(
             content=f"✅ Applied **{preset.name}** preset to Welcome & Leave cards!\nLive Welcome Preview:",
             embed=w_embed
         )
+
+    @welcome_group.command(name="test", description="Send a live test welcome or leave card to the configured channel")
+    @app_commands.describe(event_type="Select test card to dispatch (join or leave)")
+    @app_commands.choices(event_type=[
+        app_commands.Choice(name="Welcome Card (Member Join)", value="join"),
+        app_commands.Choice(name="Goodbye Card (Member Leave)", value="leave")
+    ])
+    @is_admin_or_has_role()
+    async def welcome_test(self, interaction: discord.Interaction, event_type: app_commands.Choice[str]):
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(WelcomeConfig).where(WelcomeConfig.guild_id == interaction.guild_id))
+            cfg = res.scalar_one_or_none()
+
+        if not cfg:
+            return await interaction.response.send_message(
+                embed=error_embed("Not Configured", "Please run `/welcome setup` before running test dispatches."),
+                ephemeral=True
+            )
+
+        if event_type.value == "join":
+            ch_id = cfg.channel_id
+            if not ch_id:
+                return await interaction.response.send_message("❌ Welcome channel is not set.", ephemeral=True)
+            ch = interaction.guild.get_channel(ch_id)
+            if not ch:
+                return await interaction.response.send_message("❌ Welcome channel not found.", ephemeral=True)
+
+            embed = self._build_welcome_embed(
+                interaction.user,
+                cfg.title or WELCOME_PRESETS["standard"]["title"],
+                cfg.message or WELCOME_PRESETS["standard"]["message"],
+                cfg.embed_color or 0x8B5CF6,
+                inviter=interaction.user,
+                invites_count=7
+            )
+            await ch.send(content=interaction.user.mention, embed=embed)
+            await interaction.response.send_message(f"✅ Dispatched test Welcome Card to {ch.mention}!", ephemeral=True)
+
+        elif event_type.value == "leave":
+            ch_id = getattr(cfg, "leave_channel_id", None) or cfg.channel_id
+            if not ch_id:
+                return await interaction.response.send_message("❌ Leave channel is not set.", ephemeral=True)
+            ch = interaction.guild.get_channel(ch_id)
+            if not ch:
+                return await interaction.response.send_message("❌ Leave channel not found.", ephemeral=True)
+
+            embed = self._build_leave_embed(
+                interaction.user,
+                getattr(cfg, "leave_title", None) or LEAVE_PRESETS["standard"]["title"],
+                getattr(cfg, "leave_message", None) or LEAVE_PRESETS["standard"]["message"],
+                getattr(cfg, "leave_color", None) or COLOR_CRIMSON,
+                inviter=interaction.user,
+                invites_count=6
+            )
+            await ch.send(embed=embed)
+            await interaction.response.send_message(f"✅ Dispatched test Leave Card to {ch.mention}!", ephemeral=True)
 
     @welcome_group.command(name="preview", description="Preview current welcome and leave embed designs")
     @is_admin_or_has_role()
@@ -481,18 +571,22 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             res = await session.execute(select(WelcomeConfig).where(WelcomeConfig.guild_id == interaction.guild_id))
             cfg = res.scalar_one_or_none()
 
-        if not cfg:
-            return await interaction.response.send_message(
-                embed=info_embed("Not Configured", "Welcome system is not configured yet. Run `/welcome setup`."),
-                ephemeral=True
-            )
+        title_tmpl = (cfg.title if cfg else None) or WELCOME_PRESETS["standard"]["title"]
+        msg_tmpl = (cfg.message if cfg else None) or WELCOME_PRESETS["standard"]["message"]
+        color_val = (cfg.embed_color if cfg else None) or WELCOME_PRESETS["standard"]["color"]
 
-        title_tmpl = cfg.title or WELCOME_PRESETS["standard"]["title"]
-        msg_tmpl = cfg.message or WELCOME_PRESETS["standard"]["message"]
-        color_val = cfg.embed_color or WELCOME_PRESETS["standard"]["color"]
+        w_embed = self._build_welcome_embed(interaction.user, title_tmpl, msg_tmpl, color_val, inviter=interaction.user, invites_count=5)
 
-        w_embed = self._build_welcome_embed(interaction.user, title_tmpl, msg_tmpl, color_val, inviter=interaction.user, invites_count=3)
-        await interaction.response.send_message(embed=w_embed, ephemeral=True)
+        l_title = getattr(cfg, "leave_title", None) if cfg else None or LEAVE_PRESETS["standard"]["title"]
+        l_msg = getattr(cfg, "leave_message", None) if cfg else None or LEAVE_PRESETS["standard"]["message"]
+        l_color = getattr(cfg, "leave_color", None) if cfg else None or LEAVE_PRESETS["standard"]["color"]
+        l_embed = self._build_leave_embed(interaction.user, l_title, l_msg, l_color, inviter=interaction.user, invites_count=4)
+
+        await interaction.response.send_message(
+            content="✦ **Welcome & Leave Live Previews:**",
+            embeds=[w_embed, l_embed],
+            ephemeral=True
+        )
 
     @welcome_group.command(name="toggle", description="Enable or disable the welcome and leave systems")
     @app_commands.describe(welcome_enabled="Enable Welcome messages", leave_enabled="Enable Leave messages")
@@ -510,6 +604,15 @@ class WelcomeCog(commands.Cog, name="Welcome"):
             if leave_enabled is not None:
                 cfg.leave_enabled = leave_enabled
             await session.commit()
+
+        try:
+            from utils.state_manager import update_guild_state_section
+            update_guild_state_section(interaction.guild_id, "welcome", {
+                "enabled": cfg.enabled,
+                "leave_enabled": cfg.leave_enabled
+            })
+        except Exception:
+            pass
 
         await interaction.response.send_message(
             embed=success_embed(
