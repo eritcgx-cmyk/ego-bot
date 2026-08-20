@@ -231,13 +231,15 @@ bot.tree.add_command(config_group)
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
+import urllib.request
+import time
 
 class KeepaliveHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-Type", "text/plain")
         self.end_headers()
-        self.wfile.write(b"Ego Bot Online & Healthy")
+        self.wfile.write(b"Ego Bot Online & Healthy 24/7")
 
     def log_message(self, format, *args):
         pass # Suppress continuous health check logging
@@ -253,12 +255,40 @@ def start_threaded_keepalive():
     except Exception as e:
         logger.warning(f"Could not bind keepalive port {port}: {e}")
 
+    # Launch Active Anti-Sleep Self-Pinger (Pings every 3.5 minutes to defeat Render free-tier sleep)
+    def anti_sleep_worker():
+        time.sleep(30) # Initial startup buffer
+        targets = []
+        ext_url = os.environ.get("RENDER_EXTERNAL_URL")
+        if ext_url:
+            targets.append(ext_url.rstrip("/"))
+        targets.append("https://ego-discord-bot.onrender.com")
+        targets.append(f"http://127.0.0.1:{port}")
+
+        while True:
+            for url in targets:
+                try:
+                    req = urllib.request.Request(
+                        url,
+                        headers={"User-Agent": "EgoBot-KeepAlive/2.0 (Render 24/7 Anti-Sleep)"}
+                    )
+                    with urllib.request.urlopen(req, timeout=10) as resp:
+                        if resp.status == 200:
+                            logger.debug(f"Self-ping successful to {url}")
+                except Exception as e:
+                    logger.debug(f"Self-ping notice for {url}: {e}")
+            time.sleep(210) # 3.5 minutes (Render sleep threshold is 15 minutes)
+
+    pinger_t = threading.Thread(target=anti_sleep_worker, daemon=True)
+    pinger_t.start()
+    logger.info("Active 24/7 anti-sleep pinger initialized.")
+
 async def run_bot_with_server():
     if not BOT_TOKEN:
         logger.error("BOT_TOKEN environment variable is missing! Please set it in .env or your cloud environment.")
         sys.exit(1)
 
-    # 1. Start Threaded HTTP Server immediately (Answers Render healthcheck in <1ms)
+    # 1. Start Threaded HTTP Server & Active Self-Pinger immediately
     start_threaded_keepalive()
 
     # 2. Initialize Database Schema
@@ -274,6 +304,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
