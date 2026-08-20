@@ -260,6 +260,7 @@ async def continuous_autosave_task():
         logger.debug(f"Continuous autosave notice: {e}")
 
 @bot.tree.command(name="save_all", description="Trigger an instant atomic auto-save of all bot configurations and databases")
+@app_commands.default_permissions(administrator=True)
 @is_admin_or_has_role()
 async def save_all_cmd(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
@@ -270,6 +271,23 @@ async def save_all_cmd(interaction: discord.Interaction):
             embed=success_embed(
                 "Auto-Save Snapshot Complete",
                 "✅ All database tables, server configurations, roles, and verification states have been **atomically saved** to the persistent master state engine."
+            )
+        )
+    except Exception as e:
+        await interaction.followup.send(embed=error_embed("Save Error", str(e)))
+
+@bot.tree.command(name="save", description="Admin command to trigger an instant server configuration save")
+@app_commands.default_permissions(administrator=True)
+@is_admin_or_has_role()
+async def save_cmd(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+    try:
+        from utils.state_manager import dump_entire_database_to_master_state
+        await dump_entire_database_to_master_state()
+        await interaction.followup.send(
+            embed=success_embed(
+                "State Saved",
+                "✅ Server configuration and database state committed to persistent storage."
             )
         )
     except Exception as e:
