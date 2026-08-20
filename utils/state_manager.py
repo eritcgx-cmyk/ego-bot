@@ -17,7 +17,7 @@ from sqlalchemy import select
 from database.engine import AsyncSessionLocal
 from database.models import (
     WelcomeConfig, GuildConfig, AutomodConfig, InviteTier, IdentityVerifyConfig,
-    FriendGroup, ApplicationForm, CustomRole, CommandAccess
+    FriendGroup, ApplicationForm, RulesConfig
 )
 from config import logger
 
@@ -143,6 +143,23 @@ async def dump_entire_database_to_master_state():
                 "role_id": t.role_id
             }
 
+        # 5. Rules Configuration
+        try:
+            from database.models import RulesConfig
+            res_r = await session.execute(select(RulesConfig))
+            for r in res_r.scalars().all():
+                g_key = str(r.guild_id)
+                if g_key not in state:
+                    state[g_key] = {}
+                state[g_key]["rules"] = {
+                    "channel_id": r.channel_id,
+                    "message_id": r.message_id,
+                    "agree_role_id": r.agree_role_id,
+                    "enabled": r.enabled
+                }
+        except Exception:
+            pass
+
     save_master_state(state)
     logger.debug("[MasterState] Full database dump to master state complete.")
 
@@ -210,6 +227,23 @@ async def restore_database_from_master_state():
                 a_cfg.mass_mention_limit = a_data.get("mass_mention_limit", 5)
                 a_cfg.punishment_type = a_data.get("punishment_type", "mute")
                 a_cfg.punishment_duration = a_data.get("punishment_duration", 600)
+
+            # 4. Rules
+            r_data = g_data.get("rules")
+            if r_data:
+                try:
+                    from database.models import RulesConfig
+                    res_r = await session.execute(select(RulesConfig).where(RulesConfig.guild_id == g_id))
+                    r_cfg = res_r.scalar_one_or_none()
+                    if not r_cfg:
+                        r_cfg = RulesConfig(guild_id=g_id)
+                        session.add(r_cfg)
+                    r_cfg.channel_id = r_data.get("channel_id")
+                    r_cfg.message_id = r_data.get("message_id")
+                    r_cfg.agree_role_id = r_data.get("agree_role_id")
+                    r_cfg.enabled = r_data.get("enabled", True)
+                except Exception:
+                    pass
 
             # 4. Invite Tiers
             tiers_data = g_data.get("invite_tiers", {})
