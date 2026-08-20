@@ -429,6 +429,12 @@ class IdentityVerifyCog(commands.Cog, name="IdentityVerify"):
         }
         save_face_configs(configs)
 
+        try:
+            from utils.state_manager import update_guild_state_section
+            update_guild_state_section(guild.id, "verify", configs[g_id])
+        except Exception:
+            pass
+
         boy_str = verified_boy_role.mention if verified_boy_role else "*Unset*"
         girl_str = verified_girl_role.mention if verified_girl_role else "*Unset*"
         base_str = base_verified_role.mention if base_verified_role else "*Unset*"
