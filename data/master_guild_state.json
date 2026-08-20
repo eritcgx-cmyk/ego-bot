@@ -1,0 +1,40 @@
+{
+  "1539142640891732051": {
+    "verify": {
+      "review_channel_id": 1539749771990933565,
+      "verified_boy_role_id": 1539155975791976548,
+      "verified_girl_role_id": 1539155943110213733,
+      "verified_role_id": 1539155722946879508,
+      "male_role_id": 1539161161822638150,
+      "female_role_id": 1539161171976917082,
+      "vanity_phrase": "/egoing",
+      "min_account_age_days": 10,
+      "enabled": true
+    },
+    "welcome": {
+      "enabled": true,
+      "channel_id": 1539142640891732051,
+      "title": "✦ Welcome to {server}!",
+      "message": "> Hey {mention}, welcome to **{server}**!\n> You were invited by **{inviter}**, who now has **`{invites_count}`** invites.\n> Server Member Count: **`#{membercount}`**",
+      "embed_color": 9133302,
+      "dm_enabled": false,
+      "dm_message": "Welcome to {server}! Make sure to read the rules and verify.",
+      "leave_enabled": true,
+      "leave_channel_id": 1539142640891732051,
+      "leave_title": "✦ Member Left • {server}",
+      "leave_message": "> **{user}** (`{mention}`) has left the server.\n> They were invited by **{inviter}** (now has **`{invites_count}`** invites).\n> Remaining Members: **`#{membercount}`**",
+      "leave_color": 15680324
+    },
+    "config": {
+      "mod_log_channel_id": 1539749771990933565,
+      "admin_role_id": null,
+      "mod_role_id": null
+    },
+    "automod": {
+      "enabled": true,
+      "block_invites": true,
+      "spam_threshold": 5,
+      "mass_mention_limit": 5
+    }
+  }
+}
