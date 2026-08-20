@@ -291,9 +291,14 @@ async def run_bot_with_server():
     # 1. Start Threaded HTTP Server & Active Self-Pinger immediately
     start_threaded_keepalive()
 
-    # 2. Initialize Database Schema
+    # 2. Initialize Database Schema & Hydrate from Master State
     logger.info("Verifying database schema...")
     await init_db()
+    try:
+        from utils.state_manager import restore_database_from_master_state
+        await restore_database_from_master_state()
+    except Exception as e:
+        logger.warning(f"Could not hydrate database from master state: {e}")
 
     # 3. Start Discord Bot Gateway Connection
     logger.info("Connecting to Discord Gateway...")
