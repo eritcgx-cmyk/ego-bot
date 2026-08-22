@@ -1,5 +1,13 @@
 [
   {
+    "id": 0,
+    "category": "Content Creator",
+    "name": "CC Partner",
+    "color": "#00E5FF",
+    "hoist": true,
+    "mentionable": true
+  },
+  {
     "id": 1,
     "category": "Content Creator",
     "name": "Streamer Elite",

@@ -1,7 +1,8 @@
 """
 Content Creator (CC) Verification, Tier Requirements, and Creator Video Publishing Cog for Ego Bot.
-Features /post command for Creators (with review ticket flow for CC and CC Tier 2),
-configurable follower/view/like thresholds per tier, and custom video broadcast channels.
+Features /post and /cc post commands for Creators (with review ticket flow for CC and CC Tier 2),
+configurable follower/view/like thresholds per tier, thumbnail extraction, CC Partner @here/@everyone pings,
+and custom video broadcast channels.
 """
 import os
 import json
@@ -10,9 +11,6 @@ from typing import Optional, List, Dict, Any
 import discord
 from discord import app_commands
 from discord.ext import commands
-from sqlalchemy import select
-from database.engine import AsyncSessionLocal
-from database.models import ContentCreatorTier, GuildConfig
 from utils.permissions import is_admin_or_has_role, is_guild_owner
 from utils.embeds import (
     ego_embed, success_embed, error_embed, info_embed, card_embed,
@@ -23,7 +21,7 @@ from config import logger
 CC_REQ_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cc_tier_requirements.json")
 CC_CONFIG_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cc_config.json")
 
-ALL_CC_ROLES = ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star"]
+ALL_CC_ROLES = ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star", "CC Partner"]
 LOW_TIER_ROLES = ["CC", "CC Tier 2"]
 
 DEFAULT_TIER_REQUIREMENTS = {
@@ -56,6 +54,11 @@ DEFAULT_TIER_REQUIREMENTS = {
         "followers": "50,000+",
         "views": "100,000+ Views",
         "desc": "Apex Star Icon (50k+ Followers / Top Tier Creator)"
+    },
+    "CC Partner": {
+        "followers": "Partner Program",
+        "views": "Verified Partner",
+        "desc": "Official Creator Partner (Allows @here / @everyone video pings)"
     }
 }
 
@@ -92,13 +95,44 @@ def save_cc_config(data: Dict[str, Any]):
     with open(CC_CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
+def extract_video_thumbnail(url: str) -> Optional[str]:
+    """Extracts thumbnail image URL from YouTube, TikTok, Twitch, or direct media links."""
+    if not url:
+        return None
+    url = url.strip()
+    
+    # YouTube patterns (standard, shorts, embed, youtu.be)
+    yt_match = re.search(r"(?:v=|\/|youtu\.be\/|shorts\/|embed\/)([0-9A-Za-z_-]{11})", url)
+    if yt_match:
+        video_id = yt_match.group(1)
+        return f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
+        
+    # Direct image preview
+    if re.search(r"\.(?:png|jpe?g|webp|gif)$", url, re.IGNORECASE):
+        return url
+        
+    return None
+
+def has_cc_partner_role(member: discord.Member) -> bool:
+    """Checks if member has CC Partner role or admin permissions."""
+    if member.guild_permissions.administrator or member.guild_permissions.manage_guild:
+        return True
+    return any(r.name.lower() in ["cc partner", "partner", "streamer partner"] for r in member.roles)
+
 
 class CCPostReviewView(discord.ui.View):
-    def __init__(self, creator_id: Optional[int] = None, video_url: Optional[str] = None, desc: Optional[str] = None):
+    def __init__(
+        self, 
+        creator_id: Optional[int] = None, 
+        video_url: Optional[str] = None, 
+        desc: Optional[str] = None,
+        ping: Optional[str] = None
+    ):
         super().__init__(timeout=None)
         self.creator_id = creator_id
         self.video_url = video_url
         self.desc = desc
+        self.ping = ping
 
     def _extract_info(self, message: discord.Message):
         if not message or not message.embeds:
@@ -114,6 +148,10 @@ class CCPostReviewView(discord.ui.View):
         if url_m:
             self.video_url = url_m.group(1)
 
+        ping_m = re.search(r"Ping:\*\* `([^`]+)`", desc_text)
+        if ping_m and ping_m.group(1) in ["@here", "@everyone"]:
+            self.ping = ping_m.group(1)
+
     @discord.ui.button(label="Accept & Broadcast Video", style=discord.ButtonStyle.success, custom_id="cc_post_approve_btn")
     async def approve_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not self.creator_id:
@@ -128,13 +166,18 @@ class CCPostReviewView(discord.ui.View):
         
         target_ch = guild.get_channel(vid_ch_id) if vid_ch_id else None
         if not target_ch or not isinstance(target_ch, discord.TextChannel):
-            # Fallback to current channel
             target_ch = interaction.channel
 
         creator = guild.get_member(self.creator_id)
+        if not creator:
+            try:
+                creator = await guild.fetch_member(self.creator_id)
+            except Exception:
+                creator = None
+
         creator_name = creator.display_name if creator else f"Creator ({self.creator_id})"
 
-        # Broadcast video embed
+        # Build broadcast embed with video thumbnail
         broadcast_embed = ego_embed(
             title=f"🎬 Creator Spotlight • {creator_name}",
             description=(
@@ -148,7 +191,16 @@ class CCPostReviewView(discord.ui.View):
         if creator:
             broadcast_embed.set_author(name=creator.display_name, icon_url=creator.display_avatar.url)
 
-        await target_ch.send(content=f"📢 **New Creator Video!** <@{self.creator_id}>\n{self.video_url}", embed=broadcast_embed)
+        thumb = extract_video_thumbnail(self.video_url)
+        if thumb:
+            broadcast_embed.set_image(url=thumb)
+
+        ping_prefix = f"{self.ping} " if self.ping and self.ping in ["@here", "@everyone"] else ""
+        await target_ch.send(
+            content=f"{ping_prefix}📢 **New Creator Video!** <@{self.creator_id}>\n{self.video_url}",
+            embed=broadcast_embed,
+            allowed_mentions=discord.AllowedMentions(everyone=True, roles=True, users=True)
+        )
 
         # Notify creator via DM
         if creator:
@@ -257,18 +309,33 @@ class CCTicketReviewView(discord.ui.View):
 
         guild = interaction.guild
         member = guild.get_member(self.applicant_id)
+        if not member and guild:
+            try:
+                member = await guild.fetch_member(self.applicant_id)
+            except Exception:
+                member = None
+
         requested_tier = self.requested_tier or "CC"
 
-        target_role = discord.utils.get(guild.roles, name=requested_tier)
+        # Find matching role by case-insensitive name or create if missing
+        target_role = discord.utils.find(lambda r: r.name.lower() == requested_tier.lower(), guild.roles)
         if not target_role:
             try:
-                target_role = await guild.create_role(name=requested_tier, color=discord.Color(0x8B5CF6), reason="Ego CC Tier")
+                role_color = discord.Color(0x00E5FF) if requested_tier.lower() == "cc partner" else discord.Color(0x8B5CF6)
+                target_role = await guild.create_role(
+                    name=requested_tier, 
+                    color=role_color, 
+                    hoist=True,
+                    reason=f"Ego CC Tier: {requested_tier}"
+                )
             except Exception as e:
                 return await interaction.response.send_message(f"Failed to find or create role `{requested_tier}`: {e}", ephemeral=True)
 
+        role_assigned = False
         if member:
             try:
                 await member.add_roles(target_role, reason=f"CC Application Approved: {requested_tier}")
+                role_assigned = True
                 try:
                     await member.send(
                         embed=success_embed(
@@ -280,6 +347,10 @@ class CCTicketReviewView(discord.ui.View):
                     pass
             except Exception as e:
                 logger.error(f"Failed to assign CC role: {e}")
+                return await interaction.response.send_message(
+                    embed=error_embed("Role Assignment Error", f"Failed to assign {target_role.mention}: {e}\nEnsure bot has higher role hierarchy!"),
+                    ephemeral=True
+                )
 
         for item in self.children:
             item.disabled = True
@@ -289,6 +360,8 @@ class CCTicketReviewView(discord.ui.View):
             old_embed.color = COLOR_EMERALD
             old_embed.title = f"Creator Approved - {requested_tier}"
             old_embed.add_field(name="› Reviewed By", value=interaction.user.mention, inline=True)
+            if role_assigned:
+                old_embed.add_field(name="› Role Granted", value=target_role.mention, inline=True)
             await interaction.message.edit(embed=old_embed, view=self)
 
         await interaction.response.send_message(
@@ -401,6 +474,10 @@ class CCVerifyModal(discord.ui.Modal, title="Content Creator Verification"):
         )
         ticket_embed.set_author(name=user.display_name, icon_url=user.display_avatar.url)
 
+        proof_thumb = extract_video_thumbnail(self.video_proof.value.strip())
+        if proof_thumb:
+            ticket_embed.set_image(url=proof_thumb)
+
         view = CCTicketReviewView(
             applicant_id=user.id,
             platform=self.platform,
@@ -447,7 +524,8 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
         app_commands.Choice(name="CC Tier 3", value="CC Tier 3"),
         app_commands.Choice(name="Known", value="Known"),
         app_commands.Choice(name="Famous", value="Famous"),
-        app_commands.Choice(name="Star", value="Star")
+        app_commands.Choice(name="Star", value="Star"),
+        app_commands.Choice(name="CC Partner", value="CC Partner")
     ])
     async def cc_verify(
         self,
@@ -457,16 +535,12 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
     ):
         await interaction.response.send_modal(CCVerifyModal(platform=platform.value, tier=tier.value))
 
-    @app_commands.command(name="post", description="Publish a video to the server video channel (CC / CC Tier 2 queued for staff review)")
-    @app_commands.describe(
-        video_link="Direct link to your video (TikTok, YouTube, Twitch, etc.)",
-        description="Optional title or note for your video"
-    )
-    async def post_video(
+    async def _execute_post_flow(
         self,
         interaction: discord.Interaction,
         video_link: str,
-        description: Optional[str] = None
+        description: Optional[str] = None,
+        ping: Optional[str] = None
     ):
         guild = interaction.guild
         user = interaction.user
@@ -481,14 +555,35 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
             return await interaction.response.send_message(
                 embed=error_embed(
                     "Creator Role Required",
-                    "You must have a verified Creator role (`CC` to `Star`) to use `/post`.\nRun `/cc verify` to apply!"
+                    "You must have a verified Creator role (`CC` to `Star` / `CC Partner`) to post videos.\nRun `/cc verify` to apply!"
+                ),
+                ephemeral=True
+            )
+
+        # Validate Ping permissions
+        ping_val = ping if ping in ["@here", "@everyone"] else None
+        if ping_val and not has_cc_partner_role(user):
+            return await interaction.response.send_message(
+                embed=error_embed(
+                    "Ping Permission Denied",
+                    "❌ You must have the **CC Partner** role to use `@here` or `@everyone` pings when publishing videos."
                 ),
                 ephemeral=True
             )
 
         # Check if user only holds low-tier roles (CC or CC Tier 2) requiring staff ticket approval
-        highest_tier = "Star" if "Star" in user_cc_roles else "Famous" if "Famous" in user_cc_roles else "Known" if "Known" in user_cc_roles else "CC Tier 3" if "CC Tier 3" in user_cc_roles else "CC Tier 2" if "CC Tier 2" in user_cc_roles else "CC"
+        highest_tier = (
+            "CC Partner" if "CC Partner" in user_cc_roles
+            else "Star" if "Star" in user_cc_roles 
+            else "Famous" if "Famous" in user_cc_roles 
+            else "Known" if "Known" in user_cc_roles 
+            else "CC Tier 3" if "CC Tier 3" in user_cc_roles 
+            else "CC Tier 2" if "CC Tier 2" in user_cc_roles 
+            else "CC"
+        )
         requires_approval = highest_tier in LOW_TIER_ROLES and not user.guild_permissions.administrator
+
+        thumbnail_url = extract_video_thumbnail(video_link.strip())
 
         if requires_approval:
             await interaction.response.defer(ephemeral=True)
@@ -513,6 +608,7 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
                 description=(
                     f"> **Creator:** {user.mention} (`{user.id}`)\n"
                     f"> **Tier:** `{highest_tier}`\n"
+                    + (f"> **Ping:** `{ping_val}`\n" if ping_val else "")
                     + (f"> **Note:** *{description.strip()}*\n" if description else "")
                     + f"\n› **Video URL:** [Watch Video]({video_link.strip()})\n\n"
                     f"{video_link.strip()}\n\n"
@@ -521,8 +617,15 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
                 color=COLOR_AMBER
             )
             review_embed.set_author(name=user.display_name, icon_url=user.display_avatar.url)
+            if thumbnail_url:
+                review_embed.set_image(url=thumbnail_url)
 
-            view = CCPostReviewView(creator_id=user.id, video_url=video_link.strip(), desc=description.strip() if description else None)
+            view = CCPostReviewView(
+                creator_id=user.id, 
+                video_url=video_link.strip(), 
+                desc=description.strip() if description else None,
+                ping=ping_val
+            )
             await ticket_ch.send(content=f"📢 **New Video Submission:** {user.mention}", embed=review_embed, view=view)
 
             await interaction.followup.send(
@@ -534,7 +637,7 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
                 ephemeral=True
             )
         else:
-            # High Tier (CC Tier 3, Known, Famous, Star) or Admin -> Instant Publish!
+            # High Tier (CC Tier 3, Known, Famous, Star, CC Partner) or Admin -> Instant Publish!
             cfg = load_cc_config()
             vid_ch_id = cfg.get(str(guild.id), {}).get("video_channel_id")
             target_ch = guild.get_channel(vid_ch_id) if vid_ch_id else interaction.channel
@@ -553,12 +656,61 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
                 color=COLOR_CYAN
             )
             broadcast_embed.set_author(name=user.display_name, icon_url=user.display_avatar.url)
+            if thumbnail_url:
+                broadcast_embed.set_image(url=thumbnail_url)
 
-            await target_ch.send(content=f"📢 **New Creator Video!** {user.mention}\n{video_link.strip()}", embed=broadcast_embed)
+            ping_prefix = f"{ping_val} " if ping_val in ["@here", "@everyone"] else ""
+            await target_ch.send(
+                content=f"{ping_prefix}📢 **New Creator Video!** {user.mention}\n{video_link.strip()}", 
+                embed=broadcast_embed,
+                allowed_mentions=discord.AllowedMentions(everyone=True, roles=True, users=True)
+            )
             await interaction.response.send_message(
                 embed=success_embed("Video Published", f"Your video has been broadcasted to {target_ch.mention}!"),
                 ephemeral=True
             )
+
+    @app_commands.command(name="post", description="Publish a video to the server video channel")
+    @app_commands.describe(
+        video_link="Direct link to your video (TikTok, YouTube, Twitch, etc.)",
+        description="Optional title or note for your video",
+        ping="Ping @here or @everyone (Requires CC Partner role)"
+    )
+    @app_commands.choices(ping=[
+        app_commands.Choice(name="None", value="none"),
+        app_commands.Choice(name="@here (CC Partner only)", value="@here"),
+        app_commands.Choice(name="@everyone (CC Partner only)", value="@everyone")
+    ])
+    async def post_video(
+        self,
+        interaction: discord.Interaction,
+        video_link: str,
+        description: Optional[str] = None,
+        ping: Optional[app_commands.Choice[str]] = None
+    ):
+        ping_val = ping.value if ping else None
+        await self._execute_post_flow(interaction, video_link, description, ping_val)
+
+    @cc_group.command(name="post", description="Publish a video to the server video channel")
+    @app_commands.describe(
+        video_link="Direct link to your video (TikTok, YouTube, Twitch, etc.)",
+        description="Optional title or note for your video",
+        ping="Ping @here or @everyone (Requires CC Partner role)"
+    )
+    @app_commands.choices(ping=[
+        app_commands.Choice(name="None", value="none"),
+        app_commands.Choice(name="@here (CC Partner only)", value="@here"),
+        app_commands.Choice(name="@everyone (CC Partner only)", value="@everyone")
+    ])
+    async def cc_post_video(
+        self,
+        interaction: discord.Interaction,
+        video_link: str,
+        description: Optional[str] = None,
+        ping: Optional[app_commands.Choice[str]] = None
+    ):
+        ping_val = ping.value if ping else None
+        await self._execute_post_flow(interaction, video_link, description, ping_val)
 
     cc_admin_group = app_commands.Group(
         name="cc_admin",
@@ -591,7 +743,7 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
             color=COLOR_VIOLET
         )
 
-        for t_name in ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star"]:
+        for t_name in ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star", "CC Partner"]:
             t_data = reqs.get(t_name, DEFAULT_TIER_REQUIREMENTS.get(t_name, {}))
             f_req = t_data.get("followers", "N/A")
             v_req = t_data.get("views", "N/A")
@@ -621,7 +773,8 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
         app_commands.Choice(name="CC Tier 3", value="CC Tier 3"),
         app_commands.Choice(name="Known", value="Known"),
         app_commands.Choice(name="Famous", value="Famous"),
-        app_commands.Choice(name="Star", value="Star")
+        app_commands.Choice(name="Star", value="Star"),
+        app_commands.Choice(name="CC Partner", value="CC Partner")
     ])
     @is_admin_or_has_role()
     async def cc_set_tier_req(
@@ -652,16 +805,17 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
             ephemeral=True
         )
 
-    @cc_admin_group.command(name="setup_roles", description="Auto-create all 6 Creator roles in your server")
+    @cc_admin_group.command(name="setup_roles", description="Auto-create all Creator roles in your server")
     @is_guild_owner()
     async def cc_setup_roles(self, interaction: discord.Interaction):
         guild = interaction.guild
         created = []
-        for t in ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star"]:
+        for t in ["CC", "CC Tier 2", "CC Tier 3", "Known", "Famous", "Star", "CC Partner"]:
             existing = discord.utils.find(lambda r: r.name.lower() == t.lower(), guild.roles)
             if not existing:
                 try:
-                    role = await guild.create_role(name=t, color=discord.Color(0x8B5CF6), reason="Ego CC Setup")
+                    color = discord.Color(0x00E5FF) if t == "CC Partner" else discord.Color(0x8B5CF6)
+                    await guild.create_role(name=t, color=color, hoist=True, reason="Ego CC Setup")
                     created.append(t)
                 except Exception as e:
                     logger.error(f"Error creating role {t}: {e}")
@@ -669,12 +823,11 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
         await interaction.response.send_message(
             embed=success_embed(
                 "Creator Roles Ready",
-                f"Configured all 6 Creator roles in the server:\n"
-                f"› `CC`, `CC Tier 2`, `CC Tier 3`, `Known`, `Famous`, `Star`"
+                f"Configured all 7 Creator roles in the server:\n"
+                f"› `CC`, `CC Tier 2`, `CC Tier 3`, `Known`, `Famous`, `Star`, `CC Partner`"
             ),
             ephemeral=True
         )
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ContentCreatorCog(bot))
-

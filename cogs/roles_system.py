@@ -27,7 +27,7 @@ ROLE_DESC_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data"
 ROLE_BOARD_STATE_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "role_boards.json")
 
 FG_SPECIAL_ROLES = ["Giant FG", "Huge FG", "Known FG", "Com FG", "FG"]
-CC_ROLE_NAMES = ["Star", "Famous", "Known", "CC Tier 3", "CC Tier 2", "CC"]
+CC_ROLE_NAMES = ["Star", "Famous", "Known", "CC Tier 3", "CC Tier 2", "CC", "CC Partner"]
 
 def load_role_descriptions() -> Dict[str, Any]:
     os.makedirs(os.path.dirname(ROLE_DESC_FILE), exist_ok=True)
