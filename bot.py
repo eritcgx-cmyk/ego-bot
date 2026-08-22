@@ -364,9 +364,20 @@ async def run_bot_with_server():
     except Exception as e:
         logger.warning(f"Could not hydrate database from master state: {e}")
 
-    # 3. Start Discord Bot Gateway Connection
+    # 3. Start Discord Bot Gateway Connection with Graceful Fallback
     logger.info("Connecting to Discord Gateway...")
-    await bot.start(BOT_TOKEN)
+    try:
+        await bot.start(BOT_TOKEN)
+    except discord.errors.PrivilegedIntentsRequired as e:
+        logger.warning(f"Privileged Intents error ({e}). Attempting graceful fallback to standard intents...")
+        bot.intents.presences = False
+        try:
+            await bot.start(BOT_TOKEN)
+        except discord.errors.PrivilegedIntentsRequired:
+            logger.warning("Falling back to minimal default intents...")
+            bot.intents.members = False
+            bot.intents.message_content = False
+            await bot.start(BOT_TOKEN)
 
 def main():
     asyncio.run(run_bot_with_server())
