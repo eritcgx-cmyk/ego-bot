@@ -5,7 +5,10 @@ Features:
 - Automatic 4-member staff review ticket creation & approval workflow
 - Dedicated private suite auto-provisioning (Private Category + 1 Text Lounge + 1 Voice Suite)
 - Custom role auto-creation (👑 ︱ <FG Name>) & base FG role assignment
-- Persistent FG Control Panel with interactive action buttons (Roster, Invite, Lock/Unlock Voice, Sync Role, Rename, Kick Member, Disband)
+- Persistent FG Control Panel with interactive action buttons:
+  (Roster, Invite, Lock/Unlock Voice, Sync Role, Rename FG, Rename Category, Rename Text, Rename Voice, Kick Member, Disband)
+- Ephemeral private control panel (/fg panel) visible only to the requester
+- Welcome announcement in text lounge instructing leader to use /fg panel
 - DM invitation acceptance & seamless cross-reboot persistence.
 """
 import os
@@ -39,12 +42,14 @@ class FGRenameModal(discord.ui.Modal, title="Rename Friend Group"):
         guild = interaction.guild
         user = interaction.user
 
+        await interaction.response.defer(ephemeral=True)
+
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == self.fg_id))
             fg = res.scalar_one_or_none()
 
             if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this Friend Group.", ephemeral=True)
+                return await interaction.followup.send("Only the FG Leader or an Admin can rename this Friend Group.", ephemeral=True)
 
             old_name = fg.name
             fg.name = self.new_name.value.strip()
@@ -67,8 +72,125 @@ class FGRenameModal(discord.ui.Modal, title="Rename Friend Group"):
                         except Exception:
                             pass
 
-        await interaction.response.send_message(
+        await interaction.followup.send(
             embed=success_embed("FG Renamed", f"Renamed FG from **{old_name}** to **{self.new_name.value.strip()}**."),
+            ephemeral=True
+        )
+
+
+class FGRenameCategoryModal(discord.ui.Modal, title="Rename FG Category"):
+    def __init__(self, fg_id: int):
+        super().__init__()
+        self.fg_id = fg_id
+
+    category_name = discord.ui.TextInput(label="New Category Name", placeholder="e.g. 👑 ︱ Syndicate Elite", max_length=50, required=True)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        user = interaction.user
+
+        await interaction.response.defer(ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.id == self.fg_id))
+            fg = res.scalar_one_or_none()
+
+            if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
+                return await interaction.followup.send("Only the FG Leader or an Admin can rename this category.", ephemeral=True)
+
+            if not fg.category_id or not guild:
+                return await interaction.followup.send("Category not found.", ephemeral=True)
+
+            cat = guild.get_channel(fg.category_id)
+            if not cat or not isinstance(cat, discord.CategoryChannel):
+                return await interaction.followup.send("Category channel not found in server.", ephemeral=True)
+
+            new_cat_name = self.category_name.value.strip()
+            try:
+                await cat.edit(name=new_cat_name)
+            except Exception as e:
+                return await interaction.followup.send(f"Failed to rename category: {e}", ephemeral=True)
+
+        await interaction.followup.send(
+            embed=success_embed("Category Renamed", f"Renamed FG Category to **{new_cat_name}**."),
+            ephemeral=True
+        )
+
+
+class FGRenameTextChannelModal(discord.ui.Modal, title="Rename Text Lounge"):
+    def __init__(self, fg_id: int):
+        super().__init__()
+        self.fg_id = fg_id
+
+    channel_name = discord.ui.TextInput(label="New Text Channel Name", placeholder="e.g. 💬-lounge or general", max_length=50, required=True)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        user = interaction.user
+
+        await interaction.response.defer(ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.id == self.fg_id))
+            fg = res.scalar_one_or_none()
+
+            if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
+                return await interaction.followup.send("Only the FG Leader or an Admin can rename this text channel.", ephemeral=True)
+
+            if not fg.text_channel_id or not guild:
+                return await interaction.followup.send("Text channel not found.", ephemeral=True)
+
+            ch = guild.get_channel(fg.text_channel_id)
+            if not ch or not isinstance(ch, discord.TextChannel):
+                return await interaction.followup.send("Text channel not found in server.", ephemeral=True)
+
+            new_ch_name = self.channel_name.value.strip().lower().replace(" ", "-")
+            try:
+                await ch.edit(name=new_ch_name)
+            except Exception as e:
+                return await interaction.followup.send(f"Failed to rename text channel: {e}", ephemeral=True)
+
+        await interaction.followup.send(
+            embed=success_embed("Text Channel Renamed", f"Renamed text lounge to **#{new_ch_name}**."),
+            ephemeral=True
+        )
+
+
+class FGRenameVoiceChannelModal(discord.ui.Modal, title="Rename Voice Lounge"):
+    def __init__(self, fg_id: int):
+        super().__init__()
+        self.fg_id = fg_id
+
+    channel_name = discord.ui.TextInput(label="New Voice Channel Name", placeholder="e.g. 🔊-voice or VIP Suite", max_length=50, required=True)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        user = interaction.user
+
+        await interaction.response.defer(ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.id == self.fg_id))
+            fg = res.scalar_one_or_none()
+
+            if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
+                return await interaction.followup.send("Only the FG Leader or an Admin can rename this voice channel.", ephemeral=True)
+
+            if not fg.voice_channel_id or not guild:
+                return await interaction.followup.send("Voice channel not found.", ephemeral=True)
+
+            ch = guild.get_channel(fg.voice_channel_id)
+            if not ch or not isinstance(ch, discord.VoiceChannel):
+                return await interaction.followup.send("Voice channel not found in server.", ephemeral=True)
+
+            new_ch_name = self.channel_name.value.strip()
+            try:
+                await ch.edit(name=new_ch_name)
+            except Exception as e:
+                return await interaction.followup.send(f"Failed to rename voice channel: {e}", ephemeral=True)
+
+        await interaction.followup.send(
+            embed=success_embed("Voice Channel Renamed", f"Renamed voice lounge to **{new_ch_name}**."),
             ephemeral=True
         )
 
@@ -98,16 +220,18 @@ class FGKickMemberModal(discord.ui.Modal, title="Kick Member from FG"):
         if target_uid == user.id:
             return await interaction.response.send_message("❌ You cannot kick yourself as the FG Leader. Use Disband to close the FG.", ephemeral=True)
 
+        await interaction.response.defer(ephemeral=True)
+
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == self.fg_id))
             fg = res.scalar_one_or_none()
 
             if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can kick members.", ephemeral=True)
+                return await interaction.followup.send("Only the FG Leader or an Admin can kick members.", ephemeral=True)
 
             members = fg.members
             if target_uid not in members:
-                return await interaction.response.send_message("This member is not in your Friend Group.", ephemeral=True)
+                return await interaction.followup.send("This member is not in your Friend Group.", ephemeral=True)
 
             members.remove(target_uid)
             fg.members_json = json.dumps(members)
@@ -156,7 +280,7 @@ class FGKickMemberModal(discord.ui.Modal, title="Kick Member from FG"):
                     except Exception:
                         pass
 
-        await interaction.response.send_message(
+        await interaction.followup.send(
             embed=success_embed("Member Removed", f"Successfully removed <@{target_uid}> from **{fg.name}**."),
             ephemeral=True
         )
@@ -216,7 +340,6 @@ class FGControlPanelView(discord.ui.View):
 
     @discord.ui.button(label="Invite Member", style=discord.ButtonStyle.success, emoji="👥", custom_id="fg_btn_invite", row=0)
     async def invite_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self._extract_fg_id(interaction)
         await interaction.response.send_message(
             embed=info_embed(
                 "Invite Friends",
@@ -305,7 +428,7 @@ class FGControlPanelView(discord.ui.View):
             is_locked = current_ow.connect is False
 
             if is_locked:
-                # Unlock (allow default role or private role)
+                # Unlock
                 await voice_ch.set_permissions(guild.default_role, connect=None)
                 status_msg = "🔓 **Unlocked** voice channel. Members with category access can connect."
             else:
@@ -314,20 +437,6 @@ class FGControlPanelView(discord.ui.View):
                 status_msg = "🔒 **Locked** voice channel. Only verified FG members can connect."
 
         await interaction.response.send_message(embed=success_embed("Voice Security", status_msg), ephemeral=True)
-
-    @discord.ui.button(label="Kick Member", style=discord.ButtonStyle.secondary, emoji="👢", custom_id="fg_btn_kick", row=1)
-    async def kick_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self._extract_fg_id(interaction)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
-            fg = res.scalar_one_or_none()
-            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can kick members.", ephemeral=True)
-
-        await interaction.response.send_modal(FGKickMemberModal(fg_id=fg_id))
 
     @discord.ui.button(label="Rename FG", style=discord.ButtonStyle.secondary, emoji="✏️", custom_id="fg_btn_rename", row=1)
     async def rename_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -343,7 +452,63 @@ class FGControlPanelView(discord.ui.View):
 
         await interaction.response.send_modal(FGRenameModal(fg_id=fg_id))
 
-    @discord.ui.button(label="Disband FG", style=discord.ButtonStyle.danger, emoji="💥", custom_id="fg_btn_disband", row=2)
+    @discord.ui.button(label="Kick Member", style=discord.ButtonStyle.secondary, emoji="👢", custom_id="fg_btn_kick", row=1)
+    async def kick_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        fg_id = self._extract_fg_id(interaction)
+        if not fg_id:
+            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
+            fg = res.scalar_one_or_none()
+            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
+                return await interaction.response.send_message("Only the FG Leader or an Admin can kick members.", ephemeral=True)
+
+        await interaction.response.send_modal(FGKickMemberModal(fg_id=fg_id))
+
+    @discord.ui.button(label="Rename Category", style=discord.ButtonStyle.secondary, emoji="📁", custom_id="fg_btn_rename_cat", row=2)
+    async def rename_category_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        fg_id = self._extract_fg_id(interaction)
+        if not fg_id:
+            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
+            fg = res.scalar_one_or_none()
+            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
+                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this category.", ephemeral=True)
+
+        await interaction.response.send_modal(FGRenameCategoryModal(fg_id=fg_id))
+
+    @discord.ui.button(label="Rename Text Ch", style=discord.ButtonStyle.secondary, emoji="💬", custom_id="fg_btn_rename_text", row=2)
+    async def rename_text_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        fg_id = self._extract_fg_id(interaction)
+        if not fg_id:
+            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
+            fg = res.scalar_one_or_none()
+            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
+                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this text channel.", ephemeral=True)
+
+        await interaction.response.send_modal(FGRenameTextChannelModal(fg_id=fg_id))
+
+    @discord.ui.button(label="Rename Voice Ch", style=discord.ButtonStyle.secondary, emoji="🔊", custom_id="fg_btn_rename_voice", row=2)
+    async def rename_voice_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        fg_id = self._extract_fg_id(interaction)
+        if not fg_id:
+            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
+            fg = res.scalar_one_or_none()
+            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
+                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this voice channel.", ephemeral=True)
+
+        await interaction.response.send_modal(FGRenameVoiceChannelModal(fg_id=fg_id))
+
+    @discord.ui.button(label="Disband FG", style=discord.ButtonStyle.danger, emoji="💥", custom_id="fg_btn_disband", row=3)
     async def disband_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self._extract_fg_id(interaction)
         if not fg_id:
@@ -652,7 +817,7 @@ async def trigger_fg_staff_ticket(guild: discord.Guild, fg_record: FriendGroup):
 
 
 async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
-    """Creates private role, base FG role, category, text lounge with Control Panel, and voice lounge."""
+    """Creates private role, base FG role, category, text lounge, and voice lounge, and prompts leader to use /fg panel."""
     try:
         # 1. Base FG Role
         base_fg_role = discord.utils.find(lambda r: r.name.lower() == "fg", guild.roles)
@@ -721,23 +886,19 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
                 fg.status = "active"
                 await session.commit()
 
-        # 6. Post Dedicated Interactive Control Panel
-        members_mentions = ", ".join(f"<@{m}>" for m in fg_record.members)
-        panel_embed = ego_embed(
-            title=f"👑 FG Control Panel • {fg_record.name}",
+        # 6. Send clean setup message instructing the leader to run /fg panel
+        welcome_embed = ego_embed(
+            title=f"👑 Welcome to your Friend Group Suite • {fg_record.name}",
             description=(
-                f"> **FG ID:** `#{fg_record.id}`\n"
                 f"> **Leader:** <@{fg_record.creator_id}>\n"
                 f"> **Private Role:** {private_role.mention}\n"
-                f"> **Roster ({len(fg_record.members)}):** {members_mentions}\n\n"
-                f"› **Exclusive Suite:** Private Category, Text Lounge, and Voice Suite.\n"
-                f"Use the buttons below to manage your Friend Group suite:"
+                f"> **Roster ({len(fg_record.members)}):** {', '.join(f'<@{m}>' for m in fg_record.members)}\n\n"
+                f"› **Suite Provisioned:** Dedicated Category, Text Lounge, Voice Lounge, and Private Role.\n\n"
+                f"⚙️ **Control Panel:** Run `/fg panel` at any time to open your private control panel (visible only to you) to manage your roster, invite members, rename channels/category, lock voice, or sync roles."
             ),
             color=COLOR_VIOLET
         )
-
-        panel_view = FGControlPanelView(fg_id=fg_record.id)
-        await text_ch.send(content=f"<@{fg_record.creator_id}>", embed=panel_embed, view=panel_view)
+        await text_ch.send(content=f"👑 <@{fg_record.creator_id}>", embed=welcome_embed)
 
     except Exception as e:
         logger.error(f"Failed to provision FG suite: {e}")
@@ -769,7 +930,8 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             existing = res.scalar_one_or_none()
             if existing:
                 return await interaction.followup.send(
-                    embed=error_embed("FG Already Exists", f"You already lead Friend Group **{existing.name}** (`#{existing.id}`).")
+                    embed=error_embed("FG Already Exists", f"You already lead Friend Group **{existing.name}** (`#{existing.id}`)."),
+                    ephemeral=True
                 )
 
             # Create FG in pending state
@@ -797,7 +959,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                 ),
                 color=COLOR_VIOLET
             )
-            await interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed, ephemeral=True)
 
     @fg_group.command(name="invite", description="Invite a friend to your Friend Group")
     @app_commands.describe(member="Member to invite")
@@ -810,6 +972,8 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
         if member.bot:
             return await interaction.response.send_message("❌ You cannot invite bots to an FG.", ephemeral=True)
 
+        await interaction.response.defer(ephemeral=True)
+
         async with AsyncSessionLocal() as session:
             res = await session.execute(
                 select(FriendGroup).where(
@@ -820,14 +984,14 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             )
             fg = res.scalar_one_or_none()
             if not fg:
-                return await interaction.response.send_message(
+                return await interaction.followup.send(
                     embed=error_embed("No FG Found", "You do not lead an active Friend Group. Run `/fg start` first!"),
                     ephemeral=True
                 )
 
             members = fg.members
             if member.id in members:
-                return await interaction.response.send_message(f"❌ {member.mention} is already in your Friend Group.", ephemeral=True)
+                return await interaction.followup.send(f"❌ {member.mention} is already in your Friend Group.", ephemeral=True)
 
             # Send Invite Card
             invite_embed = ego_embed(
@@ -855,7 +1019,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             if not sent_dm:
                 await interaction.channel.send(content=f"📢 {member.mention}", embed=invite_embed, view=view)
 
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 embed=success_embed(
                     "Invitation Dispatched",
                     f"Sent invite card to {member.mention} for FG **{fg.name}**."
@@ -863,10 +1027,12 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                 ephemeral=True
             )
 
-    @fg_group.command(name="panel", description="Deploy or resend the FG Control Panel to your lounge")
+    @fg_group.command(name="panel", description="Open your private Friend Group Control Panel (visible only to you)")
     async def fg_panel(self, interaction: discord.Interaction):
         user = interaction.user
         guild = interaction.guild
+
+        await interaction.response.defer(ephemeral=True)
 
         async with AsyncSessionLocal() as session:
             res = await session.execute(
@@ -878,8 +1044,8 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             )
             fg = res.scalar_one_or_none()
             if not fg:
-                return await interaction.response.send_message(
-                    embed=error_embed("No Active FG", "You do not own an active approved Friend Group."),
+                return await interaction.followup.send(
+                    embed=error_embed("No Active FG", "You do not lead an active approved Friend Group in this server."),
                     ephemeral=True
                 )
 
@@ -894,18 +1060,20 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                     f"> **Leader:** <@{fg.creator_id}>\n"
                     f"> **Private Role:** {role_mention}\n"
                     f"> **Roster ({len(fg.members)}):** {members_mentions}\n\n"
-                    f"› **Suite Controls:** Roster, Invite, Lock/Unlock Voice, Sync Role, Rename, Kick Member, Disband:"
+                    f"› **Suite Controls:** Use the interactive buttons below to manage your Friend Group suite:"
                 ),
                 color=COLOR_VIOLET
             )
 
             view = FGControlPanelView(fg_id=fg.id)
-            await interaction.response.send_message(embed=panel_embed, view=view)
+            await interaction.followup.send(embed=panel_embed, view=view, ephemeral=True)
 
     @fg_group.command(name="stats", description="View status and details of the Friend Groups you belong to")
     async def fg_stats(self, interaction: discord.Interaction):
         user = interaction.user
         guild = interaction.guild
+
+        await interaction.response.defer(ephemeral=True)
 
         async with AsyncSessionLocal() as session:
             res = await session.execute(
@@ -918,7 +1086,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             user_fgs = [f for f in all_fgs if user.id in f.members or f.creator_id == user.id]
 
             if not user_fgs:
-                return await interaction.response.send_message(
+                return await interaction.followup.send(
                     embed=info_embed("Friend Groups", "You do not belong to any Friend Groups in this server.\nRun `/fg start` to create one!"),
                     ephemeral=True
                 )
@@ -938,7 +1106,167 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                     inline=False
                 )
 
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
+
+    @fg_group.command(name="rename", description="Rename your Friend Group and its synced role/category")
+    @app_commands.describe(new_name="New name for your Friend Group")
+    async def fg_rename_cmd(self, interaction: discord.Interaction, new_name: str):
+        guild = interaction.guild
+        user = interaction.user
+
+        await interaction.response.defer(ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(
+                select(FriendGroup).where(
+                    FriendGroup.guild_id == guild.id,
+                    FriendGroup.creator_id == user.id,
+                    FriendGroup.status != "disbanded"
+                )
+            )
+            fg = res.scalar_one_or_none()
+            if not fg:
+                return await interaction.followup.send(
+                    embed=error_embed("No FG Found", "You do not lead an active Friend Group."),
+                    ephemeral=True
+                )
+
+            old_name = fg.name
+            fg.name = new_name.strip()
+            await session.commit()
+
+            if guild:
+                if fg.category_id:
+                    cat = guild.get_channel(fg.category_id)
+                    if cat:
+                        try:
+                            await cat.edit(name=f"👑 ︱ {fg.name}")
+                        except Exception:
+                            pass
+                if fg.role_id:
+                    role = guild.get_role(fg.role_id)
+                    if role:
+                        try:
+                            await role.edit(name=f"👑 ︱ {fg.name}")
+                        except Exception:
+                            pass
+
+        await interaction.followup.send(
+            embed=success_embed("FG Renamed", f"Renamed FG from **{old_name}** to **{new_name.strip()}**."),
+            ephemeral=True
+        )
+
+    @fg_group.command(name="rename_category", description="Rename the private Category channel for your Friend Group")
+    @app_commands.describe(category_name="New Category Name (e.g. 👑 ︱ Syndicate Elite)")
+    async def fg_rename_category_cmd(self, interaction: discord.Interaction, category_name: str):
+        guild = interaction.guild
+        user = interaction.user
+
+        await interaction.response.defer(ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(
+                select(FriendGroup).where(
+                    FriendGroup.guild_id == guild.id,
+                    FriendGroup.creator_id == user.id,
+                    FriendGroup.status == "active"
+                )
+            )
+            fg = res.scalar_one_or_none()
+            if not fg or not fg.category_id:
+                return await interaction.followup.send(
+                    embed=error_embed("No Active FG Category", "You do not own an active FG category."),
+                    ephemeral=True
+                )
+
+            cat = guild.get_channel(fg.category_id)
+            if not cat:
+                return await interaction.followup.send("Category channel not found.", ephemeral=True)
+
+            try:
+                await cat.edit(name=category_name.strip())
+            except Exception as e:
+                return await interaction.followup.send(f"Failed to edit category: {e}", ephemeral=True)
+
+        await interaction.followup.send(
+            embed=success_embed("Category Renamed", f"Renamed FG category to **{category_name.strip()}**."),
+            ephemeral=True
+        )
+
+    @fg_group.command(name="rename_text", description="Rename the private Text lounge for your Friend Group")
+    @app_commands.describe(channel_name="New Text Channel Name")
+    async def fg_rename_text_cmd(self, interaction: discord.Interaction, channel_name: str):
+        guild = interaction.guild
+        user = interaction.user
+
+        await interaction.response.defer(ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(
+                select(FriendGroup).where(
+                    FriendGroup.guild_id == guild.id,
+                    FriendGroup.creator_id == user.id,
+                    FriendGroup.status == "active"
+                )
+            )
+            fg = res.scalar_one_or_none()
+            if not fg or not fg.text_channel_id:
+                return await interaction.followup.send(
+                    embed=error_embed("No Active FG Text Lounge", "You do not own an active FG text lounge."),
+                    ephemeral=True
+                )
+
+            ch = guild.get_channel(fg.text_channel_id)
+            if not ch:
+                return await interaction.followup.send("Text channel not found.", ephemeral=True)
+
+            clean_name = channel_name.strip().lower().replace(" ", "-")
+            try:
+                await ch.edit(name=clean_name)
+            except Exception as e:
+                return await interaction.followup.send(f"Failed to edit text channel: {e}", ephemeral=True)
+
+        await interaction.followup.send(
+            embed=success_embed("Text Lounge Renamed", f"Renamed text lounge to **#{clean_name}**."),
+            ephemeral=True
+        )
+
+    @fg_group.command(name="rename_voice", description="Rename the private Voice lounge for your Friend Group")
+    @app_commands.describe(channel_name="New Voice Channel Name")
+    async def fg_rename_voice_cmd(self, interaction: discord.Interaction, channel_name: str):
+        guild = interaction.guild
+        user = interaction.user
+
+        await interaction.response.defer(ephemeral=True)
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(
+                select(FriendGroup).where(
+                    FriendGroup.guild_id == guild.id,
+                    FriendGroup.creator_id == user.id,
+                    FriendGroup.status == "active"
+                )
+            )
+            fg = res.scalar_one_or_none()
+            if not fg or not fg.voice_channel_id:
+                return await interaction.followup.send(
+                    embed=error_embed("No Active FG Voice Lounge", "You do not own an active FG voice lounge."),
+                    ephemeral=True
+                )
+
+            ch = guild.get_channel(fg.voice_channel_id)
+            if not ch:
+                return await interaction.followup.send("Voice channel not found.", ephemeral=True)
+
+            try:
+                await ch.edit(name=channel_name.strip())
+            except Exception as e:
+                return await interaction.followup.send(f"Failed to edit voice channel: {e}", ephemeral=True)
+
+        await interaction.followup.send(
+            embed=success_embed("Voice Lounge Renamed", f"Renamed voice lounge to **{channel_name.strip()}**."),
+            ephemeral=True
+        )
 
     fg_admin_group = app_commands.Group(
         name="fg_admin",
