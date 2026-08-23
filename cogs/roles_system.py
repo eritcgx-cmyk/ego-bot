@@ -30,6 +30,11 @@ FG_SPECIAL_ROLES = ["Giant FG", "Huge FG", "Known FG", "Com FG", "FG"]
 CC_ROLE_NAMES = ["Star", "Famous", "Known", "CC Tier 3", "CC Tier 2", "CC", "CC Partner"]
 
 def load_role_descriptions() -> Dict[str, Any]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("custom_role_descriptions")
+    if cached is not None and isinstance(cached, dict):
+        return cached
+
     os.makedirs(os.path.dirname(ROLE_DESC_FILE), exist_ok=True)
     if not os.path.exists(ROLE_DESC_FILE):
         return {}
@@ -40,11 +45,21 @@ def load_role_descriptions() -> Dict[str, Any]:
         return {}
 
 def save_role_descriptions(data: Dict[str, Any]):
+    from utils.kv_store import set_cached_kv_and_schedule_save
     os.makedirs(os.path.dirname(ROLE_DESC_FILE), exist_ok=True)
-    with open(ROLE_DESC_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(ROLE_DESC_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
+    set_cached_kv_and_schedule_save("custom_role_descriptions", data)
 
 def load_board_states() -> List[Dict[str, Any]]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("role_boards")
+    if cached is not None and isinstance(cached, list):
+        return cached
+
     os.makedirs(os.path.dirname(ROLE_BOARD_STATE_FILE), exist_ok=True)
     if not os.path.exists(ROLE_BOARD_STATE_FILE):
         return []
@@ -55,11 +70,21 @@ def load_board_states() -> List[Dict[str, Any]]:
         return []
 
 def save_board_states(data: List[Dict[str, Any]]):
+    from utils.kv_store import set_cached_kv_and_schedule_save
     os.makedirs(os.path.dirname(ROLE_BOARD_STATE_FILE), exist_ok=True)
-    with open(ROLE_BOARD_STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(ROLE_BOARD_STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
+    set_cached_kv_and_schedule_save("role_boards", data)
 
 def get_tier_requirements() -> Dict[str, Any]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("cc_tier_requirements")
+    if cached is not None and isinstance(cached, dict) and len(cached) > 0:
+        return cached
+
     if os.path.exists(CC_REQ_FILE):
         try:
             with open(CC_REQ_FILE, "r", encoding="utf-8") as f:

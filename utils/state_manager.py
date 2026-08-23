@@ -49,6 +49,11 @@ def atomic_write_json(filepath: str, data: Any):
                 pass
 
 def load_master_state() -> Dict[str, Any]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("master_guild_state")
+    if cached is not None and isinstance(cached, dict):
+        return cached
+
     ensure_data_directories()
     if not os.path.exists(MASTER_STATE_FILE):
         return {}
@@ -60,10 +65,12 @@ def load_master_state() -> Dict[str, Any]:
         return {}
 
 def save_master_state(data: Dict[str, Any]):
+    from utils.kv_store import set_cached_kv_and_schedule_save
     atomic_write_json(MASTER_STATE_FILE, data)
+    set_cached_kv_and_schedule_save("master_guild_state", data)
 
 def update_guild_state_section(guild_id: int, section: str, values: Dict[str, Any]):
-    """Instantly persists a subsystem configuration to the master state file."""
+    """Instantly persists a subsystem configuration to PostgreSQL and local master state."""
     state = load_master_state()
     g_key = str(guild_id)
     if g_key not in state:

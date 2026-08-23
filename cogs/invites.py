@@ -38,6 +38,11 @@ def ensure_files():
             json.dump({}, f)
 
 def load_board_configs() -> Dict[str, Any]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("invite_board_config")
+    if cached is not None and isinstance(cached, dict):
+        return cached
+
     ensure_files()
     try:
         with open(BOARD_CONFIG_FILE, "r", encoding="utf-8") as f:
@@ -46,11 +51,21 @@ def load_board_configs() -> Dict[str, Any]:
         return {}
 
 def save_board_configs(data: Dict[str, Any]):
+    from utils.kv_store import set_cached_kv_and_schedule_save
     ensure_files()
-    with open(BOARD_CONFIG_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(BOARD_CONFIG_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
+    set_cached_kv_and_schedule_save("invite_board_config", data)
 
 def load_inviters_map() -> Dict[str, int]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("member_inviters")
+    if cached is not None and isinstance(cached, dict):
+        return cached
+
     ensure_files()
     try:
         with open(INVITERS_MAP_FILE, "r", encoding="utf-8") as f:
@@ -59,9 +74,14 @@ def load_inviters_map() -> Dict[str, int]:
         return {}
 
 def save_inviters_map(data: Dict[str, int]):
+    from utils.kv_store import set_cached_kv_and_schedule_save
     ensure_files()
-    with open(INVITERS_MAP_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(INVITERS_MAP_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
+    set_cached_kv_and_schedule_save("member_inviters", data)
 
 
 class InviteLeaderboardView(discord.ui.View):

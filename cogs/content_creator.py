@@ -68,6 +68,11 @@ DEFAULT_TIER_REQUIREMENTS = {
 
 
 def load_tier_requirements() -> Dict[str, Any]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("cc_tier_requirements")
+    if cached is not None and isinstance(cached, dict) and len(cached) > 0:
+        return cached
+
     os.makedirs(os.path.dirname(CC_REQ_FILE), exist_ok=True)
     if not os.path.exists(CC_REQ_FILE):
         with open(CC_REQ_FILE, "w", encoding="utf-8") as f:
@@ -80,11 +85,21 @@ def load_tier_requirements() -> Dict[str, Any]:
         return DEFAULT_TIER_REQUIREMENTS.copy()
 
 def save_tier_requirements(data: Dict[str, Any]):
+    from utils.kv_store import set_cached_kv_and_schedule_save
     os.makedirs(os.path.dirname(CC_REQ_FILE), exist_ok=True)
-    with open(CC_REQ_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(CC_REQ_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
+    set_cached_kv_and_schedule_save("cc_tier_requirements", data)
 
 def load_cc_config() -> Dict[str, Any]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("cc_config")
+    if cached is not None and isinstance(cached, dict):
+        return cached
+
     os.makedirs(os.path.dirname(CC_CONFIG_FILE), exist_ok=True)
     if not os.path.exists(CC_CONFIG_FILE):
         return {}
@@ -95,9 +110,14 @@ def load_cc_config() -> Dict[str, Any]:
         return {}
 
 def save_cc_config(data: Dict[str, Any]):
+    from utils.kv_store import set_cached_kv_and_schedule_save
     os.makedirs(os.path.dirname(CC_CONFIG_FILE), exist_ok=True)
-    with open(CC_CONFIG_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(CC_CONFIG_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
+    set_cached_kv_and_schedule_save("cc_config", data)
 
 async def resolve_video_channel(guild: discord.Guild) -> Optional[discord.TextChannel]:
     """Resolves video broadcast channel with multi-tier persistence (Postgres -> MasterState -> Local JSON -> Channel Name)."""

@@ -19,10 +19,17 @@ STATUS_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "saved_statu
 class CustomStatusManager:
     @staticmethod
     def load_statuses() -> List[Dict[str, Any]]:
+        from utils.kv_store import get_cached_kv
+        cached = get_cached_kv("saved_statuses")
+        if cached is not None and isinstance(cached, list) and len(cached) > 0:
+            return cached
+
         if os.path.exists(STATUS_FILE):
             try:
                 with open(STATUS_FILE, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    if data:
+                        return data
             except Exception as e:
                 logger.error(f"Failed to load saved statuses: {e}")
         # Default starting list with user-customizable games
@@ -38,9 +45,14 @@ class CustomStatusManager:
 
     @staticmethod
     def save_statuses(statuses: List[Dict[str, Any]]):
+        from utils.kv_store import set_cached_kv_and_schedule_save
         os.makedirs(os.path.dirname(STATUS_FILE), exist_ok=True)
-        with open(STATUS_FILE, "w", encoding="utf-8") as f:
-            json.dump(statuses, f, indent=2)
+        try:
+            with open(STATUS_FILE, "w", encoding="utf-8") as f:
+                json.dump(statuses, f, indent=2)
+        except Exception:
+            pass
+        set_cached_kv_and_schedule_save("saved_statuses", statuses)
 
 class StatusSelectView(discord.ui.View):
     def __init__(self, statuses: List[Dict[str, Any]], cog: "CustomStatusCog"):

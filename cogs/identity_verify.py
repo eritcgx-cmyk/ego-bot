@@ -29,6 +29,11 @@ from config import SUCCESS_COLOR, INFO_COLOR, WARNING_COLOR, logger
 VERIFY_CONFIGS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "face_verify_config.json")
 
 def load_face_configs() -> Dict[str, Any]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("face_verify_config")
+    if cached is not None and isinstance(cached, dict):
+        return cached
+
     if not os.path.exists(VERIFY_CONFIGS_FILE):
         return {}
     try:
@@ -38,9 +43,14 @@ def load_face_configs() -> Dict[str, Any]:
         return {}
 
 def save_face_configs(data: Dict[str, Any]):
+    from utils.kv_store import set_cached_kv_and_schedule_save
     os.makedirs(os.path.dirname(VERIFY_CONFIGS_FILE), exist_ok=True)
-    with open(VERIFY_CONFIGS_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(VERIFY_CONFIGS_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
+    set_cached_kv_and_schedule_save("face_verify_config", data)
 
 def detect_member_gender(member: discord.Member, cfg: Dict[str, Any]) -> str:
     """Detects whether member has Male or Female roles configured on server."""

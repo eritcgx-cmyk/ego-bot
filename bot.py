@@ -56,7 +56,14 @@ class EgoBot(commands.Bot):
         logger.info("Connecting to database and verifying schema...")
         await init_db()
 
-        # 3. Load all Extensions
+        # 3. Hydrate persistent Key-Value storage from PostgreSQL
+        try:
+            from utils.kv_store import init_kv_store
+            await init_kv_store()
+        except Exception as e:
+            logger.error(f"Failed to hydrate KV store: {e}")
+
+        # 4. Load all Extensions
         for ext in INITIAL_COGS:
 
             try:

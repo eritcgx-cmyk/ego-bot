@@ -14,6 +14,11 @@ from database.models import GuildConfig
 COMMAND_ACCESS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "command_access.json")
 
 def load_command_access() -> Dict[str, Any]:
+    from utils.kv_store import get_cached_kv
+    cached = get_cached_kv("command_access")
+    if cached is not None and isinstance(cached, dict):
+        return cached
+
     os.makedirs(os.path.dirname(COMMAND_ACCESS_FILE), exist_ok=True)
     if not os.path.exists(COMMAND_ACCESS_FILE):
         return {}
@@ -24,9 +29,14 @@ def load_command_access() -> Dict[str, Any]:
         return {}
 
 def save_command_access(data: Dict[str, Any]):
+    from utils.kv_store import set_cached_kv_and_schedule_save
     os.makedirs(os.path.dirname(COMMAND_ACCESS_FILE), exist_ok=True)
-    with open(COMMAND_ACCESS_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(COMMAND_ACCESS_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
+    set_cached_kv_and_schedule_save("command_access", data)
 
 def has_custom_command_access(guild_id: int, command_name: str, member: discord.Member) -> bool:
     access_data = load_command_access()

@@ -321,3 +321,22 @@ class ApplicationSubmission(Base):
     @answers.setter
     def answers(self, value: Dict[str, str]):
         self.answers_json = json.dumps(value)
+
+class BotKVStore(Base):
+    __tablename__ = "bot_kv_store"
+
+    key = Column(String(255), primary_key=True, index=True)
+    value_json = Column(Text, nullable=False, default="{}")
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @property
+    def value(self) -> Any:
+        try:
+            return json.loads(self.value_json or "null")
+        except Exception:
+            return None
+
+    @value.setter
+    def value(self, val: Any):
+        self.value_json = json.dumps(val)
+
