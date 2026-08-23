@@ -38,24 +38,25 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-        # Auto-migrate welcome_configs missing columns
-        for col_def in [
-            "ALTER TABLE welcome_configs ADD COLUMN leave_enabled BOOLEAN DEFAULT 0",
-            "ALTER TABLE welcome_configs ADD COLUMN leave_channel_id BIGINT",
-            "ALTER TABLE welcome_configs ADD COLUMN leave_title VARCHAR(255)",
-            "ALTER TABLE welcome_configs ADD COLUMN leave_message TEXT",
-            "ALTER TABLE welcome_configs ADD COLUMN leave_color INTEGER DEFAULT 15680324",
-            "ALTER TABLE guild_configs ADD COLUMN video_channel_id BIGINT",
-            "ALTER TABLE guild_configs ADD COLUMN bot_manager_role_id BIGINT",
-            "ALTER TABLE automod_configs ADD COLUMN block_links BOOLEAN DEFAULT 0",
-            "ALTER TABLE automod_configs ADD COLUMN punishment_type VARCHAR(32) DEFAULT 'timeout'",
-            "ALTER TABLE automod_configs ADD COLUMN punishment_duration INTEGER DEFAULT 600"
-        ]:
-            try:
+    # Auto-migrate missing columns in separate transactions
+    for col_def in [
+        "ALTER TABLE welcome_configs ADD COLUMN leave_enabled BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE welcome_configs ADD COLUMN leave_channel_id BIGINT",
+        "ALTER TABLE welcome_configs ADD COLUMN leave_title VARCHAR(255)",
+        "ALTER TABLE welcome_configs ADD COLUMN leave_message TEXT",
+        "ALTER TABLE welcome_configs ADD COLUMN leave_color INTEGER DEFAULT 15680324",
+        "ALTER TABLE guild_configs ADD COLUMN video_channel_id BIGINT",
+        "ALTER TABLE guild_configs ADD COLUMN bot_manager_role_id BIGINT",
+        "ALTER TABLE automod_configs ADD COLUMN block_links BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE automod_configs ADD COLUMN punishment_type VARCHAR(32) DEFAULT 'timeout'",
+        "ALTER TABLE automod_configs ADD COLUMN punishment_duration INTEGER DEFAULT 600"
+    ]:
+        try:
+            async with engine.begin() as conn:
                 from sqlalchemy import text
                 await conn.execute(text(col_def))
-            except Exception:
-                pass
+        except Exception:
+            pass
 
     logger.info("Database schema verified and tables created.")
 
