@@ -2,7 +2,7 @@
 Content Creator (CC) Verification, Tier Requirements, and Creator Video Publishing Cog for Ego Bot.
 Features /post and /cc post commands for Creators (with review ticket flow for CC and CC Tier 2),
 configurable follower/view/like thresholds per tier, thumbnail extraction, CC Partner @here/@everyone pings,
-and custom video broadcast channels.
+persistent database storage for video broadcast channels, and custom video showcase channels.
 """
 import os
 import json
@@ -11,11 +11,15 @@ from typing import Optional, List, Dict, Any
 import discord
 from discord import app_commands
 from discord.ext import commands
+from sqlalchemy import select
+from database.engine import AsyncSessionLocal
+from database.models import GuildConfig
 from utils.permissions import is_admin_or_has_role, is_guild_owner
 from utils.embeds import (
     ego_embed, success_embed, error_embed, info_embed, card_embed,
     COLOR_VIOLET, COLOR_EMERALD, COLOR_CRIMSON, COLOR_CYAN, COLOR_AMBER
 )
+from utils.state_manager import update_guild_state_section, load_master_state
 from config import logger
 
 CC_REQ_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cc_tier_requirements.json")
@@ -95,6 +99,53 @@ def save_cc_config(data: Dict[str, Any]):
     with open(CC_CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
+async def resolve_video_channel(guild: discord.Guild) -> Optional[discord.TextChannel]:
+    """Resolves video broadcast channel with multi-tier persistence (Postgres -> MasterState -> Local JSON -> Channel Name)."""
+    if not guild:
+        return None
+
+    vid_ch_id = None
+
+    # Tier 1: PostgreSQL / SQLite GuildConfig table
+    try:
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(GuildConfig).where(GuildConfig.guild_id == guild.id))
+            cfg = res.scalar_one_or_none()
+            if cfg and getattr(cfg, "video_channel_id", None):
+                vid_ch_id = cfg.video_channel_id
+    except Exception as e:
+        logger.debug(f"DB video channel lookup note: {e}")
+
+    # Tier 2: Master State Engine
+    if not vid_ch_id:
+        try:
+            m_state = load_master_state()
+            g_state = m_state.get(str(guild.id), {}).get("config", {})
+            vid_ch_id = g_state.get("video_channel_id")
+        except Exception:
+            pass
+
+    # Tier 3: Local JSON
+    if not vid_ch_id:
+        try:
+            cfg = load_cc_config()
+            vid_ch_id = cfg.get(str(guild.id), {}).get("video_channel_id")
+        except Exception:
+            pass
+
+    if vid_ch_id:
+        target_ch = guild.get_channel(int(vid_ch_id))
+        if target_ch and isinstance(target_ch, discord.TextChannel):
+            return target_ch
+
+    # Tier 4: Fallback search by standard names
+    for name_query in ["videos", "creator-videos", "creators", "uploads", "showcase", "media"]:
+        ch = discord.utils.find(lambda c: isinstance(c, discord.TextChannel) and name_query in c.name.lower(), guild.channels)
+        if ch:
+            return ch
+
+    return None
+
 def extract_video_thumbnail(url: str) -> Optional[str]:
     """Extracts thumbnail image URL from YouTube, TikTok, Twitch, or direct media links."""
     if not url:
@@ -161,12 +212,7 @@ class CCPostReviewView(discord.ui.View):
             return await interaction.response.send_message("Could not parse creator or video link.", ephemeral=True)
 
         guild = interaction.guild
-        cfg = load_cc_config()
-        vid_ch_id = cfg.get(str(guild.id), {}).get("video_channel_id")
-        
-        target_ch = guild.get_channel(vid_ch_id) if vid_ch_id else None
-        if not target_ch or not isinstance(target_ch, discord.TextChannel):
-            target_ch = interaction.channel
+        target_ch = await resolve_video_channel(guild) or interaction.channel
 
         creator = guild.get_member(self.creator_id)
         if not creator:
@@ -638,12 +684,7 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
             )
         else:
             # High Tier (CC Tier 3, Known, Famous, Star, CC Partner) or Admin -> Instant Publish!
-            cfg = load_cc_config()
-            vid_ch_id = cfg.get(str(guild.id), {}).get("video_channel_id")
-            target_ch = guild.get_channel(vid_ch_id) if vid_ch_id else interaction.channel
-
-            if not target_ch or not isinstance(target_ch, discord.TextChannel):
-                target_ch = interaction.channel
+            target_ch = await resolve_video_channel(guild) or interaction.channel
 
             broadcast_embed = ego_embed(
                 title=f"🎬 Creator Spotlight • {user.display_name}",
@@ -722,17 +763,50 @@ class ContentCreatorCog(commands.Cog, name="ContentCreator"):
     @app_commands.describe(channel="Target video showcase channel")
     @is_admin_or_has_role()
     async def cc_set_video_ch(self, interaction: discord.Interaction, channel: discord.TextChannel):
+        guild = interaction.guild
+        
+        # 1. Save directly into PostgreSQL / SQLite Database table
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(GuildConfig).where(GuildConfig.guild_id == guild.id))
+            g_cfg = res.scalar_one_or_none()
+            if not g_cfg:
+                g_cfg = GuildConfig(guild_id=guild.id)
+                session.add(g_cfg)
+            g_cfg.video_channel_id = channel.id
+            await session.commit()
+
+        # 2. Save into Master State engine
+        update_guild_state_section(guild.id, "config", {"video_channel_id": channel.id})
+
+        # 3. Save into local JSON cache
         cfg = load_cc_config()
-        g_id = str(interaction.guild.id)
+        g_id = str(guild.id)
         if g_id not in cfg:
             cfg[g_id] = {}
         cfg[g_id]["video_channel_id"] = channel.id
         save_cc_config(cfg)
 
         await interaction.response.send_message(
-            embed=success_embed("Video Channel Set", f"Creator videos will now be published in {channel.mention}."),
+            embed=success_embed("Video Channel Saved", f"✅ Creator videos will now be permanently published to {channel.mention} across all reboots and updates."),
             ephemeral=True
         )
+
+    @cc_group.command(name="config", description="View the current Creator video channel and tier settings")
+    @is_admin_or_has_role()
+    async def cc_view_config(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        target_ch = await resolve_video_channel(guild)
+
+        embed = ego_embed(
+            title=f"🎬 Creator Hub Config • {guild.name}",
+            description=(
+                f"> **Video Broadcast Channel:** {target_ch.mention if target_ch else '*Not Set (Uses command channel)*'}\n"
+                f"> **Partner Ping Permissions:** `@here` & `@everyone` allowed for `CC Partner` role.\n\n"
+                f"To change the video channel, run `/cc_admin set_video_channel channel:#channel`."
+            ),
+            color=COLOR_CYAN
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @cc_group.command(name="tiers", description="View follower and view requirements for all Creator tiers")
     async def cc_tiers(self, interaction: discord.Interaction):

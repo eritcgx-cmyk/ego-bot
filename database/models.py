@@ -21,8 +21,10 @@ class GuildConfig(Base):
 
     guild_id = Column(BigInteger, primary_key=True, index=True)
     mod_log_channel_id = Column(BigInteger, nullable=True)
+    video_channel_id = Column(BigInteger, nullable=True) # Persistent creator video broadcast channel
     admin_role_id = Column(BigInteger, nullable=True)
     mod_role_id = Column(BigInteger, nullable=True)
+    bot_manager_role_id = Column(BigInteger, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class Giveaway(Base):
@@ -85,11 +87,14 @@ class AutomodConfig(Base):
     spam_threshold = Column(Integer, default=5) # Messages within 5 seconds
     mass_mention_limit = Column(Integer, default=5)
     block_invites = Column(Boolean, default=True)
+    block_links = Column(Boolean, default=False)
     banned_words_json = Column(Text, default="[]")
     warn_threshold = Column(Integer, default=2)
-    timeout_threshold = Column(Integer, default=4) # In minutes or infraction points
+    timeout_threshold = Column(Integer, default=4)
     kick_threshold = Column(Integer, default=6)
     ban_threshold = Column(Integer, default=8)
+    punishment_type = Column(String(32), default="timeout")
+    punishment_duration = Column(Integer, default=600)
 
     @property
     def banned_words(self) -> List[str]:
@@ -131,10 +136,9 @@ class FriendGroup(Base):
     voice_channel_id = Column(BigInteger, nullable=True)
     role_id = Column(BigInteger, nullable=True)
     ticket_channel_id = Column(BigInteger, nullable=True)
-    status = Column(String(32), default="pending", index=True) # pending, active, disbanded
+    status = Column(String(32), default="pending", index=True) # pending, under_review, active, disbanded
     members_json = Column(Text, default="[]") # List of user IDs accepted
     invited_json = Column(Text, default="[]") # List of user IDs pending
-
 
     @property
     def members(self) -> List[int]:
@@ -195,7 +199,7 @@ class ContentCreatorTier(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     guild_id = Column(BigInteger, index=True, nullable=False)
-    tier_name = Column(String(64), nullable=False) # tier1, tier2, tier3, star, famous
+    tier_name = Column(String(64), nullable=False) # tier1, tier2, tier3, star, famous, partner
     role_id = Column(BigInteger, nullable=True)
     required_followers = Column(Integer, default=1000)
     required_views = Column(Integer, default=5000)

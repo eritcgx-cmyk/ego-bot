@@ -1,9 +1,12 @@
 """
 Friend Group (FG) System for Ego Bot.
-Features /fg start (pending), /fg invite, auto 4-member staff review ticket,
-private suite provisioning (Category + 1 Text + 1 Voice), custom role creation,
-FG Control Panel with interactive action buttons (Create Category, 1 Text, 1 Voice, Create Role, Rename, Kick Member, Disband),
-and /fg panel deployment.
+Features:
+- /fg start (creates pending FG), /fg invite (dispatches DM & channel cards)
+- Automatic 4-member staff review ticket creation & approval workflow
+- Dedicated private suite auto-provisioning (Private Category + 1 Text Lounge + 1 Voice Suite)
+- Custom role auto-creation (👑 ︱ <FG Name>) & base FG role assignment
+- Persistent FG Control Panel with interactive action buttons (Roster, Invite, Lock/Unlock Voice, Sync Role, Rename, Kick Member, Disband)
+- DM invitation acceptance & seamless cross-reboot persistence.
 """
 import os
 import json
@@ -21,7 +24,9 @@ from utils.embeds import (
     ego_embed, success_embed, error_embed, info_embed, card_embed,
     COLOR_VIOLET, COLOR_EMERALD, COLOR_CRIMSON, COLOR_CYAN, COLOR_AMBER, COLOR_ROSE
 )
+from utils.state_manager import update_guild_state_section
 from config import logger
+
 
 class FGRenameModal(discord.ui.Modal, title="Rename Friend Group"):
     def __init__(self, fg_id: int):
@@ -38,22 +43,29 @@ class FGRenameModal(discord.ui.Modal, title="Rename Friend Group"):
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == self.fg_id))
             fg = res.scalar_one_or_none()
 
-            if not fg or fg.creator_id != user.id:
-                return await interaction.response.send_message("Only the FG Leader can rename this Friend Group.", ephemeral=True)
+            if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
+                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this Friend Group.", ephemeral=True)
 
             old_name = fg.name
             fg.name = self.new_name.value.strip()
             await session.commit()
 
             # Sync Discord Category, Role, and Channels
-            if fg.category_id:
-                cat = guild.get_channel(fg.category_id)
-                if cat:
-                    await cat.edit(name=f"👑 ︱ {fg.name}")
-            if fg.role_id:
-                role = guild.get_role(fg.role_id)
-                if role:
-                    await role.edit(name=f"👑 ︱ {fg.name}")
+            if guild:
+                if fg.category_id:
+                    cat = guild.get_channel(fg.category_id)
+                    if cat:
+                        try:
+                            await cat.edit(name=f"👑 ︱ {fg.name}")
+                        except Exception:
+                            pass
+                if fg.role_id:
+                    role = guild.get_role(fg.role_id)
+                    if role:
+                        try:
+                            await role.edit(name=f"👑 ︱ {fg.name}")
+                        except Exception:
+                            pass
 
         await interaction.response.send_message(
             embed=success_embed("FG Renamed", f"Renamed FG from **{old_name}** to **{self.new_name.value.strip()}**."),
@@ -84,14 +96,14 @@ class FGKickMemberModal(discord.ui.Modal, title="Kick Member from FG"):
         
         target_uid = int(match.group(1))
         if target_uid == user.id:
-            return await interaction.response.send_message("❌ You cannot kick yourself as the FG Leader.", ephemeral=True)
+            return await interaction.response.send_message("❌ You cannot kick yourself as the FG Leader. Use Disband to close the FG.", ephemeral=True)
 
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == self.fg_id))
             fg = res.scalar_one_or_none()
 
-            if not fg or fg.creator_id != user.id:
-                return await interaction.response.send_message("Only the FG Leader can kick members.", ephemeral=True)
+            if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
+                return await interaction.response.send_message("Only the FG Leader or an Admin can kick members.", ephemeral=True)
 
             members = fg.members
             if target_uid not in members:
@@ -102,40 +114,47 @@ class FGKickMemberModal(discord.ui.Modal, title="Kick Member from FG"):
             await session.commit()
 
             # Revoke roles from kicked member
-            target_member = guild.get_member(target_uid)
-            if target_member:
-                if fg.role_id:
-                    p_role = guild.get_role(fg.role_id)
-                    if p_role and p_role in target_member.roles:
-                        try:
-                            await target_member.remove_roles(p_role, reason="Kicked from Friend Group")
-                        except Exception:
-                            pass
+            if guild:
+                target_member = guild.get_member(target_uid)
+                if not target_member:
+                    try:
+                        target_member = await guild.fetch_member(target_uid)
+                    except Exception:
+                        target_member = None
 
-                # Check if member is in any other FG before removing base FG role
-                other_res = await session.execute(
-                    select(FriendGroup).where(
-                        FriendGroup.guild_id == guild.id,
-                        FriendGroup.id != fg.id,
-                        FriendGroup.status == "active"
-                    )
-                )
-                other_fgs = other_res.scalars().all()
-                in_other = any(target_uid in o_fg.members for o_fg in other_fgs)
-                if not in_other:
-                    base_fg = discord.utils.get(guild.roles, name="FG")
-                    if base_fg and base_fg in target_member.roles:
-                        try:
-                            await target_member.remove_roles(base_fg, reason="Left all Friend Groups")
-                        except Exception:
-                            pass
+                if target_member:
+                    if fg.role_id:
+                        p_role = guild.get_role(fg.role_id)
+                        if p_role and p_role in target_member.roles:
+                            try:
+                                await target_member.remove_roles(p_role, reason="Kicked from Friend Group")
+                            except Exception:
+                                pass
 
-                try:
-                    await target_member.send(
-                        embed=info_embed("Friend Group Update", f"You have been removed from Friend Group **{fg.name}**.")
+                    # Check if member is in any other FG before removing base FG role
+                    other_res = await session.execute(
+                        select(FriendGroup).where(
+                            FriendGroup.guild_id == guild.id,
+                            FriendGroup.id != fg.id,
+                            FriendGroup.status == "active"
+                        )
                     )
-                except Exception:
-                    pass
+                    other_fgs = other_res.scalars().all()
+                    in_other = any(target_uid in o_fg.members for o_fg in other_fgs)
+                    if not in_other:
+                        base_fg = discord.utils.get(guild.roles, name="FG")
+                        if base_fg and base_fg in target_member.roles:
+                            try:
+                                await target_member.remove_roles(base_fg, reason="Left all Friend Groups")
+                            except Exception:
+                                pass
+
+                    try:
+                        await target_member.send(
+                            embed=info_embed("Friend Group Update", f"You have been removed from Friend Group **{fg.name}** in **{guild.name}**.")
+                        )
+                    except Exception:
+                        pass
 
         await interaction.response.send_message(
             embed=success_embed("Member Removed", f"Successfully removed <@{target_uid}> from **{fg.name}**."),
@@ -148,119 +167,82 @@ class FGControlPanelView(discord.ui.View):
         super().__init__(timeout=None)
         self.fg_id = fg_id
 
-    def _extract_fg_id(self, message: discord.Message) -> Optional[int]:
-        if not message or not message.embeds:
-            return None
-        embed = message.embeds[0]
-        desc = embed.description or ""
-        match = re.search(r"FG ID:\*\* `#(\d+)`", desc)
-        if match:
-            return int(match.group(1))
+    def _extract_fg_id(self, interaction: discord.Interaction) -> Optional[int]:
+        if self.fg_id:
+            return self.fg_id
+
+        # 1. From message embed
+        msg = interaction.message
+        if msg and msg.embeds:
+            desc = msg.embeds[0].description or ""
+            match = re.search(r"FG ID:\*\* `#(\d+)`", desc)
+            if match:
+                return int(match.group(1))
+
+        # 2. From channel topic
+        ch = interaction.channel
+        if ch and getattr(ch, "topic", None):
+            match = re.search(r"FG ID:\s*#?(\d+)", ch.topic)
+            if match:
+                return int(match.group(1))
+
         return None
 
-    @discord.ui.button(label="Setup Category", style=discord.ButtonStyle.primary, custom_id="fg_panel_category", row=0)
-    async def create_category_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
+    @discord.ui.button(label="Roster & Stats", style=discord.ButtonStyle.primary, emoji="📋", custom_id="fg_btn_roster", row=0)
+    async def roster_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        fg_id = self._extract_fg_id(interaction)
         if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
+            return await interaction.response.send_message("❌ Could not resolve Friend Group record.", ephemeral=True)
 
-        guild = interaction.guild
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
-            if not fg or fg.creator_id != interaction.user.id:
-                return await interaction.response.send_message("Only the FG Leader can configure channels.", ephemeral=True)
+            if not fg:
+                return await interaction.response.send_message("❌ Friend Group record not found.", ephemeral=True)
 
-            if fg.category_id and guild.get_channel(fg.category_id):
-                return await interaction.response.send_message("Category is already configured for this FG.", ephemeral=True)
+            members_mentions = ", ".join(f"<@{m}>" for m in fg.members) if fg.members else "None"
+            embed = ego_embed(
+                title=f"👑 FG Roster • {fg.name}",
+                description=(
+                    f"> **FG ID:** `#{fg.id}`\n"
+                    f"> **Leader:** <@{fg.creator_id}>\n"
+                    f"> **Status:** `{fg.status.upper()}`\n"
+                    f"> **Total Members:** `{len(fg.members)}`\n\n"
+                    f"› **Roster Members:**\n{members_mentions}\n"
+                ),
+                color=COLOR_CYAN
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
-            # Resolve private role
-            p_role = guild.get_role(fg.role_id) if fg.role_id else None
-            overwrites = {
-                guild.default_role: discord.PermissionOverwrite(read_messages=False, connect=False),
-                guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_channels=True, connect=True)
-            }
-            if p_role:
-                overwrites[p_role] = discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True, speak=True)
-            for r in guild.roles:
-                if r.permissions.manage_guild or r.permissions.administrator:
-                    overwrites[r] = discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True)
-
-            cat = await guild.create_category(name=f"👑 ︱ {fg.name}", overwrites=overwrites)
-            fg.category_id = cat.id
-            await session.commit()
-
+    @discord.ui.button(label="Invite Member", style=discord.ButtonStyle.success, emoji="👥", custom_id="fg_btn_invite", row=0)
+    async def invite_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        fg_id = self._extract_fg_id(interaction)
         await interaction.response.send_message(
-            embed=success_embed("Category Created", f"Configured private category `{cat.name}`."),
+            embed=info_embed(
+                "Invite Friends",
+                "To invite a friend to your Friend Group, run the slash command:\n"
+                f"› `/fg invite member:@friend`"
+            ),
             ephemeral=True
         )
 
-    @discord.ui.button(label="Create Text Lounge (Max 1)", style=discord.ButtonStyle.primary, custom_id="fg_panel_text", row=0)
-    async def create_text_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
+    @discord.ui.button(label="Sync Roles", style=discord.ButtonStyle.secondary, emoji="👑", custom_id="fg_btn_role_sync", row=0)
+    async def sync_role_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        fg_id = self._extract_fg_id(interaction)
         if not fg_id:
             return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
 
         guild = interaction.guild
+        if not guild:
+            return await interaction.response.send_message("Server context missing.", ephemeral=True)
+
+        await interaction.response.defer(ephemeral=True)
+
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
-            if not fg or fg.creator_id != interaction.user.id:
-                return await interaction.response.send_message("Only the FG Leader can configure channels.", ephemeral=True)
-
-            # Strict limit: Only 1 text channel
-            if fg.text_channel_id and guild.get_channel(fg.text_channel_id):
-                return await interaction.response.send_message("❌ Limit Reached: Only 1 text channel allowed per Friend Group.", ephemeral=True)
-
-            cat = guild.get_channel(fg.category_id) if fg.category_id else None
-            text_ch = await guild.create_text_channel(name="💬-lounge", category=cat, topic=f"Private FG lounge for {fg.name}")
-            fg.text_channel_id = text_ch.id
-            await session.commit()
-
-        await interaction.response.send_message(
-            embed=success_embed("Text Lounge Ready", f"Created {text_ch.mention} (Limit: 1/1 text channels)."),
-            ephemeral=True
-        )
-
-    @discord.ui.button(label="Create Voice Suite (Max 1)", style=discord.ButtonStyle.primary, custom_id="fg_panel_voice", row=0)
-    async def create_voice_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
-        guild = interaction.guild
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
-            fg = res.scalar_one_or_none()
-            if not fg or fg.creator_id != interaction.user.id:
-                return await interaction.response.send_message("Only the FG Leader can configure channels.", ephemeral=True)
-
-            # Strict limit: Only 1 voice channel
-            if fg.voice_channel_id and guild.get_channel(fg.voice_channel_id):
-                return await interaction.response.send_message("❌ Limit Reached: Only 1 voice channel allowed per Friend Group.", ephemeral=True)
-
-            cat = guild.get_channel(fg.category_id) if fg.category_id else None
-            voice_ch = await guild.create_voice_channel(name="🔊-voice", category=cat)
-            fg.voice_channel_id = voice_ch.id
-            await session.commit()
-
-        await interaction.response.send_message(
-            embed=success_embed("Voice Suite Ready", f"Created {voice_ch.mention} (Limit: 1/1 voice channels)."),
-            ephemeral=True
-        )
-
-    @discord.ui.button(label="Create Custom Role", style=discord.ButtonStyle.secondary, custom_id="fg_panel_role", row=1)
-    async def create_role_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
-        guild = interaction.guild
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
-            fg = res.scalar_one_or_none()
-            if not fg or fg.creator_id != interaction.user.id:
-                return await interaction.response.send_message("Only the FG Leader can configure roles.", ephemeral=True)
+            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
+                return await interaction.followup.send("Only the FG Leader or an Admin can sync roles.", ephemeral=True)
 
             p_role = guild.get_role(fg.role_id) if fg.role_id else None
             if not p_role:
@@ -270,113 +252,144 @@ class FGControlPanelView(discord.ui.View):
                         name=f"👑 ︱ {fg.name}",
                         color=discord.Color(0x8B5CF6),
                         mentionable=True,
-                        reason="Ego FG Custom Role"
+                        reason="Ego FG Private Role"
                     )
                 fg.role_id = p_role.id
                 await session.commit()
 
-            # Auto-apply role to all members
             base_fg = discord.utils.find(lambda r: r.name.lower() == "fg", guild.roles)
+            if not base_fg:
+                base_fg = await guild.create_role(name="FG", color=discord.Color(0x3B82F6), mentionable=True, reason="Ego Base FG Role")
+
+            synced_count = 0
             for uid in fg.members:
                 m = guild.get_member(uid)
+                if not m:
+                    try:
+                        m = await guild.fetch_member(uid)
+                    except Exception:
+                        m = None
                 if m:
                     roles_to_add = [r for r in (p_role, base_fg) if r and r not in m.roles]
                     if roles_to_add:
                         try:
-                            await m.add_roles(*roles_to_add, reason="FG Custom Role Assignment")
+                            await m.add_roles(*roles_to_add, reason="FG Role Sync")
+                            synced_count += 1
                         except Exception:
                             pass
 
-        await interaction.response.send_message(
-            embed=success_embed("Role Configured", f"Created & applied {p_role.mention} to all FG members."),
+        await interaction.followup.send(
+            embed=success_embed("Roles Synced", f"Applied {p_role.mention} and {base_fg.mention} to all `{len(fg.members)}` members."),
             ephemeral=True
         )
 
-    @discord.ui.button(label="Kick Member", style=discord.ButtonStyle.secondary, custom_id="fg_panel_kick", row=1)
+    @discord.ui.button(label="Lock/Unlock Voice", style=discord.ButtonStyle.secondary, emoji="🔒", custom_id="fg_btn_toggle_voice", row=1)
+    async def toggle_voice_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        fg_id = self._extract_fg_id(interaction)
+        guild = interaction.guild
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
+            fg = res.scalar_one_or_none()
+            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
+                return await interaction.response.send_message("Only the FG Leader or an Admin can manage voice security.", ephemeral=True)
+
+            if not fg.voice_channel_id:
+                return await interaction.response.send_message("No voice channel found for this FG.", ephemeral=True)
+
+            voice_ch = guild.get_channel(fg.voice_channel_id)
+            if not voice_ch or not isinstance(voice_ch, discord.VoiceChannel):
+                return await interaction.response.send_message("Voice channel not found.", ephemeral=True)
+
+            current_ow = voice_ch.overwrites_for(guild.default_role)
+            is_locked = current_ow.connect is False
+
+            if is_locked:
+                # Unlock (allow default role or private role)
+                await voice_ch.set_permissions(guild.default_role, connect=None)
+                status_msg = "🔓 **Unlocked** voice channel. Members with category access can connect."
+            else:
+                # Lock
+                await voice_ch.set_permissions(guild.default_role, connect=False)
+                status_msg = "🔒 **Locked** voice channel. Only verified FG members can connect."
+
+        await interaction.response.send_message(embed=success_embed("Voice Security", status_msg), ephemeral=True)
+
+    @discord.ui.button(label="Kick Member", style=discord.ButtonStyle.secondary, emoji="👢", custom_id="fg_btn_kick", row=1)
     async def kick_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
+        fg_id = self._extract_fg_id(interaction)
         if not fg_id:
             return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
 
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
-            if not fg or fg.creator_id != interaction.user.id:
-                return await interaction.response.send_message("Only the FG Leader can kick members.", ephemeral=True)
+            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
+                return await interaction.response.send_message("Only the FG Leader or an Admin can kick members.", ephemeral=True)
 
         await interaction.response.send_modal(FGKickMemberModal(fg_id=fg_id))
 
-    @discord.ui.button(label="Rename FG", style=discord.ButtonStyle.secondary, custom_id="fg_panel_rename", row=1)
+    @discord.ui.button(label="Rename FG", style=discord.ButtonStyle.secondary, emoji="✏️", custom_id="fg_btn_rename", row=1)
     async def rename_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
+        fg_id = self._extract_fg_id(interaction)
         if not fg_id:
             return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
 
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
-            if not fg or fg.creator_id != interaction.user.id:
-                return await interaction.response.send_message("Only the FG Leader can rename this FG.", ephemeral=True)
+            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
+                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this FG.", ephemeral=True)
 
         await interaction.response.send_modal(FGRenameModal(fg_id=fg_id))
 
-    @discord.ui.button(label="Roster & Stats", style=discord.ButtonStyle.secondary, custom_id="fg_panel_roster", row=2)
-    async def roster_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
-            fg = res.scalar_one_or_none()
-            if not fg:
-                return await interaction.response.send_message("FG record not found.", ephemeral=True)
-
-            members_mentions = ", ".join(f"<@{m}>" for m in fg.members) if fg.members else "None"
-            embed = ego_embed(
-                title=f"FG Roster • {fg.name}",
-                description=(
-                    f"> **Leader:** <@{fg.creator_id}>\n"
-                    f"> **Total Members:** `{len(fg.members)}`\n\n"
-                    f"› **Active Members:**\n{members_mentions}\n"
-                ),
-                color=COLOR_CYAN
-            )
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-
-    @discord.ui.button(label="Disband FG", style=discord.ButtonStyle.danger, custom_id="fg_panel_disband", row=2)
+    @discord.ui.button(label="Disband FG", style=discord.ButtonStyle.danger, emoji="💥", custom_id="fg_btn_disband", row=2)
     async def disband_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
+        fg_id = self._extract_fg_id(interaction)
         if not fg_id:
             return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
 
         guild = interaction.guild
         user = interaction.user
 
+        await interaction.response.defer(ephemeral=True)
+
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
             if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can disband this FG.", ephemeral=True)
+                return await interaction.followup.send("Only the FG Leader or an Admin can disband this FG.", ephemeral=True)
 
-            # Purge Category, Channels, and Role
-            if fg.category_id:
+            fg_name = fg.name
+
+            # Purge Category & Channels
+            if guild and fg.category_id:
                 cat = guild.get_channel(fg.category_id)
                 if cat:
                     for ch in cat.channels:
-                        await ch.delete()
-                    await cat.delete()
+                        try:
+                            await ch.delete()
+                        except Exception:
+                            pass
+                    try:
+                        await cat.delete()
+                    except Exception:
+                        pass
 
-            if fg.role_id:
+            # Purge Role
+            if guild and fg.role_id:
                 role = guild.get_role(fg.role_id)
                 if role:
-                    await role.delete(reason="Friend Group Disbanded")
+                    try:
+                        await role.delete(reason="Friend Group Disbanded")
+                    except Exception:
+                        pass
 
             await session.delete(fg)
             await session.commit()
 
-        await interaction.response.send_message(
-            embed=success_embed("FG Disbanded", "Friend Group disbanded and private suite purged."),
+        await interaction.followup.send(
+            embed=success_embed("FG Disbanded", f"Friend Group **{fg_name}** has been disbanded and all channels/roles purged."),
             ephemeral=True
         )
 
@@ -386,51 +399,64 @@ class FGTicketReviewView(discord.ui.View):
         super().__init__(timeout=None)
         self.fg_id = fg_id
 
-    def _extract_fg_id(self, message: discord.Message) -> Optional[int]:
-        if not message or not message.embeds:
-            return None
-        embed = message.embeds[0]
-        desc = embed.description or ""
-        match = re.search(r"FG ID:\*\* `#(\d+)`", desc)
-        if match:
-            return int(match.group(1))
+    def _extract_fg_id(self, interaction: discord.Interaction) -> Optional[int]:
+        if self.fg_id:
+            return self.fg_id
+
+        msg = interaction.message
+        if msg and msg.embeds:
+            desc = msg.embeds[0].description or ""
+            match = re.search(r"FG ID:\*\* `#(\d+)`", desc)
+            if match:
+                return int(match.group(1))
+
+        ch = interaction.channel
+        if ch and getattr(ch, "topic", None):
+            match = re.search(r"FG ID:\s*#?(\d+)", ch.topic)
+            if match:
+                return int(match.group(1))
+
         return None
 
-    @discord.ui.button(label="Approve & Unlock FG", style=discord.ButtonStyle.success, custom_id="fg_ticket_approve")
+    @discord.ui.button(label="Approve & Unlock FG", style=discord.ButtonStyle.success, emoji="✅", custom_id="fg_ticket_approve")
     async def approve_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
+        fg_id = self._extract_fg_id(interaction)
         if not fg_id:
             return await interaction.response.send_message("Could not resolve FG ID from this ticket.", ephemeral=True)
 
         guild = interaction.guild
+        if not guild:
+            return await interaction.response.send_message("Server context missing.", ephemeral=True)
+
+        await interaction.response.defer(ephemeral=True)
+
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
 
             if not fg:
-                return await interaction.response.send_message("FG record not found in database.", ephemeral=True)
+                return await interaction.followup.send("FG record not found in database.", ephemeral=True)
 
             if fg.status == "active":
-                return await interaction.response.send_message("This Friend Group is already approved and active.", ephemeral=True)
+                return await interaction.followup.send("This Friend Group is already approved and active.", ephemeral=True)
 
-            await interaction.response.defer(ephemeral=True)
             await provision_fg_suite(guild, fg)
 
         for item in self.children:
             item.disabled = True
 
-        if interaction.message.embeds:
+        if interaction.message and interaction.message.embeds:
             embed = interaction.message.embeds[0]
             embed.color = COLOR_EMERALD
             embed.title = f"Friend Group Approved - {fg.name}"
             embed.add_field(name="› Approved By", value=interaction.user.mention, inline=True)
             await interaction.message.edit(embed=embed, view=self)
 
-        await interaction.followup.send(f"Approved and provisioned private channels for **{fg.name}**.", ephemeral=True)
+        await interaction.followup.send(f"✅ Approved and provisioned private channels for **{fg.name}**.", ephemeral=True)
 
-    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger, custom_id="fg_ticket_decline")
+    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger, emoji="✖", custom_id="fg_ticket_decline")
     async def decline_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
+        fg_id = self._extract_fg_id(interaction)
         guild = interaction.guild
 
         async with AsyncSessionLocal() as session:
@@ -438,19 +464,20 @@ class FGTicketReviewView(discord.ui.View):
                 res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
                 fg = res.scalar_one_or_none()
                 if fg:
-                    creator = guild.get_member(fg.creator_id)
-                    if creator:
-                        try:
-                            await creator.send(embed=error_embed("Friend Group Declined", f"Your application for FG **{fg.name}** was declined by staff."))
-                        except Exception:
-                            pass
+                    if guild:
+                        creator = guild.get_member(fg.creator_id)
+                        if creator:
+                            try:
+                                await creator.send(embed=error_embed("Friend Group Declined", f"Your application for FG **{fg.name}** in **{guild.name}** was declined by staff."))
+                            except Exception:
+                                pass
                     await session.delete(fg)
                     await session.commit()
 
         for item in self.children:
             item.disabled = True
 
-        if interaction.message.embeds:
+        if interaction.message and interaction.message.embeds:
             embed = interaction.message.embeds[0]
             embed.color = COLOR_CRIMSON
             embed.title = "Friend Group Declined"
@@ -465,31 +492,37 @@ class FGInviteView(discord.ui.View):
         super().__init__(timeout=None)
         self.fg_id = fg_id
 
-    def _extract_fg_id(self, message: discord.Message) -> Optional[int]:
-        if not message or not message.embeds:
-            return None
-        embed = message.embeds[0]
-        desc = embed.description or ""
-        match = re.search(r"FG ID:\*\* `#(\d+)`", desc)
-        if match:
-            return int(match.group(1))
+    def _extract_fg_id(self, interaction: discord.Interaction) -> Optional[int]:
+        if self.fg_id:
+            return self.fg_id
+
+        msg = interaction.message
+        if msg and msg.embeds:
+            desc = msg.embeds[0].description or ""
+            match = re.search(r"FG ID:\*\* `#(\d+)`", desc)
+            if match:
+                return int(match.group(1))
+
         return None
 
-    @discord.ui.button(label="Accept Invitation", style=discord.ButtonStyle.success, custom_id="fg_invite_accept")
+    @discord.ui.button(label="Accept Invitation", style=discord.ButtonStyle.success, emoji="✅", custom_id="fg_invite_accept")
     async def accept_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        fg_id = self.fg_id or self._extract_fg_id(interaction.message)
+        fg_id = self._extract_fg_id(interaction)
         user = interaction.user
 
         if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
+            return await interaction.response.send_message("❌ Could not resolve FG ID from this card.", ephemeral=True)
 
-        guild = interaction.guild
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
 
             if not fg:
-                return await interaction.response.send_message("This Friend Group no longer exists.", ephemeral=True)
+                return await interaction.response.send_message("❌ This Friend Group no longer exists.", ephemeral=True)
+
+            guild = interaction.guild or interaction.client.get_guild(fg.guild_id)
+            if not guild:
+                return await interaction.response.send_message("❌ Could not find the associated server.", ephemeral=True)
 
             members = fg.members
             if user.id not in members:
@@ -499,24 +532,36 @@ class FGInviteView(discord.ui.View):
 
             # If FG is already active, assign the private role and base FG role
             if fg.status == "active" and guild:
-                roles_to_add = []
-                if fg.role_id:
-                    p_role = guild.get_role(fg.role_id)
-                    if p_role and p_role not in user.roles:
-                        roles_to_add.append(p_role)
-                base_fg = discord.utils.get(guild.roles, name="FG")
-                if base_fg and base_fg not in user.roles:
-                    roles_to_add.append(base_fg)
-                if roles_to_add:
+                member_obj = guild.get_member(user.id)
+                if not member_obj:
                     try:
-                        await user.add_roles(*roles_to_add, reason="Joined Active Friend Group")
+                        member_obj = await guild.fetch_member(user.id)
                     except Exception:
-                        pass
+                        member_obj = None
+
+                if member_obj:
+                    roles_to_add = []
+                    if fg.role_id:
+                        p_role = guild.get_role(fg.role_id)
+                        if p_role and p_role not in member_obj.roles:
+                            roles_to_add.append(p_role)
+                    base_fg = discord.utils.find(lambda r: r.name.lower() == "fg", guild.roles)
+                    if base_fg and base_fg not in member_obj.roles:
+                        roles_to_add.append(base_fg)
+                    if roles_to_add:
+                        try:
+                            await member_obj.add_roles(*roles_to_add, reason="Joined Active Friend Group")
+                        except Exception:
+                            pass
 
             for item in self.children:
                 item.disabled = True
 
-            await interaction.message.edit(view=self)
+            try:
+                await interaction.message.edit(view=self)
+            except Exception:
+                pass
+
             await interaction.response.send_message(
                 embed=success_embed("Invitation Accepted", f"You joined **{fg.name}**! ({len(members)} members in FG)"),
                 ephemeral=True
@@ -528,11 +573,14 @@ class FGInviteView(discord.ui.View):
                 await session.commit()
                 await trigger_fg_staff_ticket(guild, fg)
 
-    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger, custom_id="fg_invite_decline")
+    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger, emoji="✖", custom_id="fg_invite_decline")
     async def decline_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         for item in self.children:
             item.disabled = True
-        await interaction.message.edit(view=self)
+        try:
+            await interaction.message.edit(view=self)
+        except Exception:
+            pass
         await interaction.response.send_message(
             embed=error_embed("Invitation Declined", "You declined the Friend Group invitation."),
             ephemeral=True
@@ -543,6 +591,12 @@ async def trigger_fg_staff_ticket(guild: discord.Guild, fg_record: FriendGroup):
     """Automatically generates a private staff review ticket when an FG hits 4 members."""
     try:
         creator = guild.get_member(fg_record.creator_id)
+        if not creator:
+            try:
+                creator = await guild.fetch_member(fg_record.creator_id)
+            except Exception:
+                creator = None
+
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
             guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_channels=True)
@@ -623,6 +677,11 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
         # Assign Private Role and Base FG Role to all members
         for uid in fg_record.members:
             m = guild.get_member(uid)
+            if not m:
+                try:
+                    m = await guild.fetch_member(uid)
+                except Exception:
+                    m = None
             if m:
                 try:
                     roles_to_add = [r for r in (private_role, base_fg_role) if r and r not in m.roles]
@@ -641,9 +700,13 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
             if r.permissions.manage_guild or r.permissions.administrator:
                 overwrites[r] = discord.PermissionOverwrite(read_messages=True, send_messages=True, connect=True)
 
-        # 4. Create Category, Text Lounge (1 text max), and Voice Suite (1 voice max)
+        # 4. Create Dedicated Category, Text Lounge, and Voice Suite
         cat = await guild.create_category(name=f"👑 ︱ {fg_record.name}", overwrites=overwrites)
-        text_ch = await guild.create_text_channel(name="💬-lounge", category=cat, topic=f"Private FG lounge for {fg_record.name}")
+        text_ch = await guild.create_text_channel(
+            name="💬-lounge", 
+            category=cat, 
+            topic=f"Private FG lounge for {fg_record.name} (FG ID: #{fg_record.id})"
+        )
         voice_ch = await guild.create_voice_channel(name="🔊-voice", category=cat)
 
         # 5. Save IDs to DB
@@ -667,7 +730,7 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
                 f"> **Leader:** <@{fg_record.creator_id}>\n"
                 f"> **Private Role:** {private_role.mention}\n"
                 f"> **Roster ({len(fg_record.members)}):** {members_mentions}\n\n"
-                f"› **Exclusive Suite:** Limit 1 text channel (`#💬-lounge`) and 1 voice channel (`#🔊-voice`).\n"
+                f"› **Exclusive Suite:** Private Category, Text Lounge, and Voice Suite.\n"
                 f"Use the buttons below to manage your Friend Group suite:"
             ),
             color=COLOR_VIOLET
@@ -774,7 +837,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                     f"> **FG ID:** `#{fg.id}`\n"
                     f"> **Invited By:** {user.mention}\n"
                     f"> **Current Members:** `{len(members)}`\n\n"
-                    f"Click **Accept Invitation** below to join this Friend Group!"
+                    f"Click **Accept Invitation** below to join this Friend Group in **{guild.name}**!"
                 ),
                 color=COLOR_CYAN
             )
@@ -831,7 +894,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                     f"> **Leader:** <@{fg.creator_id}>\n"
                     f"> **Private Role:** {role_mention}\n"
                     f"> **Roster ({len(fg.members)}):** {members_mentions}\n\n"
-                    f"› **Suite Controls:** Setup Category, 1 Text, 1 Voice, Custom Role, Rename, or Kick Members:"
+                    f"› **Suite Controls:** Roster, Invite, Lock/Unlock Voice, Sync Role, Rename, Kick Member, Disband:"
                 ),
                 color=COLOR_VIOLET
             )
@@ -852,32 +915,25 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                 )
             )
             all_fgs = res.scalars().all()
-            user_fgs = [fg for fg in all_fgs if user.id in fg.members]
+            user_fgs = [f for f in all_fgs if user.id in f.members or f.creator_id == user.id]
 
             if not user_fgs:
                 return await interaction.response.send_message(
-                    embed=info_embed("Friend Groups", "You are not currently in any Friend Group.\nRun `/fg start` to create one!"),
+                    embed=info_embed("Friend Groups", "You do not belong to any Friend Groups in this server.\nRun `/fg start` to create one!"),
                     ephemeral=True
                 )
 
-            embed = ego_embed(
-                title=f"My Friend Groups ({len(user_fgs)})",
-                description=f"> Active Friend Groups for {user.mention}:\n",
-                color=COLOR_VIOLET
-            )
-
+            embed = ego_embed(title=f"Your Friend Groups • {user.display_name}", color=COLOR_CYAN)
             for fg in user_fgs:
-                members_mentions = ", ".join(f"<@{m}>" for m in fg.members)
-                status_text = "🟢 Active Suite" if fg.status == "active" else "🟡 Under Staff Review" if fg.status == "under_review" else "⚪ Pending (Needs 4 members)"
-                role_str = f"<@&{fg.role_id}>" if fg.role_id else "*None*"
-
+                is_leader = "👑 Leader" if fg.creator_id == user.id else "Member"
+                status_str = "🟢 Active" if fg.status == "active" else "🟡 Under Review" if fg.status == "under_review" else "⚪ Pending"
+                p_role = guild.get_role(fg.role_id) if fg.role_id else None
                 embed.add_field(
-                    name=f"👑 {fg.name} (ID: #{fg.id})",
+                    name=f"› {fg.name} (#{fg.id}) — {is_leader}",
                     value=(
-                        f"• **Status:** `{status_text}`\n"
-                        f"• **Leader:** <@{fg.creator_id}>\n"
-                        f"• **Private Role:** {role_str}\n"
-                        f"• **Members ({len(fg.members)}):** {members_mentions}"
+                        f"• **Status:** {status_str}\n"
+                        f"• **Members:** `{len(fg.members)}`\n"
+                        f"• **Private Role:** {p_role.mention if p_role else 'None'}"
                     ),
                     inline=False
                 )
@@ -886,14 +942,14 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
 
     fg_admin_group = app_commands.Group(
         name="fg_admin",
-        description="Staff administration controls for Friend Groups",
+        description="Admin management commands for Friend Groups",
         default_permissions=discord.Permissions(manage_guild=True)
     )
 
-    @fg_admin_group.command(name="create", description="[Admin/Owner] Instantly create and approve an active Friend Group")
+    @fg_admin_group.command(name="create", description="[Admin/Mods] Instantly create and provision an active Friend Group")
     @app_commands.describe(
-        name="Name of the FG",
-        leader="Member who will lead the FG",
+        name="Name of the Friend Group",
+        leader="Leader of the FG",
         member2="Second member",
         member3="Third member",
         member4="Fourth member",
@@ -933,7 +989,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
         await interaction.followup.send(
             embed=success_embed(
                 "FG Created Instantly",
-                f"Successfully deployed **{name}** with `{len(member_ids)}` members and provisioned private suite."
+                f"Successfully deployed **{name}** with `{len(member_ids)}` members and provisioned dedicated category, text lounge, voice suite, and role."
             )
         )
 
@@ -980,4 +1036,3 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(FriendGroupsCog(bot))
-
