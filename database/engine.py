@@ -32,6 +32,9 @@ AsyncSessionLocal = async_sessionmaker(
 
 async def init_db() -> None:
     """Initialize tables in the database and auto-migrate missing columns."""
+    # Ensure all database models are imported and registered on Base.metadata
+    import database.models  # noqa: F401
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
