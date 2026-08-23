@@ -345,15 +345,30 @@ class FGControlPanelView(discord.ui.View):
             if not fg:
                 return await interaction.response.send_message("❌ Friend Group record not found.", ephemeral=True)
 
+            member_cnt = len(fg.members)
             members_mentions = ", ".join(f"<@{m}>" for m in fg.members) if fg.members else "None"
+
+            if fg.status == "pending":
+                needed = max(0, 4 - member_cnt)
+                status_text = f"⚪ PENDING ({member_cnt}/4 members joined — {needed} more needed for staff review)"
+            elif fg.status == "under_review":
+                status_text = f"🟡 UNDER STAFF REVIEW ({member_cnt}/4+ members ready)"
+            elif fg.status == "active":
+                status_text = f"🟢 ACTIVE SUITE ({member_cnt} members)"
+            else:
+                status_text = f"⚫ {fg.status.upper()} ({member_cnt} members)"
+
+            p_role = interaction.guild.get_role(fg.role_id) if fg.role_id and interaction.guild else None
+
             embed = ego_embed(
-                title=f"👑 FG Roster • {fg.name}",
+                title=f"👑 FG Roster & Stats • {fg.name}",
                 description=(
                     f"> **FG ID:** `#{fg.id}`\n"
                     f"> **Leader:** <@{fg.creator_id}>\n"
-                    f"> **Status:** `{fg.status.upper()}`\n"
-                    f"> **Total Members:** `{len(fg.members)}`\n\n"
-                    f"› **Roster Members:**\n{members_mentions}\n"
+                    f"> **Status:** {status_text}\n"
+                    f"> **Total Members:** `{member_cnt}`\n"
+                    f"> **Private Role:** {p_role.mention if p_role else 'None'}\n\n"
+                    f"› **Roster Members ({member_cnt}):**\n{members_mentions}\n"
                 ),
                 color=COLOR_CYAN
             )
@@ -1064,14 +1079,30 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             embed = ego_embed(title=f"Your Friend Groups • {user.display_name}", color=COLOR_CYAN)
             for fg in user_fgs:
                 is_leader = "👑 Leader" if fg.creator_id == user.id else "Member"
-                status_str = "🟢 Active" if fg.status == "active" else "🟡 Under Review" if fg.status == "under_review" else "⚪ Pending"
+                member_cnt = len(fg.members)
+                members_list = ", ".join(f"<@{m}>" for m in fg.members) if fg.members else "None"
+
+                if fg.status == "pending":
+                    needed = max(0, 4 - member_cnt)
+                    status_line = f"⚪ **Pending Application** (`{member_cnt}/4` members joined — `{needed}` more needed to trigger staff review)"
+                elif fg.status == "under_review":
+                    ticket_info = f"<#{fg.ticket_channel_id}>" if fg.ticket_channel_id else "Staff Review"
+                    status_line = f"🟡 **Under Staff Review** (`{member_cnt}/4+` members ready — Ticket: {ticket_info})"
+                elif fg.status == "active":
+                    status_line = f"🟢 **Active Suite** (`{member_cnt}` members)"
+                else:
+                    status_line = f"⚫ **{fg.status.capitalize()}** (`{member_cnt}` members)"
+
                 p_role = guild.get_role(fg.role_id) if fg.role_id else None
+                cat_ch = guild.get_channel(fg.category_id) if fg.category_id else None
+
                 embed.add_field(
-                    name=f"› {fg.name} (#{fg.id}) — {is_leader}",
+                    name=f"› {fg.name} (FG ID: #{fg.id}) — {is_leader}",
                     value=(
-                        f"• **Status:** {status_str}\n"
-                        f"• **Members:** `{len(fg.members)}`\n"
-                        f"• **Private Role:** {p_role.mention if p_role else 'None'}"
+                        f"• **Status:** {status_line}\n"
+                        f"• **Joined Members ({member_cnt}/4):** {members_list}\n"
+                        f"• **Private Role:** {p_role.mention if p_role else 'None'}\n"
+                        f"• **Suite Category:** {cat_ch.name if cat_ch else 'Not provisioned yet'}"
                     ),
                     inline=False
                 )
@@ -1318,12 +1349,21 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             )
 
             for fg in fgs:
-                status_str = "🟢 Active" if fg.status == "active" else "🟡 In Review" if fg.status == "under_review" else "⚪ Pending"
+                member_cnt = len(fg.members)
+                if fg.status == "pending":
+                    status_str = f"⚪ Pending ({member_cnt}/4)"
+                elif fg.status == "under_review":
+                    status_str = f"🟡 In Review ({member_cnt}/4+)"
+                elif fg.status == "active":
+                    status_str = f"🟢 Active ({member_cnt})"
+                else:
+                    status_str = f"⚫ {fg.status.capitalize()} ({member_cnt})"
+
                 embed.add_field(
                     name=f"› {fg.name} (#{fg.id}) — {status_str}",
                     value=(
                         f"• **Leader:** <@{fg.creator_id}>\n"
-                        f"• **Members:** `{len(fg.members)}`\n"
+                        f"• **Members ({member_cnt}/4):** `{member_cnt}`\n"
                         f"• **Role:** {f'<@&{fg.role_id}>' if fg.role_id else 'None'}\n"
                         f"• **Category:** {f'<#{fg.category_id}>' if fg.category_id else 'None'}"
                     ),

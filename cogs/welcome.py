@@ -123,13 +123,16 @@ class WelcomeCog(commands.Cog, name="Welcome"):
         invites_count = 0
 
         try:
-            inviters_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "member_inviters.json")
-            if os.path.exists(inviters_file):
-                with open(inviters_file, "r", encoding="utf-8") as f:
-                    inv_map = json.load(f)
-                inv_id = inv_map.get(f"{guild.id}_{member.id}")
-                if inv_id:
-                    inviter = guild.get_member(inv_id) or await self.bot.fetch_user(inv_id)
+            from utils.kv_store import get_cached_kv
+            inv_map = get_cached_kv("member_inviters") or {}
+            inv_id = inv_map.get(f"{guild.id}_{member.id}")
+            if inv_id:
+                inviter = guild.get_member(inv_id)
+                if not inviter:
+                    try:
+                        inviter = await self.bot.fetch_user(inv_id)
+                    except Exception:
+                        inviter = None
         except Exception:
             pass
 
