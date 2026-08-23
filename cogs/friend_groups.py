@@ -7,7 +7,8 @@ Features:
 - Custom role auto-creation (👑 ︱ <FG Name>) & base FG role assignment
 - Persistent FG Control Panel with interactive action buttons:
   (Roster, Invite, Lock/Unlock Voice, Sync Role, Rename FG, Rename Category, Rename Text, Rename Voice, Kick Member, Disband)
-- Ephemeral private control panel (/fg panel) visible only to the requester
+- Strict Leader-Only Authorization on Control Panel & all action buttons (via View interaction_check)
+- Ephemeral private control panel (/fg panel) visible strictly to the Leader
 - Welcome announcement in text lounge instructing leader to use /fg panel
 - DM invitation acceptance & seamless cross-reboot persistence.
 """
@@ -49,7 +50,7 @@ class FGRenameModal(discord.ui.Modal, title="Rename Friend Group"):
             fg = res.scalar_one_or_none()
 
             if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.followup.send("Only the FG Leader or an Admin can rename this Friend Group.", ephemeral=True)
+                return await interaction.followup.send("❌ Access Denied: Only the FG Leader or an Admin can rename this Friend Group.", ephemeral=True)
 
             old_name = fg.name
             fg.name = self.new_name.value.strip()
@@ -96,7 +97,7 @@ class FGRenameCategoryModal(discord.ui.Modal, title="Rename FG Category"):
             fg = res.scalar_one_or_none()
 
             if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.followup.send("Only the FG Leader or an Admin can rename this category.", ephemeral=True)
+                return await interaction.followup.send("❌ Access Denied: Only the FG Leader or an Admin can rename this category.", ephemeral=True)
 
             if not fg.category_id or not guild:
                 return await interaction.followup.send("Category not found.", ephemeral=True)
@@ -135,7 +136,7 @@ class FGRenameTextChannelModal(discord.ui.Modal, title="Rename Text Lounge"):
             fg = res.scalar_one_or_none()
 
             if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.followup.send("Only the FG Leader or an Admin can rename this text channel.", ephemeral=True)
+                return await interaction.followup.send("❌ Access Denied: Only the FG Leader or an Admin can rename this text channel.", ephemeral=True)
 
             if not fg.text_channel_id or not guild:
                 return await interaction.followup.send("Text channel not found.", ephemeral=True)
@@ -174,7 +175,7 @@ class FGRenameVoiceChannelModal(discord.ui.Modal, title="Rename Voice Lounge"):
             fg = res.scalar_one_or_none()
 
             if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.followup.send("Only the FG Leader or an Admin can rename this voice channel.", ephemeral=True)
+                return await interaction.followup.send("❌ Access Denied: Only the FG Leader or an Admin can rename this voice channel.", ephemeral=True)
 
             if not fg.voice_channel_id or not guild:
                 return await interaction.followup.send("Voice channel not found.", ephemeral=True)
@@ -227,7 +228,7 @@ class FGKickMemberModal(discord.ui.Modal, title="Kick Member from FG"):
             fg = res.scalar_one_or_none()
 
             if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.followup.send("Only the FG Leader or an Admin can kick members.", ephemeral=True)
+                return await interaction.followup.send("❌ Access Denied: Only the FG Leader or an Admin can kick members.", ephemeral=True)
 
             members = fg.members
             if target_uid not in members:
@@ -312,12 +313,32 @@ class FGControlPanelView(discord.ui.View):
 
         return None
 
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        """Enforces that ONLY the FG Leader (or Server Administrator) can click buttons on this panel."""
+        fg_id = self._extract_fg_id(interaction)
+        if not fg_id:
+            await interaction.response.send_message("❌ Could not resolve Friend Group record.", ephemeral=True)
+            return False
+
+        async with AsyncSessionLocal() as session:
+            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
+            fg = res.scalar_one_or_none()
+            if not fg:
+                await interaction.response.send_message("❌ Friend Group record not found.", ephemeral=True)
+                return False
+
+            if fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator:
+                await interaction.response.send_message(
+                    embed=error_embed("Access Denied", "❌ Only the **Friend Group Leader** can access and use this control panel."),
+                    ephemeral=True
+                )
+                return False
+
+        return True
+
     @discord.ui.button(label="Roster & Stats", style=discord.ButtonStyle.primary, emoji="📋", custom_id="fg_btn_roster", row=0)
     async def roster_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self._extract_fg_id(interaction)
-        if not fg_id:
-            return await interaction.response.send_message("❌ Could not resolve Friend Group record.", ephemeral=True)
-
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
@@ -352,9 +373,6 @@ class FGControlPanelView(discord.ui.View):
     @discord.ui.button(label="Sync Roles", style=discord.ButtonStyle.secondary, emoji="👑", custom_id="fg_btn_role_sync", row=0)
     async def sync_role_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self._extract_fg_id(interaction)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
         guild = interaction.guild
         if not guild:
             return await interaction.response.send_message("Server context missing.", ephemeral=True)
@@ -364,8 +382,8 @@ class FGControlPanelView(discord.ui.View):
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
-            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
-                return await interaction.followup.send("Only the FG Leader or an Admin can sync roles.", ephemeral=True)
+            if not fg:
+                return await interaction.followup.send("FG record not found.", ephemeral=True)
 
             p_role = guild.get_role(fg.role_id) if fg.role_id else None
             if not p_role:
@@ -414,8 +432,8 @@ class FGControlPanelView(discord.ui.View):
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
-            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can manage voice security.", ephemeral=True)
+            if not fg:
+                return await interaction.response.send_message("FG record not found.", ephemeral=True)
 
             if not fg.voice_channel_id:
                 return await interaction.response.send_message("No voice channel found for this FG.", ephemeral=True)
@@ -441,79 +459,31 @@ class FGControlPanelView(discord.ui.View):
     @discord.ui.button(label="Rename FG", style=discord.ButtonStyle.secondary, emoji="✏️", custom_id="fg_btn_rename", row=1)
     async def rename_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self._extract_fg_id(interaction)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
-            fg = res.scalar_one_or_none()
-            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this FG.", ephemeral=True)
-
         await interaction.response.send_modal(FGRenameModal(fg_id=fg_id))
 
     @discord.ui.button(label="Kick Member", style=discord.ButtonStyle.secondary, emoji="👢", custom_id="fg_btn_kick", row=1)
     async def kick_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self._extract_fg_id(interaction)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
-            fg = res.scalar_one_or_none()
-            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can kick members.", ephemeral=True)
-
         await interaction.response.send_modal(FGKickMemberModal(fg_id=fg_id))
 
     @discord.ui.button(label="Rename Category", style=discord.ButtonStyle.secondary, emoji="📁", custom_id="fg_btn_rename_cat", row=2)
     async def rename_category_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self._extract_fg_id(interaction)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
-            fg = res.scalar_one_or_none()
-            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this category.", ephemeral=True)
-
         await interaction.response.send_modal(FGRenameCategoryModal(fg_id=fg_id))
 
     @discord.ui.button(label="Rename Text Ch", style=discord.ButtonStyle.secondary, emoji="💬", custom_id="fg_btn_rename_text", row=2)
     async def rename_text_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self._extract_fg_id(interaction)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
-            fg = res.scalar_one_or_none()
-            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this text channel.", ephemeral=True)
-
         await interaction.response.send_modal(FGRenameTextChannelModal(fg_id=fg_id))
 
     @discord.ui.button(label="Rename Voice Ch", style=discord.ButtonStyle.secondary, emoji="🔊", custom_id="fg_btn_rename_voice", row=2)
     async def rename_voice_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self._extract_fg_id(interaction)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
-        async with AsyncSessionLocal() as session:
-            res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
-            fg = res.scalar_one_or_none()
-            if not fg or (fg.creator_id != interaction.user.id and not interaction.user.guild_permissions.administrator):
-                return await interaction.response.send_message("Only the FG Leader or an Admin can rename this voice channel.", ephemeral=True)
-
         await interaction.response.send_modal(FGRenameVoiceChannelModal(fg_id=fg_id))
 
     @discord.ui.button(label="Disband FG", style=discord.ButtonStyle.danger, emoji="💥", custom_id="fg_btn_disband", row=3)
     async def disband_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         fg_id = self._extract_fg_id(interaction)
-        if not fg_id:
-            return await interaction.response.send_message("Could not resolve FG ID.", ephemeral=True)
-
         guild = interaction.guild
         user = interaction.user
 
@@ -522,8 +492,8 @@ class FGControlPanelView(discord.ui.View):
         async with AsyncSessionLocal() as session:
             res = await session.execute(select(FriendGroup).where(FriendGroup.id == fg_id))
             fg = res.scalar_one_or_none()
-            if not fg or (fg.creator_id != user.id and not user.guild_permissions.administrator):
-                return await interaction.followup.send("Only the FG Leader or an Admin can disband this FG.", ephemeral=True)
+            if not fg:
+                return await interaction.followup.send("FG record not found.", ephemeral=True)
 
             fg_name = fg.name
 
@@ -894,7 +864,7 @@ async def provision_fg_suite(guild: discord.Guild, fg_record: FriendGroup):
                 f"> **Private Role:** {private_role.mention}\n"
                 f"> **Roster ({len(fg_record.members)}):** {', '.join(f'<@{m}>' for m in fg_record.members)}\n\n"
                 f"› **Suite Provisioned:** Dedicated Category, Text Lounge, Voice Lounge, and Private Role.\n\n"
-                f"⚙️ **Control Panel:** Run `/fg panel` at any time to open your private control panel (visible only to you) to manage your roster, invite members, rename channels/category, lock voice, or sync roles."
+                f"⚙️ **Control Panel:** Run `/fg panel` at any time to open your private control panel (visible only to the Leader) to manage your roster, invite members, rename channels/category, lock voice, or sync roles."
             ),
             color=COLOR_VIOLET
         )
@@ -961,7 +931,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             )
             await interaction.followup.send(embed=embed, ephemeral=True)
 
-    @fg_group.command(name="invite", description="Invite a friend to your Friend Group")
+    @fg_group.command(name="invite", description="Invite a friend to your Friend Group (Leader only)")
     @app_commands.describe(member="Member to invite")
     async def fg_invite(self, interaction: discord.Interaction, member: discord.Member):
         guild = interaction.guild
@@ -985,7 +955,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             fg = res.scalar_one_or_none()
             if not fg:
                 return await interaction.followup.send(
-                    embed=error_embed("No FG Found", "You do not lead an active Friend Group. Run `/fg start` first!"),
+                    embed=error_embed("Access Denied", "❌ Only the **Friend Group Leader** can invite members.\nYou do not lead an active Friend Group."),
                     ephemeral=True
                 )
 
@@ -1027,7 +997,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
                 ephemeral=True
             )
 
-    @fg_group.command(name="panel", description="Open your private Friend Group Control Panel (visible only to you)")
+    @fg_group.command(name="panel", description="Open your private Friend Group Control Panel (Leader only)")
     async def fg_panel(self, interaction: discord.Interaction):
         user = interaction.user
         guild = interaction.guild
@@ -1045,7 +1015,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             fg = res.scalar_one_or_none()
             if not fg:
                 return await interaction.followup.send(
-                    embed=error_embed("No Active FG", "You do not lead an active approved Friend Group in this server."),
+                    embed=error_embed("Access Denied", "❌ Only the **Friend Group Leader** can open this control panel.\nYou do not own an active approved Friend Group in this server."),
                     ephemeral=True
                 )
 
@@ -1054,13 +1024,13 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             members_mentions = ", ".join(f"<@{m}>" for m in fg.members)
 
             panel_embed = ego_embed(
-                title=f"👑 FG Control Panel • {fg.name}",
+                title=f"👑 FG Leader Control Panel • {fg.name}",
                 description=(
                     f"> **FG ID:** `#{fg.id}`\n"
                     f"> **Leader:** <@{fg.creator_id}>\n"
                     f"> **Private Role:** {role_mention}\n"
                     f"> **Roster ({len(fg.members)}):** {members_mentions}\n\n"
-                    f"› **Suite Controls:** Use the interactive buttons below to manage your Friend Group suite:"
+                    f"› **Leader Suite Controls:** Use the interactive buttons below to manage your Friend Group suite:"
                 ),
                 color=COLOR_VIOLET
             )
@@ -1108,7 +1078,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
 
             await interaction.followup.send(embed=embed, ephemeral=True)
 
-    @fg_group.command(name="rename", description="Rename your Friend Group and its synced role/category")
+    @fg_group.command(name="rename", description="Rename your Friend Group and its synced role/category (Leader only)")
     @app_commands.describe(new_name="New name for your Friend Group")
     async def fg_rename_cmd(self, interaction: discord.Interaction, new_name: str):
         guild = interaction.guild
@@ -1127,7 +1097,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             fg = res.scalar_one_or_none()
             if not fg:
                 return await interaction.followup.send(
-                    embed=error_embed("No FG Found", "You do not lead an active Friend Group."),
+                    embed=error_embed("Access Denied", "❌ Only the **Friend Group Leader** can rename this Friend Group."),
                     ephemeral=True
                 )
 
@@ -1156,7 +1126,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             ephemeral=True
         )
 
-    @fg_group.command(name="rename_category", description="Rename the private Category channel for your Friend Group")
+    @fg_group.command(name="rename_category", description="Rename the private Category channel for your Friend Group (Leader only)")
     @app_commands.describe(category_name="New Category Name (e.g. 👑 ︱ Syndicate Elite)")
     async def fg_rename_category_cmd(self, interaction: discord.Interaction, category_name: str):
         guild = interaction.guild
@@ -1175,7 +1145,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             fg = res.scalar_one_or_none()
             if not fg or not fg.category_id:
                 return await interaction.followup.send(
-                    embed=error_embed("No Active FG Category", "You do not own an active FG category."),
+                    embed=error_embed("Access Denied", "❌ Only the **Friend Group Leader** can rename the FG category."),
                     ephemeral=True
                 )
 
@@ -1193,7 +1163,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             ephemeral=True
         )
 
-    @fg_group.command(name="rename_text", description="Rename the private Text lounge for your Friend Group")
+    @fg_group.command(name="rename_text", description="Rename the private Text lounge for your Friend Group (Leader only)")
     @app_commands.describe(channel_name="New Text Channel Name")
     async def fg_rename_text_cmd(self, interaction: discord.Interaction, channel_name: str):
         guild = interaction.guild
@@ -1212,7 +1182,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             fg = res.scalar_one_or_none()
             if not fg or not fg.text_channel_id:
                 return await interaction.followup.send(
-                    embed=error_embed("No Active FG Text Lounge", "You do not own an active FG text lounge."),
+                    embed=error_embed("Access Denied", "❌ Only the **Friend Group Leader** can rename the text lounge."),
                     ephemeral=True
                 )
 
@@ -1231,7 +1201,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             ephemeral=True
         )
 
-    @fg_group.command(name="rename_voice", description="Rename the private Voice lounge for your Friend Group")
+    @fg_group.command(name="rename_voice", description="Rename the private Voice lounge for your Friend Group (Leader only)")
     @app_commands.describe(channel_name="New Voice Channel Name")
     async def fg_rename_voice_cmd(self, interaction: discord.Interaction, channel_name: str):
         guild = interaction.guild
@@ -1250,7 +1220,7 @@ class FriendGroupsCog(commands.Cog, name="FriendGroups"):
             fg = res.scalar_one_or_none()
             if not fg or not fg.voice_channel_id:
                 return await interaction.followup.send(
-                    embed=error_embed("No Active FG Voice Lounge", "You do not own an active FG voice lounge."),
+                    embed=error_embed("Access Denied", "❌ Only the **Friend Group Leader** can rename the voice lounge."),
                     ephemeral=True
                 )
 
